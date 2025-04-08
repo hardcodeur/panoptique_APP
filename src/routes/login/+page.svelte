@@ -1,32 +1,11 @@
 <script lang="ts">
-    let email = "";
-    let password = "";
-    let error = "";
+    import { enhance } from '$app/forms';
+    // Reçoit automatiquement les données retournées par l'action serveur
+    export let form; 
+    $: error = form?.error;
+</script>
   
-    async function handleSubmit(event: Event) {
-      event.preventDefault();
-      const API_URL = import.meta.env.VITE_API_URL;
-      error = "";
-  
-      try {
-        const response = await fetch(`${API_URL}/login`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
-        });
-        console.log(response);
-        if (!response.ok) {
-          throw new Error(await response.text());
-        }
-        const {token} = await response.json();
-        // window.location.href = "/dashboard";
-      } catch (err) {
-        error = "Échec de la connexion";
-      }
-    }
-  </script>
-  
-  <form on:submit={handleSubmit} class="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
+  <form method="POST" use:enhance class="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
     <h1 class="text-2xl font-bold mb-6">Connexion</h1>
     
     {#if error}
@@ -38,8 +17,7 @@
       <input
         type="email"
         id="email"
-        bind:value={email}
-        required
+        name="email"
         class="w-full p-2 border rounded"
       />
     </div>
@@ -49,8 +27,7 @@
       <input
         type="password"
         id="password"
-        bind:value={password}
-        required
+        name="password"
         class="w-full p-2 border rounded"
       />
     </div>
