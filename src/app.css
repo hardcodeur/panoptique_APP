@@ -1,5 +1,8 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/forms';
+@plugin 'flowbite/plugin';
+
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
     /* Colors */
@@ -7,7 +10,7 @@
     --color-th-blue: #003366;
     --color-th-white: #F0F0F0;
     --color-th-black: #333333;
-    --color-th-black-light: rgba(51,51,51,50);
+    --color-th-black-light: rgba(51,51,51,0.5);
 
     /* font */
     --font-titre : Oswald Bold,sans-serif;
@@ -15,7 +18,7 @@
     --font-titre-b : Oswald Bold,sans-serif;
 
     --font-text : Lato Regular,sans-serif;
-    --font-text-b : Lato Bold,sans-serif; 
+    --font-text-b : Lato Bold,sans-serif;
 }
 
 /* custom class */
@@ -88,3 +91,5 @@
     src:url('/fonts/oswald/Oswald-Bold.woff') format('woff');
     font-display: swap;
 }
+
+@source "../node_modules/flowbite-svelte/dist";
