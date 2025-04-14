@@ -1,5 +1,5 @@
 <script lang="ts">
-import logo from "$lib/assets/panoptique_logo.svg";
+import logo from "$lib/assets/logo/panoptique_logo_white.svg";
 import userPict from "$lib/assets/emptyImage_trash.svg";
 import { Navbar, NavBrand, Avatar, Dropdown, DropdownItem, DropdownHeader, DropdownDivider } from 'flowbite-svelte';
 </script>
