@@ -5,25 +5,35 @@
 
     let { 
         hidden = $bindable(false),
-        formComponent = null,
-        componentProps = {}
+        sidbarTitle,
+        form,
+        FormComponent,
     } = $props()
 
+    let resetForm  :boolean = $state(false) 
+
     let transitionParams = {
-      x: -320,
+      x: 320,
       duration: 200,
       easing: sineIn
     };
+
+    $effect(() => {
+        if(!hidden){
+            resetForm = true
+        }
+    });
+
 </script>
     
-<Section name="crudcreatedrawer">
-    <Drawer transitionType="fly" {transitionParams} bind:hidden id="sidebar4">
+<Section name="default">
+    <Drawer transitionType="fly" placement="right" {transitionParams} bind:hidden id="crudForm">
         <div class="flex items-center">
-            <h5 id="drawer-label" class="inline-flex items-center mb-6 text-base font-semibold text-gray-500 uppercase dark:text-gray-400">New Product</h5>
+            <h5 id="drawer-label" class="inline-flex items-center mb-6 text-base font-semibold text-gray-500 uppercase dark:text-gray-400">{sidbarTitle}</h5>
             <CloseButton on:click={() => (hidden = true)} class="mb-4 dark:text-white" />
         </div>
-        {#if formComponent}
-        {@render formComponent(componentProps)}
+        {#if FormComponent}
+           <FormComponent {form} {resetForm} />
         {/if}
     </Drawer>
 </Section>

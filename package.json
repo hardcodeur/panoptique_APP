@@ -48,6 +48,7 @@
 		"vitest": "^3.0.0"
 	},
 	"dependencies": {
-		"svelte-persisted-store": "^0.12.0"
+		"svelte-persisted-store": "^0.12.0",
+		"zod": "^3.24.3"
 	}
 }

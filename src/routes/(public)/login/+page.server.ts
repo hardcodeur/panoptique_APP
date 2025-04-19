@@ -1,30 +1,51 @@
-import { fail, redirect } from '@sveltejs/kit';
+import { fail } from '@sveltejs/kit';
+import { z } from "zod";
 import { getAuthToken } from "$lib/api/auth";
+import type { Actions } from './$types';
 
-export const actions = {
+const schema = z.object({
+    email: z.string()
+        .min(1, 'Champ obligatoire')
+        .max(100,("L'email ne peut pas dépasser 100 caractères"))
+        .email("Email invalide")
+        // .regex(/^[a-zA-Z0-9._-]+@sgs\.(com|fr)$/,"L'email doit être une adresse sgs")
+        ,
+    password: z.string()
+        .min(1, 'Champ obligatoire')
+        .min(8,("Le mot de passe doit faire au moins 8 caractères"))
+        .max(32, "Le mot de passe ne doit pas dépasser 32 caractères")
+        // .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).*$/,"Le mot de passe doit contenir au moins 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial(!@#$%^&*)")
+});
+
+type FormData = z.infer<typeof schema>;
+
+export const actions : Actions = {
     default: async ({ request, cookies }) => {
-    const formData = await request.formData();
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-    const API_URL = import.meta.env.VITE_API_URL;
 
-    if (!email || !password) {
-      return fail(400, { error: 'Email et mot de passe requis' });
+    const API_URL : string = import.meta.env.VITE_API_URL;
+
+    const formData = Object.fromEntries(await request.formData()) as Partial<FormData> ;
+    const result = schema.safeParse(formData);
+
+    const email : string = formData.email?.toString() || "";
+
+    if (!result.success) {
+        const errors = result.error.flatten().fieldErrors;
+        return fail(400, { errors,email});
     }
 
-    const apiResponse = await getAuthToken(email, password)
+    const apiResponse = await getAuthToken(result.data.email, result.data.password)
 
     if (!apiResponse.ok) {
-      return fail(401, { error: 'Identifiants invalides' });
+      return fail(401, { errors: {_global: ['Identifiants invalides']}});
     }
     const { token } = await apiResponse.json();
     
     if(!token){
-      return fail(400, { error: 'Erreur API' });
+      return fail(400, { error: { _global: ["Un problème technique a été détecté. Si l'erreur persiste après un nouvel essai, merci de signaler l'incident au service informatique."] }});
     }
 
-    // secure = uniquement en HTTPS (obligatoire en prod passé a true)
-    cookies.set('auth_token', token, { path: '/', httpOnly: true, secure: false, sameSite: 'lax', maxAge: 86400,});
+    cookies.set('auth_token', token, { path: '/', httpOnly: true, secure: true, sameSite: 'lax', maxAge: 86400,});
     return { success: true };
   }
 
