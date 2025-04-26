@@ -1,14 +1,16 @@
 import { fail } from '@sveltejs/kit';
 import { z } from "zod";
+import { getUsers } from "$lib/api/user"
+
 
 const roles = ['admin', 'manager', 'team_manager', 'agent'] as const;
 
 const schema = z.object({
-    name: z.string()
+    firstName: z.string()
         .min(1, 'Champ obligatoire')
         .min(2,("Le nom doit contenir au moins 2 caractères"))
         .max(100,("Le nom ne peut pas dépasser 100 caractères")),
-    surname: z.string()
+    lastName: z.string()
         .min(1, 'Champ obligatoire')
         .min(2,("Le nom doit contenir au moins 2 caractères"))
         .max(100,("Le nom ne peut pas dépasser 100 caractères")),
@@ -30,11 +32,20 @@ export const actions = {
 
         if (!result.success) {
             const errors = result.error.flatten().fieldErrors;
-            return fail(400, { errors,formData });
+            return fail(400, { errors,formData});
         }
 
         console.log("send");
         return { success: true };
   }
 
+}
+
+
+export async function load({cookies}) {
+    
+    const token :string = cookies.get('auth_token') as string;
+    const apiResponse :Response = await getUsers(token);
+    const userList = await apiResponse.json();    
+    return { userList };
 }

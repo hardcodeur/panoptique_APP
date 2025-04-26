@@ -13,7 +13,7 @@ export interface SelectInputValue {
     name: string;
 }
 
-export type FormField = 'name' | 'surname' | 'email' | 'phone' | 'role' | 'team';
+export type FormField = 'firstName' | 'lastName' | 'email' | 'phone' | 'role' | 'team';
 
 export type FormSchemas = {
     [key in FormField]?: string;

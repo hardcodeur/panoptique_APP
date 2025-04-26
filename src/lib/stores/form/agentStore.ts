@@ -5,8 +5,8 @@ import type { FormStore } from '$lib/types';
 const getInitialFormState = (): FormStore => ({
     errors: {},
     values: {
-        name: '',
-        surname: '',
+        firstName: '',
+        lastName: '',
         email: '',
         phone: '',
         role: '',
@@ -16,6 +16,12 @@ const getInitialFormState = (): FormStore => ({
 
 export const formStore = writable<FormStore>(getInitialFormState());
 
-export function resetFormStore(): void {
+export function resetFormStore(): void {    
     formStore.set(getInitialFormState());
+}
+
+export const userSelectedStore = writable(null);
+
+export function resetUserSelectedStore(): void {    
+    userSelectedStore.set(null);
 }

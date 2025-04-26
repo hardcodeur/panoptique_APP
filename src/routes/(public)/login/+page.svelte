@@ -22,13 +22,13 @@
     })
 </script>
 
-<Section name="login" sectionClass="max-w-md mx-auto mt-10 p-6">
-  <Register aClass="flex items-center mb-4" divClass="'w-full md:mt-0 sm:max-w-md xl:p-0">
+<Section name="login" sectionClass="max-w-md mx-auto">
+  <Register  href="*" aClass="flex items-center mb-4" divClass="'w-full">
     <svelte:fragment slot="top">
       <img class="h-16" src="{logo}" alt="logo" />
     </svelte:fragment>
-    <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
-      <form class="flex flex-col space-y-6" use:enhance method="POST">
+    <div class="sm:pt-8 w-full">
+      <form class="flex flex-col space-y-6 w-full" use:enhance method="POST">
         <h3 class="ts-title-2 p-0 text-center">Connexion</h3>
         {#if errors?._global}
         <div class="mb-4 p-2 text-center text-th-red rounded">
@@ -37,7 +37,7 @@
         {/if}
         <Label class="space-y-2">
           <span>Email</span>
-          <Input type="email" name="email" bind:value={email} placeholder="email@pto.com" />
+          <Input type="email" name="email" bind:value={email} placeholder="email@sgs.com" />
           {#if errors?.email}
           <Helper class={helperClass}> 
               {errors.email}

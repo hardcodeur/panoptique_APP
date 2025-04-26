@@ -1,8 +1,7 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
-    import type { FormSchemas } from "$lib/types";
     import {Button,Label, Input, Helper,Select} from "flowbite-svelte";
-    import { formStore,resetFormStore } from "$lib/stores/form/agentStore";
+    import { formStore,userSelectedStore,resetFormStore,resetUserSelectedStore } from "$lib/stores/form/agentStore";
     import type {SelectInputValue} from "$lib/types"
 
     let { 
@@ -13,42 +12,70 @@
     let roleSelected:string = $state("");
     let teamSelected:string = $state("");
     let initialLoad = $state(true);
-    
+
     $effect(() => {
-        
         if (resetForm) {
-            resetFormStore();
+            resetFormStore()
             roleSelected = "";
             teamSelected = "";
-            return;
-        }
-
-        if (form && initialLoad) {
-
-            formStore.update(store => ({
-                errors: form.errors || {},
-                values: { ...store.values, ...form.fieldValue }
-            }));
-
-            if (form.fieldValue.role !== roleSelected) {
-                roleSelected = form.fieldValue.role;
-            }
-            if (form.fieldValue.team !== teamSelected) {
-                teamSelected = form.fieldValue.team;
-            }
-
-            initialLoad = false;
+            initialLoad = true;
         }
     });
-    
+
+    $effect(() => {
+
+        if ($userSelectedStore && initialLoad) {
+            formStore.update(store => ({
+                ...store,
+                values: {
+                    ...store.values,
+                    firstName: $userSelectedStore.firstName || "",
+                    lastName: $userSelectedStore.lastName || "",
+                    email: $userSelectedStore.email || "",
+                    phone: $userSelectedStore.phone || "",
+                    role: $userSelectedStore.role || "",
+                    team: $userSelectedStore.team || ""
+                }
+            }));
+            
+            roleSelected = $userSelectedStore.role || "";
+            teamSelected = $userSelectedStore.team || "";
+
+            initialLoad = false
+
+            console.log("roleSelected",roleSelected);
+        }
+    });
+
+    $effect(() => {
+
+        if (form) {
+            formStore.update(store => ({
+                errors: form.errors || {},
+                values: { ...store.values, ...form.formData }
+            }));
+
+            if (form.formData?.role !== roleSelected) {
+                roleSelected = form.formData.role;
+            }
+            if (form.formData?.team !== teamSelected) {
+                teamSelected = form.formData.team;
+            }
+        }
+
+        console.log("roleSelected",roleSelected);
+
+    });
+        
     let roleItems :SelectInputValue[] = [
-        { value: 'us', name: 'United States' },
-        { value: 'ca', name: 'Canada' },
-        { value: 'fr', name: 'France' }
+        { value: 'admin', name: 'Administrateur' },
+        { value: 'manager', name: "Directeur d'agence" },
+        { value: 'team_manager', name: "Chef d'équipe" },
+        { value: 'agent', name: "Agent" },
     ];
 
     let teamItems :SelectInputValue[] = [
-        { value: 'us', name: 'United States' },
+        { value: 'us', name: 'United States'},
         { value: 'ca', name: 'Canada' },
         { value: 'fr', name: 'France' }
     ];
@@ -56,25 +83,24 @@
     let btnClass="text-center focus-within:ring-4 focus-within:outline-hidden inline-flex items-center justify-center px-5 py-2.5 text-white bg-th-blue hover:bg-primary-800 rounded-lg"
     let helperClass="text-sm text-th-red mt-2"
 
-
 </script>
 
 <form use:enhance method="POST" action="?/add" class="mb-6">
     <div class="mb-6">
-        <Label for="name" class="ts-text-bold block mb-2">Nom</Label>
-        <Input class="text-th-black-light" id="name" bind:value={$formStore.values.name} name="name" placeholder="Jean" />
-        {#if $formStore.errors?.name}
+        <Label for="firstName" class="ts-text-bold block mb-2">Nom</Label>
+        <Input class="text-th-black-light" id="firstName" bind:value={$formStore.values.firstName} name="firstName" placeholder="Jean" />
+        {#if $formStore.errors?.firstName}
         <Helper class={helperClass}> 
-            {$formStore.errors.name}
+            {$formStore.errors.firstName}
         </Helper>
         {/if}
     </div>
     <div class="mb-6">
-        <Label for="surname" class="ts-text-bold block mb-2">Prénom</Label>
-        <Input class="text-th-black-light" id="surname" bind:value={$formStore.values.surname} name="surname" placeholder="Dupont" />
-        {#if $formStore.errors?.surname}
+        <Label for="lastName" class="ts-text-bold block mb-2">Prénom</Label>
+        <Input class="text-th-black-light" id="lastName" bind:value={$formStore.values.lastName} name="lastName" placeholder="Dupont" />
+        {#if $formStore.errors?.lastName}
         <Helper class={helperClass}> 
-            {$formStore.errors.surname}
+            {$formStore.errors.lastName}
         </Helper>
         {/if}
     </div>
