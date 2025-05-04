@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell, TableSearch, Button, Dropdown, DropdownItem, Checkbox, ButtonGroup, List, Li } from 'flowbite-svelte';
+	import { TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell, TableSearch, Button, ButtonGroup } from 'flowbite-svelte';
 	import { Section } from 'flowbite-svelte-blocks';
 	import { userSelectedStore } from "$lib/stores/form/agentStore";
 	import { ProfileCardSolid,ChevronRightOutline, ChevronLeftOutline } from 'flowbite-svelte-icons';
@@ -12,17 +12,17 @@
 	const showPage = 5;
 	let totalPages = $state(0);
 	let pagesToShow: number[] = $state([]);
-	let totalItems = userList.member.length;
+	let totalItems = userList.length;
 	let startPage: number;
 	let endPage: number = $state(10);
 
 	const updateDataAndPagination = () => {
-		let currentPageItems = userList.member.slice(currentPosition, currentPosition + itemsPerPage);
+		let currentPageItems = userList.slice(currentPosition, currentPosition + itemsPerPage);
 		renderPagination(currentPageItems.length);
 	};
 
 	const loadNextPage = () => {
-		if (currentPosition + itemsPerPage < userList.member.length) {
+		if (currentPosition + itemsPerPage < userList.length) {
 			currentPosition += itemsPerPage;
 			updateDataAndPagination();
 		}
@@ -36,7 +36,7 @@
 	};
 
 	const renderPagination = (totalItems: number) => {
-		totalPages = Math.ceil(userList.member.length / itemsPerPage);
+		totalPages = Math.ceil(userList.length / itemsPerPage);
 		const currentPage = Math.ceil((currentPosition + 1) / itemsPerPage);
 
 		startPage = currentPage - Math.floor(showPage / 2);
@@ -60,17 +60,17 @@
 
 	$effect(() => {
 		// Call renderPagination when the component initially mounts
-		renderPagination(userList.member.length);
+		renderPagination(userList.length);
 	});
 
-	let currentPageItems = $derived(userList.member.slice(currentPosition, currentPosition + itemsPerPage));
-	let filteredItems = $derived(userList.member.filter((item) => item.fullName.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1));
+	let currentPageItems = $derived(userList.slice(currentPosition, currentPosition + itemsPerPage));
+	let filteredItems = $derived(userList.filter((item) => item.fullName.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1));
 
-	let divClass = 'bg-white relative shadow-md sm:rounded-lg overflow-hidden';
-	let innerDivClass = 'flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4';
-	let searchClass = 'w-full md:w-1/2 relative';
-	let btnViewClass="ts-text-bold text-th-blue hover:text-th-white hover:bg-th-blue"
-    let btnIconClass="mr-1"
+	const divClass = 'bg-white relative shadow-md sm:rounded-lg overflow-hidden';
+	const innerDivClass = 'flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4';
+	const searchClass = 'w-full md:w-1/2 relative';
+	const btnViewClass="ts-text-bold text-th-blue hover:text-th-white hover:bg-th-blue"
+    const btnIconClass="mr-1"
 
 </script>
 

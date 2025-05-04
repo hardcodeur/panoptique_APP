@@ -1,6 +1,8 @@
 import { fail } from '@sveltejs/kit';
 import { z } from "zod";
 import { getUsers } from "$lib/api/user"
+import { getTeams } from "$lib/api/team.js"
+import { getTeamsWhiteUsers,getTeamUnassignedUsers } from "$lib/api/teamUsers.js";
 
 
 const roles = ['admin', 'manager', 'team_manager', 'agent'] as const;
@@ -43,9 +45,21 @@ export const actions = {
 
 
 export async function load({cookies}) {
-    
+
     const token :string = cookies.get('auth_token') as string;
-    const apiResponse :Response = await getUsers(token);
-    const userList = await apiResponse.json();    
-    return { userList };
+
+    const apiUsersResponse :Response = await getUsers(token);
+    const userList = await apiUsersResponse.json();
+
+    const apiTeamsResponse :Response = await getTeams(token);
+    const teamList = await apiTeamsResponse.json();
+
+    const apiTeamsWhiteUsersResponse :Response = await getTeamsWhiteUsers(token);
+    const teamWhiteUsers = await apiTeamsWhiteUsersResponse.json();
+
+    const apiTeamUnassignedUsersResponse :Response = await getTeamUnassignedUsers(token);
+    const teamUnassignedUsers = await apiTeamUnassignedUsersResponse.json();
+    
+
+    return { userList,teamList,teamWhiteUsers,teamUnassignedUsers};
 }

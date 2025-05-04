@@ -5,6 +5,7 @@
     import FormAgent from "$lib/components/form/agents/FormAgent.svelte"
     import FormTeam from "$lib/components/form/Team/FormTeam.svelte"
     import TableUser from "$lib/components/tables/TableUser.svelte";
+    import TeamCard from "$lib/components/card/TeamCard.svelte"
     import type { ActionData,PageData } from './$types';
     import { resetUserSelectedStore } from "$lib/stores/form/agentStore";
 	import type {  ComponentType } from 'svelte';
@@ -22,12 +23,17 @@
         form = null
     }
 
-    let tabsTitleAgent="Agents"
-    let tabsTitleTeam="Équipes"
-    let tabsClass="p-4 mt-4'";
-    let tabItemTitleRow="flex justify-between items-center"
-    let btnClass="ts-text-bold bg-th-red"
-    let btnIconClass="mr-1"
+    const tabsTitleAgent="Agents"
+    const tabsTitleTeam="Équipes"
+    const tabsClass="p-4 mt-4'";
+    const tabItemTitleRow="flex justify-between items-center"
+    const btnClass="ts-text-bold bg-th-red"
+    const btnIconClass="mr-1"
+
+    const userList=data.userList;
+    const teamList = data.teamList
+    const teamsUsers = data.teamWhiteUsers;
+    const unassignedUsers=data.teamUnassignedUsers;
 
 </script>
   
@@ -37,15 +43,18 @@
             <h1>{tabsTitleAgent}</h1>
             <Button size="sm" class={btnClass} on:click={() => {openDrawer(FormAgent,"Nouvel agent"),resetUserSelectedStore()}}><CirclePlusSolid class={btnIconClass} />Ajouter un agent</Button>
         </div>
-        <div class="">
-            <TableUser userList={data.userList}  openDrawer={openDrawer} />
-        </div>
+        <TableUser userList={userList}  openDrawer={openDrawer} />
     </TabItem>
     <TabItem title={tabsTitleTeam}>
         <div class={tabItemTitleRow}>
             <h1>{tabsTitleTeam}</h1>
             <Button size="sm" class={btnClass} on:click={() => (openDrawer(FormTeam,"Nouvelle équipe"))}><CirclePlusSolid class={btnIconClass} />Ajouter une équipe</Button>
         </div>
+        <div class="grid grid-cols-3 gap-x-8 gap-y-4 mt-3">
+            {#each teamsUsers as teamUsers (teamUsers.id)}
+                <TeamCard teamName={teamUsers.teamName} users={teamUsers.users} openDrawer={openDrawer}/>
+            {/each}
+        </div>
     </TabItem>
 </Tabs>
-<SidebarForm bind:hidden={drawerHidden} {sidbarTitle} {form} {FormComponent} />
+<SidebarForm bind:hidden={drawerHidden} formProps={{selectTeam:teamList,teamWhiteUsers:teamsUsers,unassignedUsers:unassignedUsers}} {sidbarTitle} {form} {FormComponent} />

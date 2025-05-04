@@ -1,17 +1,19 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
     import {Button,Label, Input, Helper,Select} from "flowbite-svelte";
-    import { formStore,userSelectedStore,resetFormStore,resetUserSelectedStore } from "$lib/stores/form/agentStore";
+    import { formStore,userSelectedStore,resetFormStore } from "$lib/stores/form/agentStore";
     import type {SelectInputValue} from "$lib/types"
 
     let { 
         form,
         resetForm,
+        formProps
     } = $props();
 
     let roleSelected:string = $state("");
     let teamSelected:string = $state("");
     let initialLoad = $state(true);
+    const selectTeam = formProps.selectTeam
 
     $effect(() => {
         if (resetForm) {
@@ -42,8 +44,6 @@
             teamSelected = $userSelectedStore.team || "";
 
             initialLoad = false
-
-            console.log("roleSelected",roleSelected);
         }
     });
 
@@ -62,26 +62,23 @@
                 teamSelected = form.formData.team;
             }
         }
-
-        console.log("roleSelected",roleSelected);
-
     });
+
         
     let roleItems :SelectInputValue[] = [
         { value: 'admin', name: 'Administrateur' },
         { value: 'manager', name: "Directeur d'agence" },
         { value: 'team_manager', name: "Chef d'équipe" },
-        { value: 'agent', name: "Agent" },
+        { value: 'user', name: "Agent" },
     ];
+    
+    let teamItems :SelectInputValue[] = [];
+    selectTeam.forEach(team => {
+        teamItems = [...teamItems, { value: team.teamName, name: team.teamName }];
+    });
 
-    let teamItems :SelectInputValue[] = [
-        { value: 'us', name: 'United States'},
-        { value: 'ca', name: 'Canada' },
-        { value: 'fr', name: 'France' }
-    ];
-
-    let btnClass="text-center focus-within:ring-4 focus-within:outline-hidden inline-flex items-center justify-center px-5 py-2.5 text-white bg-th-blue hover:bg-primary-800 rounded-lg"
-    let helperClass="text-sm text-th-red mt-2"
+    const btnClass="text-center focus-within:ring-4 focus-within:outline-hidden inline-flex items-center justify-center px-5 py-2.5 text-white bg-th-blue hover:bg-primary-800 rounded-lg"
+    const helperClass="text-sm text-th-red mt-2"
 
 </script>
 
@@ -125,7 +122,7 @@
     <div class="mb-6">
         <Label class="ts-text-bold mb-2">
             Role
-            <Select name="role" class="mt-2 ts-text text-th-black-light" placeholder="Liste des roles" items={roleItems} bind:value={roleSelected} />
+            <Select name="role" class="mt-2 ts-text text-th-black-light capitalize" placeholder="Liste des roles" items={roleItems} bind:value={roleSelected} />
         </Label>
         {#if $formStore.errors?.role}
         <Helper class={helperClass}> 
@@ -136,7 +133,7 @@
     <div class="mb-6">
         <Label class="ts-text-bold mb-2">
             Équipe
-            <Select name="team" class="mt-2 ts-text text-th-black-light" placeholder="Liste des équipes" items={teamItems} bind:value={teamSelected} />
+            <Select name="team" class="mt-2 ts-text text-th-black-light capitalize" placeholder="Liste des équipes" items={teamItems} bind:value={teamSelected} />
         </Label>
         {#if $formStore.errors?.team}
         <Helper class={helperClass}> 
