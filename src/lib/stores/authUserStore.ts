@@ -1,13 +1,20 @@
-import { writable } from 'svelte/store';
+import { writable,get } from 'svelte/store';
 import type { AuthUser } from '$lib/types';
 
-const getInitialAuthUserState = (): AuthUser => ({
-    userId : "",
-    role : "",
-});
+const createAuthUserStore = () => {
+    const { subscribe, set, update } = writable<AuthUser>({
+        userId: "",
+        role: ""
+    });
 
-export const authUserStore = writable<AuthUser>(getInitialAuthUserState());
+    return {
+        subscribe,
+        set,
+        update,
+        reset: () => set({ userId: "", role: "" }),
+        get: () => get({ subscribe }),
+        getUserId: () => get({ subscribe }).userId
+    };
+};
 
-export function resetAuthUserStore(): void {    
-    authUserStore.set(getInitialAuthUserState());
-}
+export const authUserStore = createAuthUserStore();

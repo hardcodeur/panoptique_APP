@@ -16,7 +16,7 @@
 
 </script>
 
-<form use:enhance method="POST" action="?/add" class="p-4">
+<form use:enhance method="POST" action="?/add">
     <div class="mb-6">
         <Label for="phone" class={labelClass}>Téléphone</Label>
         <Input class={inputClass} id="phone"  name="phone"/>

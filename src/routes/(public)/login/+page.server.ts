@@ -35,21 +35,27 @@ export const actions : Actions = {
         return fail(400, { errors,email});
     }
 
-    const apiLoginResponse = await getAuthToken(result.data.email, result.data.password)
+    try {
+      const apiLoginResponse = await getAuthToken(result.data.email, result.data.password)
 
-    if (!apiLoginResponse.ok) {
-      return fail(401, { errors: {_global: ['Identifiants invalides']}});
+      if (!apiLoginResponse.ok) {
+        return fail(401, { errors: {_global: ['Identifiants invalides']}});
+      }
+      const {token,userId,userRole} = await apiLoginResponse.json();
+  
+      if(!token || !userId){
+        return fail(400, { error: { _global: ["Un problème technique a été détecté. Si l'erreur persiste après un nouvel essai, merci de signaler l'incident au service informatique."] }});
+      }
+  
+      cookies.set('auth_token', token, { path: '/', httpOnly: true, secure: true, sameSite: 'lax', maxAge: 86400,});
+      authUserStore.set({ userId:userId, role: userRole});
+      return { success: true };
+      
+    } catch (error) {
+      return fail(500, { error: { _global: ["Erreur serveur"] } 
+    });
     }
-    const {token,userId,userRole} = await apiLoginResponse.json();
 
-    if(!token || !userId){
-      return fail(400, { error: { _global: ["Un problème technique a été détecté. Si l'erreur persiste après un nouvel essai, merci de signaler l'incident au service informatique."] }});
-    }
-
-    cookies.set('auth_token', token, { path: '/', httpOnly: true, secure: true, sameSite: 'lax', maxAge: 86400,});
-    authUserStore.set({userId : userId,role : userRole,})
-
-    return { success: true };
   }
 
 }
