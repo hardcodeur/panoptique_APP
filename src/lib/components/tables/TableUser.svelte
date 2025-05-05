@@ -74,7 +74,7 @@
 
 </script>
 
-<Section name="advancedTable" sectionClass="p-3 sm:p-5">
+<Section name="advancedTable" sectionClass="pt-5">
 	<TableSearch placeholder="Search" hoverable={true} bind:inputValue={searchTerm} {divClass} {innerDivClass} {searchClass}>
 		<TableHead>
 			<TableHeadCell class="px-4 py-3" scope="col">Agent</TableHeadCell>

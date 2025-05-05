@@ -9,9 +9,9 @@
 
 
 <Header/>
-<div class="flex">
+<div class="flex antialiased">
 	<SideNavBar/>
-	<main class="w-full">
+	<main class="p-4 h-auto w-full">
 		{@render children()}
 	</main>
 </div>

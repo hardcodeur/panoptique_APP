@@ -1,6 +1,7 @@
 import { fail } from '@sveltejs/kit';
 import { z } from "zod";
 import { getAuthToken } from "$lib/api/auth";
+import { authUserStore } from "$lib/stores/authUserStore";
 import type { Actions } from './$types';
 
 const schema = z.object({
@@ -34,18 +35,20 @@ export const actions : Actions = {
         return fail(400, { errors,email});
     }
 
-    const apiResponse = await getAuthToken(result.data.email, result.data.password)
+    const apiLoginResponse = await getAuthToken(result.data.email, result.data.password)
 
-    if (!apiResponse.ok) {
+    if (!apiLoginResponse.ok) {
       return fail(401, { errors: {_global: ['Identifiants invalides']}});
     }
-    const { token } = await apiResponse.json();
-    
-    if(!token){
+    const {token,userId,userRole} = await apiLoginResponse.json();
+
+    if(!token || !userId){
       return fail(400, { error: { _global: ["Un problème technique a été détecté. Si l'erreur persiste après un nouvel essai, merci de signaler l'incident au service informatique."] }});
     }
 
     cookies.set('auth_token', token, { path: '/', httpOnly: true, secure: true, sameSite: 'lax', maxAge: 86400,});
+    authUserStore.set({userId : userId,role : userRole,})
+
     return { success: true };
   }
 

@@ -25,7 +25,8 @@
 
     const tabsTitleAgent="Agents"
     const tabsTitleTeam="Équipes"
-    const tabsClass="p-4 mt-4'";
+    const tabsClass="mt-4";
+    
     const tabItemTitleRow="flex justify-between items-center"
     const btnClass="ts-text-bold bg-th-red"
     const btnIconClass="mr-1"
@@ -57,4 +58,4 @@
         </div>
     </TabItem>
 </Tabs>
-<SidebarForm bind:hidden={drawerHidden} formProps={{selectTeam:teamList,teamWhiteUsers:teamsUsers,unassignedUsers:unassignedUsers}} {sidbarTitle} {form} {FormComponent} />
+<SidebarForm bind:hidden={drawerHidden} formProps={{teamList:teamList,teamWhiteUsers:teamsUsers,unassignedUsers:unassignedUsers}} {sidbarTitle} {form} {FormComponent} />
