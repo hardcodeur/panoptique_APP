@@ -42,7 +42,7 @@
                 <svelte:fragment slot="icon">
                     <RectangleListSolid class="w-6 h-6  {iconeStyle}" />
                 </svelte:fragment>
-                <SidebarDropdownItem label="Missions" active={false} href="#" aClass="flex items-center p-2 ps-11 w-full ts-text rounded-lg transition duration-75 group {nonActiveClass}" {activeClass} />
+                <SidebarDropdownItem label="Missions" active={false} href="/missions" aClass="flex items-center p-2 ps-11 w-full ts-text rounded-lg transition duration-75 group {nonActiveClass}" {activeClass} />
                 <SidebarDropdownItem label="Quarts" active={false} href="#" aClass="flex items-center p-2 ps-11 w-full  ts-text rounded-lg transition duration-75 group {nonActiveClass}" {activeClass} />
                 <SidebarDropdownItem label="Lieux" active={false} href="#" aClass="flex items-center p-2 ps-11 w-full  ts-text rounded-lg transition duration-75 group {nonActiveClass}" {activeClass} />
                 <svelte:fragment slot="arrowup">
