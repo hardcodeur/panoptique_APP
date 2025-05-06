@@ -13,7 +13,7 @@
     let roleSelected:string = $state("");
     let teamSelected:string = $state("");
     let initialLoad = $state(true);
-    const selectTeam = formProps.selectTeam
+    const teamList = formProps.teamList
 
     $effect(() => {
         if (resetForm) {
@@ -73,7 +73,7 @@
     ];
     
     let teamItems :SelectInputValue[] = [];
-    selectTeam.forEach(team => {
+    teamList.forEach(team => {
         teamItems = [...teamItems, { value: team.teamName, name: team.teamName }];
     });
 

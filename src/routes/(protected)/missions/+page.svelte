@@ -5,6 +5,7 @@
 	import type {  ComponentType } from 'svelte';
     import SidebarForm from "$lib/components/sidebar/SidebarForm.svelte";
     import MissionCard from "$lib/components/card/MissionCard.svelte";
+    import MissionShiftCard from "$lib/components/card/MissionShiftCard.svelte";
 
     import FormAgent from "$lib/components/form/agents/FormAgent.svelte"
 
@@ -21,6 +22,7 @@
     }
 
     const missionList = data.missionList;
+    const missionShiftsList = data.missionShifts;
 
     const tabsTitleMissions="Missions"
     const tabsTitleShift="Quarts"
@@ -48,6 +50,9 @@
             <h1>{tabsTitleShift}</h1>
             <Button size="sm" class={btnClass} on:click={() => (openDrawer(FormAgent,"Nouvelle équipe"))}><CirclePlusSolid class={btnIconClass} />Ajouter une équipe</Button>
         </div>
+        {#each missionShiftsList as missionShifts}
+        <MissionShiftCard {missionShifts}/>
+        {/each}
     </TabItem>
     <TabItem title={tabsTitleLocation}>
         <div class={tabItemTitleRow}>
