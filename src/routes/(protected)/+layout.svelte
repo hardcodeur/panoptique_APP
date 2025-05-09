@@ -1,17 +1,23 @@
 <script lang="ts">
-	import '../../app.css';
-	import Header from "$lib/components/header/Header.svelte";
-	import SideNavBar from "$lib/components/sidebar/SideNavBar.svelte";
+import '../../app.css';
+import 'flowbite';
+import { onMount } from 'svelte';
+import Header from "$lib/components/header/Header.svelte";
+import SideNavBar from "$lib/components/sidebar/SideNavBar.svelte";
 
-	let { children } = $props();
-	
+
+onMount(async () => {
+	const { initFlowbite } = await import('flowbite');
+    initFlowbite();
+});
+
+let { children } = $props();
+
+const mainClass="py-2 px-4 sm:ml-64 mt-18"
 </script>
 
-
 <Header/>
-<div class="flex antialiased">
-	<SideNavBar/>
-	<main class="p-4 h-auto w-full">
-		{@render children()}
-	</main>
-</div>
+<SideNavBar/>
+<main class={mainClass}>
+	{@render children()}
+</main>

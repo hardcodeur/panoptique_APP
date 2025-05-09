@@ -39,6 +39,11 @@
   font-size: 1.5rem;
 }
 
+.ts-text-sub-title{
+  font-family: var(--font-text-b);
+  font-size: 1.2rem;
+}
+
 .ts-text-bold{
   font-family: var(--font-text-b);
   font-size: 1rem;

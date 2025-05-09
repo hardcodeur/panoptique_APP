@@ -17,62 +17,72 @@
 
   </script>
   
-<Sidebar {activeUrl} class=" border-r min-h-full px-2 pt-3 border-th-black-light">
-    <SidebarWrapper divClass=" bg-th-white">
-        <SidebarGroup>
-            <SidebarItem label="Accueil" href="/dashboard"  class="flex items-center p-2 ts-text rounded-lg" {nonActiveClass} {activeClass} >
-                <svelte:fragment slot="icon">
-                    <HomeSolid class="w-6 h-6 {iconeStyle}" />
-                </svelte:fragment>
-            </SidebarItem>
-            <SidebarDropdownWrapper label="Agents" btnClass="flex items-center p-2 w-full ts-text rounded-lg transition duration-75 group hover:bg-th-blue hover:text-th-white">
-                <svelte:fragment slot="icon">
-                    <UsersGroupSolid class="w-6 h-6  {iconeStyle}" />
-                </svelte:fragment>
-                <SidebarDropdownItem label="Agents" active={false} href="/agents" aClass="flex items-center p-2 ps-11 w-full ts-text rounded-lg transition duration-75 group {nonActiveClass}" {activeClass} />
-                <SidebarDropdownItem label="Equipe" active={false} href="#" aClass="flex items-center p-2 ps-11 w-full  ts-text rounded-lg transition duration-75 group {nonActiveClass}" {activeClass}/>
-                <svelte:fragment slot="arrowup">
-                    <AngleUpOutline class="w-5 h-5  {iconeStyle}" />
-                </svelte:fragment>
-                <svelte:fragment slot="arrowdown">
-                    <AngleDownOutline class="w-5 h-5  {iconeStyle}" />
-                </svelte:fragment>
-            </SidebarDropdownWrapper>
-            <SidebarDropdownWrapper label="Missions" btnClass="flex items-center p-2 w-full ts-text rounded-lg transition duration-75 group hover:bg-th-blue hover:text-th-white">
-                <svelte:fragment slot="icon">
-                    <RectangleListSolid class="w-6 h-6  {iconeStyle}" />
-                </svelte:fragment>
-                <SidebarDropdownItem label="Missions" active={false} href="/missions" aClass="flex items-center p-2 ps-11 w-full ts-text rounded-lg transition duration-75 group {nonActiveClass}" {activeClass} />
-                <SidebarDropdownItem label="Quarts" active={false} href="#" aClass="flex items-center p-2 ps-11 w-full  ts-text rounded-lg transition duration-75 group {nonActiveClass}" {activeClass} />
-                <SidebarDropdownItem label="Lieux" active={false} href="#" aClass="flex items-center p-2 ps-11 w-full  ts-text rounded-lg transition duration-75 group {nonActiveClass}" {activeClass} />
-                <svelte:fragment slot="arrowup">
-                    <AngleUpOutline class="w-5 h-5  {iconeStyle}" />
-                </svelte:fragment>
-                <svelte:fragment slot="arrowdown">
-                    <AngleDownOutline class="w-5 h-5  {iconeStyle}" />
-                </svelte:fragment>
-            </SidebarDropdownWrapper>
-            <SidebarItem label="Notifications"  {spanClass} href="#" class="flex items-center p-2  ts-text rounded-lg" {nonActiveClass} {activeClass}>
-                <svelte:fragment slot="icon">
-                    <BellSolid class="w-6 h-6 {iconeStyle}" />
-                </svelte:fragment>
-                <svelte:fragment slot="subtext">
-                    <span class="inline-flex justify-center items-center p-3 ms-3 w-3 h-3 text-sm font-bold text-th-white bg-th-red rounded-full"> 3 </span>
-                </svelte:fragment>
-            </SidebarItem>
-            <SidebarItem label="Statistiques" href="#" class="flex items-center p-2  ts-text rounded-lg" {nonActiveClass} {activeClass} >
-                <svelte:fragment slot="icon">
-                    <ChartPieSolid class="w-6 h-6 {iconeStyle}" />
-                </svelte:fragment>
-            </SidebarItem>
-            <SidebarGroup border borderClass="pt-4 mt-4 border-t border-th-black-light">
-                <SidebarItem label="Profile" href="/profil" class="flex items-center p-2  ts-text rounded-lg" {nonActiveClass} {activeClass} >
-                    <svelte:fragment slot="icon">
-                        <UserSolid class="w-6 h-6 {iconeStyle}" />
-                    </svelte:fragment>
-                </SidebarItem>
-                <SidebarItem label="Déconnexion" href="#" class="flex items-center text-th-red hover:text-th-white hover:bg-th-red hover:p-2 transition duration-75 rounded-lg ts-text-bold" spanClass=""></SidebarItem>
-            </SidebarGroup>
-        </SidebarGroup>
-    </SidebarWrapper>
+  <Sidebar
+  id="sidebar-nav-menu"
+  {activeUrl}
+  aria-label="Sidebar"
+  class="fixed top-0 left-0 z-40 w-64 h-screen px-2 pt-23 transition-transform -translate-x-full bg-th-white border-r border-th-black-light sm:translate-x-0"
+>
+  <SidebarWrapper divClass="bg-th-white">
+    <SidebarGroup>
+      <SidebarItem label="Accueil" href="/dashboard" class="flex items-center p-2 ts-text rounded-lg" {nonActiveClass} {activeClass}>
+        <svelte:fragment slot="icon">
+          <HomeSolid class="w-6 h-6 {iconeStyle}" />
+        </svelte:fragment>
+      </SidebarItem>
+
+      <SidebarDropdownWrapper label="Agents" btnClass="flex items-center p-2 w-full ts-text rounded-lg transition duration-75 group hover:bg-th-blue hover:text-th-white">
+        <svelte:fragment slot="icon">
+          <UsersGroupSolid class="w-6 h-6 {iconeStyle}" />
+        </svelte:fragment>
+        <SidebarDropdownItem label="Agents" active={false} href="/agents" aClass="flex items-center p-2 ps-11 w-full ts-text rounded-lg transition duration-75 group {nonActiveClass}" {activeClass} />
+        <SidebarDropdownItem label="Equipe" active={false} href="#" aClass="flex items-center p-2 ps-11 w-full ts-text rounded-lg transition duration-75 group {nonActiveClass}" {activeClass} />
+        <svelte:fragment slot="arrowup">
+          <AngleUpOutline class="w-5 h-5 {iconeStyle}" />
+        </svelte:fragment>
+        <svelte:fragment slot="arrowdown">
+          <AngleDownOutline class="w-5 h-5 {iconeStyle}" />
+        </svelte:fragment>
+      </SidebarDropdownWrapper>
+
+      <SidebarDropdownWrapper label="Missions" btnClass="flex items-center p-2 w-full ts-text rounded-lg transition duration-75 group hover:bg-th-blue hover:text-th-white">
+        <svelte:fragment slot="icon">
+          <RectangleListSolid class="w-6 h-6 {iconeStyle}" />
+        </svelte:fragment>
+        <SidebarDropdownItem label="Missions" active={false} href="/missions" aClass="flex items-center p-2 ps-11 w-full ts-text rounded-lg transition duration-75 group {nonActiveClass}" {activeClass} />
+        <SidebarDropdownItem label="Quarts" active={false} href="#" aClass="flex items-center p-2 ps-11 w-full ts-text rounded-lg transition duration-75 group {nonActiveClass}" {activeClass} />
+        <SidebarDropdownItem label="Lieux" active={false} href="#" aClass="flex items-center p-2 ps-11 w-full ts-text rounded-lg transition duration-75 group {nonActiveClass}" {activeClass} />
+        <svelte:fragment slot="arrowup">
+          <AngleUpOutline class="w-5 h-5 {iconeStyle}" />
+        </svelte:fragment>
+        <svelte:fragment slot="arrowdown">
+          <AngleDownOutline class="w-5 h-5 {iconeStyle}" />
+        </svelte:fragment>
+      </SidebarDropdownWrapper>
+
+      <SidebarItem label="Notifications" href="#" class="flex items-center p-2 ts-text rounded-lg" {nonActiveClass} {activeClass} {spanClass}>
+        <svelte:fragment slot="icon">
+          <BellSolid class="w-6 h-6 {iconeStyle}" />
+        </svelte:fragment>
+        <svelte:fragment slot="subtext">
+          <span class="inline-flex justify-center items-center p-3 ms-3 w-3 h-3 text-sm font-bold text-th-white bg-th-red rounded-full">3</span>
+        </svelte:fragment>
+      </SidebarItem>
+
+      <SidebarItem label="Statistiques" href="#" class="flex items-center p-2 ts-text rounded-lg" {nonActiveClass} {activeClass}>
+        <svelte:fragment slot="icon">
+          <ChartPieSolid class="w-6 h-6 {iconeStyle}" />
+        </svelte:fragment>
+      </SidebarItem>
+
+      <SidebarGroup border borderClass="pt-4 mt-4 border-t border-th-black-light">
+        <SidebarItem label="Profile" href="/profil" class="flex items-center p-2 ts-text rounded-lg" {nonActiveClass} {activeClass}>
+          <svelte:fragment slot="icon">
+            <UserSolid class="w-6 h-6 {iconeStyle}" />
+          </svelte:fragment>
+        </SidebarItem>
+        <SidebarItem label="Déconnexion" href="#" class="flex items-center text-th-red hover:text-th-white hover:bg-th-red hover:p-2 transition duration-75 rounded-lg ts-text-bold" spanClass="" />
+      </SidebarGroup>
+    </SidebarGroup>
+  </SidebarWrapper>
 </Sidebar>

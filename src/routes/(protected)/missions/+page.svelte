@@ -10,6 +10,17 @@
 
     import FormAgent from "$lib/components/form/agents/FormAgent.svelte"
 
+    type Mission = {
+        id: number;
+        start: string;
+        end: string;
+        customer: string;
+        product: string;
+        location: string;
+        address: string;
+        team: string;
+    };
+
     let { form,data } : { form: ActionData,data: PageData}  = $props();
  
     let drawerHidden: boolean = $state(true);
@@ -22,7 +33,38 @@
         sidbarTitle = DrawerTitle
     }
 
-    const missionList = data.missionList;
+    function groupMissionsByDate(missions: Mission[]) {
+        const today = new Date();
+        const todayMissions: Mission[] = [];
+        const upcomingMissions: Mission[] = [];
+
+        for (const mission of missions) {
+            const startDate = new Date(mission.start);
+
+            const isSameDay =
+            startDate.getDate() === today.getDate() &&
+            startDate.getMonth() === today.getMonth() &&
+            startDate.getFullYear() === today.getFullYear();
+
+            const isSameMonth =
+            startDate.getDate() > today.getDate() &&
+            startDate.getMonth() === today.getMonth() &&
+            startDate.getFullYear() === today.getFullYear();
+
+            if (isSameDay) {
+            todayMissions.push(mission);
+            } else if (isSameMonth) {
+            upcomingMissions.push(mission);
+            }
+        }
+
+        return {
+            today: todayMissions,
+            upcoming: upcomingMissions,
+        };
+    }
+
+    const missionList = groupMissionsByDate(data.missionList);
     const missionShiftsList = data.missionShifts;
     const locationList = data.location;
 
@@ -30,35 +72,56 @@
     const tabsTitleShift="Quarts"
     const tabsTitleLocation="Lieux"
     const tabsClass="mt-4";
+    const tabItemActiveClass="inline-block ts-text-bold text-center disabled:cursor-not-allowed p-4 text-th-blue border-b-2 border-th-blue active"
+    const tabItemInactiveClass="inline-block ts-text text-center disabled:cursor-not-allowed p-4 border-b-2 border-transparent hover:text-th-black text-th-black"
     
-    const tabItemTitleRow="flex justify-between items-center"
-    const btnClass="ts-text-bold bg-th-red"
-    const btnIconClass="mr-1"
+    const tabItemTitle="ts-title-2" 
+    const tabItemTitleRow="flex flex-col items-center sm:flex-row sm:justify-between gap-4 py-4"
+    const btnClass="text-th-white bg-th-blue ts-text-bold"
+    const btnIconClass="mr-2"
+
+    const missionListTitleClass="ts-text-title text-th-black-light"
 
 </script>
   
 <Tabs contentClass={tabsClass} tabStyle="underline" >
-    <TabItem open title={tabsTitleMissions}>
+    <TabItem open title={tabsTitleMissions} activeClasses={tabItemActiveClass} inactiveClasses={tabItemInactiveClass}>
         <div class={tabItemTitleRow}>
-            <h1>{tabsTitleMissions}</h1>
-            <Button size="sm" class={btnClass} on:click={() => {openDrawer(FormAgent,"Nouvel agent")}}><CirclePlusSolid class={btnIconClass} />Ajouter un agent</Button>
+            <h1 class={tabItemTitle}>{tabsTitleMissions}</h1>
+            <Button size="sm" class={btnClass} on:click={() => {openDrawer(FormAgent,"Nouvel mission")}}><CirclePlusSolid class={btnIconClass} />Ajouter une mission</Button>
         </div>
-        {#each missionList as mission}
-            <MissionCard {mission}/>
-        {/each}
+        {#if missionList.today.length != 0 || missionList.upcoming.length != 0}
+            {#if missionList.today.length != 0}
+                <h4 class={missionListTitleClass}>En cours</h4>
+                {#each missionList.today as mission}
+                    <MissionCard {mission}/>
+                {/each}
+            {/if}
+            {#if missionList.upcoming.length != 0}
+                <h4 class={missionListTitleClass}>À venir</h4>
+                {#each missionList.upcoming as mission}
+                    <MissionCard {mission}/>
+                {/each}
+            {/if}
+        {:else}
+        <div class="text-center">
+            <p class="ts-text-title text-th-red">Pas de mission en vue pour les jours à venir.</p>
+        </div>
+        {/if}
+
     </TabItem>
-    <TabItem title={tabsTitleShift}>
+    <TabItem title={tabsTitleShift} activeClasses={tabItemActiveClass} inactiveClasses={tabItemInactiveClass}>
         <div class={tabItemTitleRow}>
-            <h1>{tabsTitleShift}</h1>
-            <Button size="sm" class={btnClass} on:click={() => (openDrawer(FormAgent,"Nouvelle équipe"))}><CirclePlusSolid class={btnIconClass} />Ajouter une équipe</Button>
+            <h1 class={tabItemTitle}>{tabsTitleShift}</h1>
+            <Button size="sm" class={btnClass} on:click={() => (openDrawer(FormAgent,"Nouvelle mission"))}><CirclePlusSolid class={btnIconClass} />Ajouter une mission</Button>
         </div>
         {#each missionShiftsList as missionShifts}
         <MissionShiftCard {missionShifts}/>
         {/each}
     </TabItem>
-    <TabItem title={tabsTitleLocation}>
+    <TabItem title={tabsTitleLocation} activeClasses={tabItemActiveClass} inactiveClasses={tabItemInactiveClass}>
         <div class={tabItemTitleRow}>
-            <h1>{tabsTitleLocation}</h1>
+            <h1 class={tabItemTitle}>{tabsTitleLocation}</h1>
             <Button size="sm" class={btnClass} on:click={() => (openDrawer(FormAgent,"Nouvelle équipe"))}><CirclePlusSolid class={btnIconClass} />Ajouter une équipe</Button>
         </div>
         {#each locationList as location}

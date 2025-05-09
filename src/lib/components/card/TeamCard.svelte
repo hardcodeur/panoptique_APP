@@ -1,6 +1,8 @@
 <script lang="ts" >
     import { AccordionItem, Accordion,Button} from 'flowbite-svelte';
     import FormTeam from "$lib/components/form/Team/FormTeam.svelte";
+    import RoleBadge from "$lib/components/badge/RoleBadge.svelte"
+    import StatusBadge from "$lib/components/badge/StatusBadge.svelte"
 
     const {
         teamName,
@@ -22,43 +24,35 @@
     const usersStatus = countUsersStatus(users);
 
     const btnEditClass="ts-text-bold text-th-blue hover:text-th-white hover:bg-th-blue"
-    const pillAvailableClass="bg-blue-100 text-blue-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded-sm"
-    const pillUnavailableClass="bg-red-100 text-red-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded-sm"
-    const pillStatusText = (status: string): string =>{
-        return (status !== "0") ? "Disponible" : "Congé";
-    }
-    const pillStatusClass = (status: string): string =>{
-        return (status !== "0") ? pillAvailableClass : pillUnavailableClass;
-    } 
+    const accordionItemClass= "flex items-center justify-between w-full ts-text text-left group-first:rounded-t-xl border-b border-th-black-light py-5 text-th-black"
 
 </script>
 
-<div class="max-w-sm h-fit p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
-    <div class="flex justify-between items-center ">
-        <span>{nbUsers} agents</span>
-        <span>Equipe {teamName}</span>
-        <Button outline size="xs" class={btnEditClass} on:click={() => (openDrawer(FormTeam,`Equipe - ${teamName}`))}>Modifier</Button>
+<div class="max-w-sm h-fit py-6 px-4 border border-th-black-light rounded-lg">
+    <div class="flex flex-col">
+        <div class="flex flex-col lg:flex-row justify-center lg:justify-between items-center gap-2">
+            <span class="ts-text-title md:text-center">Équipe {teamName}</span>
+            <Button outline size="xs" class={btnEditClass} on:click={() => (openDrawer(FormTeam,`Equipe - ${teamName}`))}>Modifier</Button>
+        </div>
     </div>
     <div class="flex justify-center mt-3">
         {#if usersStatus.available > 0}
-        <span class={pillAvailableClass}>Disponible {usersStatus.available}/{nbUsers}</span>
+        <StatusBadge status="1" indicator={usersStatus.available+"/"+nbUsers} />
         {/if}
         {#if usersStatus.unavailable > 0}
-        <span class={pillUnavailableClass}>Congé{usersStatus.unavailable}/{nbUsers}</span>
+        <StatusBadge status="0" indicator={usersStatus.unavailable+"/"+nbUsers} />
         {/if}
     </div>
-    <div>
-        <Accordion flush>
-            <AccordionItem>
-                <span slot="header">Liste des membres</span>
-                <div class="inline-grid grid-cols-3 gap-4">
-                {#each users as user}
-                    <span>{user.fullname}</span>
-                    <span>{user.role}</span>
-                    <span class={pillStatusClass(user.status)}>{pillStatusText(user.status)}</span>
-                {/each}
-                </div>
-            </AccordionItem>
-        </Accordion>
-    </div>
+    <Accordion flush>
+        <AccordionItem class={accordionItemClass}>
+            <span slot="header">Liste des membres</span>
+            <div class="inline-grid grid-cols-3 gap-2 sm:gap-4 text-th-black">
+            {#each users as user}
+                <span>{user.fullname}</span>
+                <RoleBadge role={user.role} />
+                <StatusBadge status={user.status} />
+            {/each}
+            </div>
+        </AccordionItem>
+    </Accordion>
 </div>

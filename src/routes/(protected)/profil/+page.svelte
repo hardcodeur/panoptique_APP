@@ -1,14 +1,10 @@
 <script lang="ts">
     import { Button } from 'flowbite-svelte';
     import { CogSolid } from 'flowbite-svelte-icons';
+    import { UserSolid,MailBoxSolid,GraduationCapSolid,PhoneSolid} from 'flowbite-svelte-icons';
     import SidebarForm from "$lib/components/sidebar/SidebarForm.svelte";
     import type { ActionData,PageData } from './$types';
-    import type {  SvelteComponent } from 'svelte';
     import FormProfil from "$lib/components/form/profil/FormProfil.svelte"
-
-    const titleRowClass="flex justify-between items-center mt-4"
-    const btnClass="ts-text-bold bg-th-red"
-    const btnIconClass="mr-1"
 
     let { form,data } : { form: ActionData,data: PageData}  = $props();
 
@@ -34,23 +30,46 @@
         drawerHidden = false;
         sidbarTitle = DrawerTitle
     }
+
+    const cardClass="max-full border border-th-black-light rounded-lg mt-4 text-th-black";
+    const cartTitle="text-th-blue ts-text-title";;
+    const cardTitleRowClass="flex p-4 justify-between items-center border-b border-th-black-light";
+    const cardContend="flex flex-col p-4"
+    const iconClass="mr-1"
+    const dataRowClass="flex justify-start items-center text-th-black ts-text-bold"
+    const dataClass="ml-1 ts-text"
+    const btnClass="ts-text-bold bg-th-red"
+    const btnIconClass="mr-1"
+
 </script>
 
 <section>
-    <div class={titleRowClass}>
-        <h1>Profile</h1>
+    <div class={cardClass} >
+        <div class={cardTitleRowClass}>
+            <h2 class={cartTitle}>Profile</h2>
+        </div>
+        <div class={cardContend}>
+            <span class={dataRowClass}><UserSolid class={iconClass}/>Nom:<span class={dataClass}>{profil.firstName} {profil.lastName}</span></span>
+            <span class={dataRowClass}><MailBoxSolid class={iconClass}/>Email:<span class={dataClass}>{profil.email}</span></span>
+            <span class={dataRowClass}><GraduationCapSolid class={iconClass}/>Fonction:<span class={dataClass}>{getRoleLabel(profil.roles)}</span></span>
+        </div>
     </div>
-    <div class="flex flex-col mt-4">
-        <span>{profil.firstName} {profil.lastName}</span>
-        <span>{profil.email}</span>
-        <span>{getRoleLabel(profil.roles)}</span>
-    </div>
-    <div class="flex flex-col mt-4">
-        <div class={titleRowClass}>
-            <h2>Données personnel</h2>
+    <div class={cardClass}>
+        <div class={cardTitleRowClass}>
+            <h2 class={cartTitle}>Données personnel</h2>
             <Button size="sm" class={btnClass} on:click={() => {openDrawer("Modifier mes données personnel")}}><CogSolid class={btnIconClass} />Modifier</Button>
         </div>
-        <span>{profil.phone}</span>
+        <div class={cardContend}>
+            <span class={dataRowClass}><PhoneSolid class={iconClass}/>Téléphone:<span class={dataClass}>{profil.phone}</span></span>
+        </div>
+    </div>
+    <div class={cardClass}>
+        <div class={cardTitleRowClass}>
+            <h2 class={cartTitle}>Mot de passe</h2>
+        </div>
+        <div class={cardContend}>
+            <Button size="lg" class={btnClass} on:click={() => {openDrawer("Modifier mes données personnel")}}><CogSolid class={btnIconClass} />Modifier</Button>
+        </div>
     </div>
     <SidebarForm bind:hidden={drawerHidden} formProps="" {sidbarTitle} {form} {FormComponent} />
 </section>

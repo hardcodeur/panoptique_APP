@@ -3,6 +3,8 @@
 	import { Section } from 'flowbite-svelte-blocks';
 	import { userSelectedStore } from "$lib/stores/form/agentStore";
 	import { ProfileCardSolid,ChevronRightOutline, ChevronLeftOutline } from 'flowbite-svelte-icons';
+	import RoleBadge from "$lib/components/badge/RoleBadge.svelte"
+    import StatusBadge from "$lib/components/badge/StatusBadge.svelte"
 	import FormAgent from "$lib/components/form/agents/FormAgent.svelte"
 
 	let { userList,openDrawer } = $props();
@@ -66,9 +68,10 @@
 	let currentPageItems = $derived(userList.slice(currentPosition, currentPosition + itemsPerPage));
 	let filteredItems = $derived(userList.filter((item) => item.fullName.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1));
 
-	const divClass = 'bg-white relative shadow-md sm:rounded-lg overflow-hidden';
-	const innerDivClass = 'flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4';
-	const searchClass = 'w-full md:w-1/2 relative';
+	const divClass = 'bg-th-white text-th-black relative sm:rounded-lg overflow-x-auto';
+	const innerDivClass = 'flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 py-4';
+	const searchClass = 'w-full md:w-1/2 ts-text relative text-th-black placeholder:ts-text';
+	const cellRowClass="bg-th-white ts-text text-th-black border border-th-black-light"
 	const btnViewClass="ts-text-bold text-th-blue hover:text-th-white hover:bg-th-blue"
     const btnIconClass="mr-1"
 
@@ -76,40 +79,41 @@
 
 <Section name="advancedTable" sectionClass="pt-5">
 	<TableSearch placeholder="Search" hoverable={true} bind:inputValue={searchTerm} {divClass} {innerDivClass} {searchClass}>
-		<TableHead>
+		<TableHead class="bg-white ts-text-bold text-th-black border border-th-black-light">
 			<TableHeadCell class="px-4 py-3" scope="col">Agent</TableHeadCell>
-			<TableHeadCell class="px-4 py-3" scope="col">Email</TableHeadCell>
-			<TableHeadCell class="px-4 py-3" scope="col">Equipe</TableHeadCell>
-			<TableHeadCell class="px-4 py-3" scope="col">Status</TableHeadCell>
 			<TableHeadCell class="px-4 py-3" scope="col">Role</TableHeadCell>
+			<TableHeadCell class="px-4 py-3" scope="col">Equipe</TableHeadCell>
+			<TableHeadCell class="px-4 py-3" scope="col">Email</TableHeadCell>
+			<TableHeadCell class="px-4 py-3" scope="col">Status</TableHeadCell>
+			<TableHeadCell class="px-4 py-3" scope="col">Action</TableHeadCell>
 		</TableHead>
 		<TableBody class="divide-y">
 			{#if searchTerm !== ''}
 				{#each filteredItems as item (item.id)}
-					<TableBodyRow>
+					<TableBodyRow class={cellRowClass}>
 						<TableBodyCell class="px-4 py-3">{item.fullName}</TableBodyCell>
-						<TableBodyCell class="px-4 py-3">{item.email}</TableBodyCell>
+						<TableBodyCell class="px-4 py-3"><RoleBadge role={item.role} /></TableBodyCell>
 						<TableBodyCell class="px-4 py-3">{item.team}</TableBodyCell>
-						<TableBodyCell class="px-4 py-3">{item.status}</TableBodyCell>
-						<TableBodyCell class="px-4 py-3">{item.role}</TableBodyCell>
+						<TableBodyCell class="px-4 py-3">{item.email}</TableBodyCell>
+						<TableBodyCell class="px-4 py-3"><StatusBadge status={item.status} /></TableBodyCell>
 						<TableBodyCell class="px-4 py-3"><Button outline size="xs" class={btnViewClass} on:click={() => (openDrawer(FormAgent,`Agent - ${item.fullName}`),userSelected(item))}><ProfileCardSolid class={btnIconClass} />Profil</Button></TableBodyCell>
 					</TableBodyRow>
 				{/each}
 			{:else}
 				{#each currentPageItems as item (item.id)}
-					<TableBodyRow>
+					<TableBodyRow class={cellRowClass}>
 						<TableBodyCell class="px-4 py-3">{item.fullName}</TableBodyCell>
-						<TableBodyCell class="px-4 py-3">{item.email}</TableBodyCell>
+						<TableBodyCell class="px-4 py-3"><RoleBadge role={item.role} /></TableBodyCell>
 						<TableBodyCell class="px-4 py-3">{item.team}</TableBodyCell>
-						<TableBodyCell class="px-4 py-3">{item.status}</TableBodyCell>
-						<TableBodyCell class="px-4 py-3">{item.role}</TableBodyCell>
+						<TableBodyCell class="px-4 py-3">{item.email}</TableBodyCell>
+						<TableBodyCell class="px-4 py-3"><StatusBadge status={item.status} /></TableBodyCell>
 						<TableBodyCell class="px-4 py-3"><Button outline size="xs" class={btnViewClass} on:click={() => (openDrawer(FormAgent,`Agent - ${item.fullName}`),userSelected(item))}><ProfileCardSolid class={btnIconClass} />Profil</Button></TableBodyCell>
 					</TableBodyRow>
 				{/each}
 			{/if}
 		</TableBody>
 		{#snippet footer()}
-			<div class="flex flex-col items-start justify-between space-y-3 p-4 md:flex-row md:items-center md:space-y-0" aria-label="Table navigation">
+			<div class="flex flex-col items-start justify-between space-y-3 p-4 md:flex-row md:items-center md:space-y-0 border-t border-th-black-light" aria-label="Table navigation">
 				<span class="text-sm font-normal text-gray-500 dark:text-gray-400">
 					Showing
 					<span class="font-semibold text-gray-900 dark:text-white">{startRange}-{endRange}</span>
