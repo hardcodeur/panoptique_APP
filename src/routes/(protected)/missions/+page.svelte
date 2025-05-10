@@ -7,7 +7,9 @@
     import MissionCard from "$lib/components/card/MissionCard.svelte";
     import MissionShiftCard from "$lib/components/card/MissionShiftCard.svelte";
     import LocationCard from "$lib/components/card/LocationCard.svelte";
+    import FormLocation from "$lib/components/form/location/FormLocation.svelte";
 
+    // sup
     import FormAgent from "$lib/components/form/agents/FormAgent.svelte"
 
     type Mission = {
@@ -26,11 +28,12 @@
     let drawerHidden: boolean = $state(true);
     let FormComponent: ComponentType = $state(FormAgent);
     let sidbarTitle :string = $state("");
+    let resetKey = $state(0)
 
     function openDrawer(component: ComponentType,DrawerTitle :string): void {
         FormComponent = component;
         drawerHidden = false;
-        sidbarTitle = DrawerTitle
+        sidbarTitle = DrawerTitle;
     }
 
     function groupMissionsByDate(missions: Mission[]) {
@@ -122,7 +125,7 @@
     <TabItem title={tabsTitleLocation} activeClasses={tabItemActiveClass} inactiveClasses={tabItemInactiveClass}>
         <div class={tabItemTitleRow}>
             <h1 class={tabItemTitle}>{tabsTitleLocation}</h1>
-            <Button size="sm" class={btnClass} on:click={() => (openDrawer(FormAgent,"Nouvelle équipe"))}><CirclePlusSolid class={btnIconClass} />Ajouter une équipe</Button>
+            <Button size="sm" class={btnClass} on:click={() => (openDrawer(FormLocation,"Nouveau lieu"))}><CirclePlusSolid class={btnIconClass} />Ajouter un lieux</Button>
         </div>
         {#each locationList as location}
         <LocationCard {location}/>
@@ -130,4 +133,4 @@
         
     </TabItem>
 </Tabs>
-<SidebarForm bind:hidden={drawerHidden} formProps="" {sidbarTitle} {form} {FormComponent} />
+<SidebarForm bind:hidden={drawerHidden} formProps={{teamList:data.teamList}} {sidbarTitle} {form} {FormComponent} />
