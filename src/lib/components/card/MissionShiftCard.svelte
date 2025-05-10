@@ -32,7 +32,7 @@
         </div>
         <div class="flex items-center justify-center">
             <div class="flex flex-col sm:flex-row items-center justify-around gap-4 w-full py-8 flex-wrap">
-                <div class={shiftDivClass+" border-b sm:border-b-0 sm:border-r border-th-black-light"}>
+                <div class={shiftDivClass+" border-b lg:border-b-0 lg:border-r border-th-black-light"}>
                     <span class={shiftDateClass}>{shiftCo.startDateFormat}</span>
                     <span class={shiftActivityClass}>Connexion</span>
                     <div class={shiftDivInnerClass}>
@@ -44,7 +44,7 @@
                 </div>
                 {#if shiftSurv}
                 {#each shiftSurv as shift}
-                <div class={shiftDivClass+" border-b sm:border-r sm:border-b-0 border-th-black-light"}>
+                <div class={shiftDivClass+" border-b lg:border-b-0 lg:border-r border-th-black-light"}>
                     <span class={shiftDateClass}>{shift.startDateFormat}</span>
                     <span class={shiftActivityClass}>Surveillance</span>
                     <div class={shiftDivInnerClass}>

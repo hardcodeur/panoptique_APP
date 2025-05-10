@@ -23,8 +23,6 @@ type FormData = z.infer<typeof schema>;
 export const actions : Actions = {
     default: async ({ request, cookies }) => {
 
-    const API_URL : string = import.meta.env.VITE_API_URL;
-
     const formData = Object.fromEntries(await request.formData()) as Partial<FormData> ;
     const result = schema.safeParse(formData);
 
@@ -54,6 +52,7 @@ export const actions : Actions = {
     } catch (error) {
       return fail(500, { error: { _global: ["Erreur serveur"] } 
     });
+    
     }
 
   }

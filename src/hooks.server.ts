@@ -1,7 +1,7 @@
 import { redirect } from '@sveltejs/kit';
 import type { Handle } from '@sveltejs/kit';
 import { verifyToken } from "./lib/api/auth";
-import { resetAuthUserStore } from "$lib/stores/authUserStore";
+import { authUserStore } from "$lib/stores/authUserStore";
 
 export const handle: Handle = async ({ event, resolve }) => {
     const PUBLIC_ROUTES = ['/login'];
@@ -17,7 +17,8 @@ export const handle: Handle = async ({ event, resolve }) => {
             const isValid = await verifyToken(token);
             if (!isValid) {
                 event.cookies.delete('auth_token', { path: '/' });
-                resetAuthUserStore()
+                authUserStore.reset();
+                throw redirect(302, '/login');
             }
         } catch (error) {
             console.error('Token verification failed:', error);

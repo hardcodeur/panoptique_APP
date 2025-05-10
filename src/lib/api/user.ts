@@ -23,3 +23,27 @@ export async function getUsersById(token: string,userId: string): Promise<Respon
     
     return response;
 }
+
+export async function getUserCurrentWeekShifts(token: string,userId: string): Promise<Response> {
+    const response = await fetch(`${API_URL}/users/${userId}/current-week-shifts`, {
+        method: 'GET',
+        headers: { 
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        }
+    });
+    
+    return response;
+}
+
+export async function getUserCurrentMonthShiftsMetric(token: string,userId: string): Promise<Response> {
+    const response = await fetch(`${API_URL}/users/${userId}/metric-shift`, {
+        method: 'GET',
+        headers: { 
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        }
+    });
+    
+    return response;
+}

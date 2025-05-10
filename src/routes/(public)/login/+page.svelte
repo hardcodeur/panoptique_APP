@@ -17,7 +17,7 @@
       errors = form?.errors;
       email = form?.email ?? ""
       if (form?.success) {
-      goto("/dashboard");
+      goto("/");
     }
     })
 </script>
