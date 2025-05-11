@@ -9,7 +9,7 @@ export async function load({cookies}) {
     const apiUserResponse :Response = await getUsersById(token,userId);
     const profil = await apiUserResponse.json();
 
-    return {profil};
+    return {userId,profil};
 }
 
 

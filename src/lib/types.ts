@@ -1,20 +1,4 @@
-export interface AuthUser {
-    userId: string;
-    role: string;
-}
 
-
-// export interface AuthUser {
-//     id: string;
-//     firstName: string;
-//     lastName: string;
-//     email: string;
-//     roles: string;
-//     team : string;
-//     createdAt : string;
-//     updatedAt : string;
-//     lastLogin : string;
-// }
 
 export interface SelectInputValue {
     value: string;

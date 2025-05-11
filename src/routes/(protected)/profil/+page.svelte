@@ -17,7 +17,8 @@
     };
     
     const profil = data.profil;
-
+    console.log("user",data.userId);
+    
     const getRoleLabel = (role: string): string => {
         return roles[role as RoleKey];
     };

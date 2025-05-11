@@ -2,7 +2,9 @@ import { fail } from '@sveltejs/kit';
 import { z } from "zod";
 import { getUsers } from "$lib/api/user"
 import { getTeams } from "$lib/api/team.js"
+import { error } from '@sveltejs/kit';
 import { getTeamsWhiteUsers,getTeamUnassignedUsers } from "$lib/api/teamUsers.js";
+import { authUserStore,Role } from "$lib/stores/authUserStore"
 
 
 const roles = ['admin', 'manager', 'team_manager', 'agent'] as const;
@@ -45,6 +47,12 @@ export const actions = {
 
 
 export async function load({cookies}) {
+
+    if(authUserStore.hasAnyRole(Role.ADMIN, Role.MANAGER, Role.TEAM_MANAGER)){
+        throw error(403, {
+            message: 'Accès interdit - Vous n\'avez pas les permissions nécessaires'
+        });
+    }
 
     const token :string = cookies.get('auth_token') as string;
 

@@ -1,6 +1,8 @@
 <script lang="ts">
     import { Tabs, TabItem, Button } from 'flowbite-svelte';
     import { CirclePlusSolid } from 'flowbite-svelte-icons';
+    import { Role } from "$lib/stores/authUserStore"
+    import AccessControl from "$lib/components/AccessControl.svelte";
     import type { ActionData,PageData } from './$types'
 	import type {  ComponentType } from 'svelte';
     import SidebarForm from "$lib/components/sidebar/SidebarForm.svelte";
@@ -91,7 +93,9 @@
     <TabItem open title={tabsTitleMissions} activeClasses={tabItemActiveClass} inactiveClasses={tabItemInactiveClass}>
         <div class={tabItemTitleRow}>
             <h1 class={tabItemTitle}>{tabsTitleMissions}</h1>
+            <AccessControl anyRole={[Role.ADMIN, Role.MANAGER,Role.TEAM_MANAGER]}>
             <Button size="sm" class={btnClass} on:click={() => {openDrawer(FormAgent,"Nouvel mission")}}><CirclePlusSolid class={btnIconClass} />Ajouter une mission</Button>
+            </AccessControl>
         </div>
         {#if missionList.today.length != 0 || missionList.upcoming.length != 0}
             {#if missionList.today.length != 0}
@@ -116,7 +120,9 @@
     <TabItem title={tabsTitleShift} activeClasses={tabItemActiveClass} inactiveClasses={tabItemInactiveClass}>
         <div class={tabItemTitleRow}>
             <h1 class={tabItemTitle}>{tabsTitleShift}</h1>
+            <AccessControl anyRole={[Role.ADMIN, Role.MANAGER,Role.TEAM_MANAGER]}>
             <Button size="sm" class={btnClass} on:click={() => (openDrawer(FormAgent,"Nouvelle mission"))}><CirclePlusSolid class={btnIconClass} />Ajouter une mission</Button>
+            </AccessControl>
         </div>
         {#each missionShiftsList as missionShifts}
         <MissionShiftCard {missionShifts}/>
@@ -125,7 +131,9 @@
     <TabItem title={tabsTitleLocation} activeClasses={tabItemActiveClass} inactiveClasses={tabItemInactiveClass}>
         <div class={tabItemTitleRow}>
             <h1 class={tabItemTitle}>{tabsTitleLocation}</h1>
+            <AccessControl anyRole={[Role.ADMIN, Role.MANAGER,Role.TEAM_MANAGER]}>
             <Button size="sm" class={btnClass} on:click={() => (openDrawer(FormLocation,"Nouveau lieu"))}><CirclePlusSolid class={btnIconClass} />Ajouter un lieux</Button>
+            </AccessControl>
         </div>
         {#each locationList as location}
         <LocationCard {location}/>
