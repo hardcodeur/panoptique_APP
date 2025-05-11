@@ -3,6 +3,7 @@ import { z } from "zod";
 import { getUsers } from "$lib/api/user"
 import { getTeams } from "$lib/api/team.js"
 import { error } from '@sveltejs/kit';
+import { redirect } from '@sveltejs/kit';
 import { getTeamsWhiteUsers,getTeamUnassignedUsers } from "$lib/api/teamUsers.js";
 import { authUserStore,Role } from "$lib/stores/authUserStore"
 
@@ -26,6 +27,11 @@ const schema = z.object({
     team: z.string().min(1, 'Champ obligatoire'),
 });
 
+  
+if(!authUserStore.hasAnyRole(Role.ADMIN, Role.MANAGER, Role.TEAM_MANAGER)){
+    throw redirect(302, '/403');
+}
+
 
 export const actions = {
 
@@ -45,29 +51,43 @@ export const actions = {
 
 }
 
-
 export async function load({cookies}) {
+    try {
+        const token: string = cookies.get('auth_token') as string;
+        if (!token) throw error(401, 'Non autorisé');
 
-    if(authUserStore.hasAnyRole(Role.ADMIN, Role.MANAGER, Role.TEAM_MANAGER)){
-        throw error(403, {
-            message: 'Accès interdit - Vous n\'avez pas les permissions nécessaires'
-        });
+        const [
+            apiUsersResponse,
+            apiTeamsResponse, 
+            apiTeamsWhiteUsersResponse, 
+            apiTeamUnassignedUsersResponse
+        ] = 
+            await Promise.all([
+                getUsers(token),
+                getTeams(token),
+                getTeamsWhiteUsers(token),
+                getTeamUnassignedUsers(token)
+            ]);
+
+        if (!apiUsersResponse.ok) throw error(apiUsersResponse.status, await apiUsersResponse.text());
+        if (!apiTeamsResponse.ok) throw error(apiTeamsResponse.status, await apiTeamsResponse.text());
+        if (!apiTeamsWhiteUsersResponse.ok) throw error(apiTeamsWhiteUsersResponse.status, await apiTeamsWhiteUsersResponse.text());
+        if (!apiTeamUnassignedUsersResponse.ok) throw error(apiTeamUnassignedUsersResponse.status, await apiTeamUnassignedUsersResponse.text());
+
+        const [
+            userList, 
+            teamList, 
+            teamWhiteUsers, 
+            teamUnassignedUsers
+        ] = await Promise.all([
+            apiUsersResponse.json(),
+            apiTeamsResponse.json(),
+            apiTeamsWhiteUsersResponse.json(),
+            apiTeamUnassignedUsersResponse.json()
+        ]);
+
+        return { userList, teamList, teamWhiteUsers, teamUnassignedUsers };
+    } catch (err) {
+        throw error(500, 'Erreur lors du chargement des données');
     }
-
-    const token :string = cookies.get('auth_token') as string;
-
-    const apiUsersResponse :Response = await getUsers(token);
-    const userList = await apiUsersResponse.json();
-
-    const apiTeamsResponse :Response = await getTeams(token);
-    const teamList = await apiTeamsResponse.json();
-
-    const apiTeamsWhiteUsersResponse :Response = await getTeamsWhiteUsers(token);
-    const teamWhiteUsers = await apiTeamsWhiteUsersResponse.json();
-
-    const apiTeamUnassignedUsersResponse :Response = await getTeamUnassignedUsers(token);
-    const teamUnassignedUsers = await apiTeamUnassignedUsersResponse.json();
-    
-
-    return { userList,teamList,teamWhiteUsers,teamUnassignedUsers};
 }

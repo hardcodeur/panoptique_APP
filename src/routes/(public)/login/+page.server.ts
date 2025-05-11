@@ -1,7 +1,7 @@
 import { fail } from '@sveltejs/kit';
 import { z } from "zod";
 import { getAuthToken } from "$lib/api/auth";
-import { authUserStore } from "$lib/stores/authUserStore";
+import { authUserStore,Role } from "$lib/stores/authUserStore";
 import type { Actions } from './$types';
 
 const schema = z.object({
@@ -19,6 +19,22 @@ const schema = z.object({
 });
 
 type FormData = z.infer<typeof schema>;
+
+
+function roleTrad(authRole: string): Role{
+  switch (authRole) {
+    case "admin":
+      return Role.ADMIN
+    case "manager":
+      return Role.MANAGER
+    case "team_manager":
+      return Role.TEAM_MANAGER
+    case "agent":
+      return Role.USER
+    default:
+      return Role.USER
+  }
+} 
 
 export const actions : Actions = {
     default: async ({ request, cookies }) => {
@@ -46,13 +62,13 @@ export const actions : Actions = {
       }
   
       cookies.set('auth_token', token, { path: '/', httpOnly: true, secure: true, sameSite: 'lax', maxAge: 86400,});
-      authUserStore.set({ userId:userId, role: userRole});
+      authUserStore.set({ userId:userId, role: roleTrad(userRole) });
+      
       return { success: true };
       
     } catch (error) {
       return fail(500, { error: { _global: ["Erreur serveur"] } 
     });
-    
     }
 
   }

@@ -4,6 +4,7 @@ import { verifyToken } from "./lib/api/auth";
 import { authUserStore } from "$lib/stores/authUserStore";
 
 export const handle: Handle = async ({ event, resolve }) => {
+    
     const PUBLIC_ROUTES = ['/login'];
     const token = event.cookies.get('auth_token');
     const isPublicRoute = PUBLIC_ROUTES.some(route => event.url.pathname.startsWith(route));

@@ -41,7 +41,7 @@
     <div class="mb-6">
         <Accordion flush>
             <AccordionItem>
-                <span slot="header">Equipe {teamUsers.teamName}</span>
+                <span slot="header">Équipe <span class="capitalize">{teamUsers.teamName}</span></span>
                 {#each teamUsers.users as user}
                     <Checkbox class={checkboxClass}>{user.fullname}</Checkbox>
                 {/each}

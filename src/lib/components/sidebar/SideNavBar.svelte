@@ -1,10 +1,11 @@
 <script lang="ts">
     import { Sidebar, SidebarGroup, SidebarItem, SidebarWrapper, SidebarDropdownItem, SidebarDropdownWrapper } from 'flowbite-svelte';
-    import { HomeSolid,AngleDownOutline,AngleUpOutline, BellSolid, UsersGroupSolid, RectangleListSolid, ChartPieSolid, UserSolid, EditOutline } from 'flowbite-svelte-icons';
+    import { HomeSolid, BellSolid, UsersGroupSolid, RectangleListSolid, ChartPieSolid, UserSolid, EditOutline } from 'flowbite-svelte-icons';
     import AccessControl from "$lib/components/AccessControl.svelte";
     import { Role} from "$lib/stores/authUserStore"
     import { goto } from '$app/navigation';
     import { page } from "$app/state";
+    import { userStore} from "$lib/stores/userFrontStore"
 
     let activeUrl = $state(page.url.pathname);
 
@@ -16,15 +17,15 @@
     const activeClass = 'text-th-white bg-th-blue';
     const nonActiveClass ="hover:text-th-white hover:bg-th-blue text-th-black "
     const iconeStyle ='transition duration-75 group-hover:text-th-white';
-
+    
 
     const handLogOut= async ()=>{
       await fetch('/logout', {
         method: 'POST'
       });
+      userStore.reset();
       goto("/login");
     }
-
 
   </script>
   
@@ -68,7 +69,7 @@
       </SidebarItem>
 
       <SidebarGroup border borderClass="pt-4 mt-4 border-t border-th-black-light">
-        <SidebarItem label="Profile" href="/profil" class="flex items-center p-2 ts-text rounded-lg" {nonActiveClass} {activeClass}>
+        <SidebarItem label="Profil" href="/profil" class="flex items-center p-2 ts-text rounded-lg" {nonActiveClass} {activeClass}>
           <svelte:fragment slot="icon">
             <UserSolid class="w-6 h-6 {iconeStyle}" />
           </svelte:fragment>

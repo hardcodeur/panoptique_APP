@@ -17,11 +17,11 @@ const shiftMetricActivities=shiftMetric.activitiesCount;
     <h1 class="ts-title-2 text-th-red">Bonjour, {user.firstName+" "+user.lastName}</h1>
 </div>
 <div class="grid grid-cols-3 gap-4">
-    <AchivmentWidget value={shiftMetric.totalHours} text="Nombre d’heures effectuées ce mois" />
+    <AchivmentWidget value={shiftMetric.totalHours} text="Nombre d’heures effectuées ce mois-ci" />
     <AchivmentWidget value={shiftMetric.totalShifts} text="Total des quarts travaillés ce mois-ci" />
     <MonthShiftsMetricWidget activities={shiftMetricActivities}/>
 </div>
-<div class="grid grid-cols-3 gap-4">
+<div class="grid grid-cols-2 gap-4">
     <WeekShiftWidget shifts={weekShifts} />
     
 </div>

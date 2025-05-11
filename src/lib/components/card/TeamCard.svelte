@@ -31,7 +31,7 @@
 <div class="max-w-sm h-fit py-6 px-4 border border-th-black-light rounded-lg">
     <div class="flex flex-col">
         <div class="flex flex-col lg:flex-row justify-center lg:justify-between items-center gap-2">
-            <span class="ts-text-title md:text-center">Équipe {teamName}</span>
+            <span class="ts-text-title md:text-center">Équipe <span class="capitalize">{teamName}</span></span>
             <Button outline size="xs" class={btnEditClass} on:click={() => (openDrawer(FormTeam,`Equipe - ${teamName}`))}>Modifier</Button>
         </div>
     </div>

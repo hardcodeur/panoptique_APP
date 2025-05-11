@@ -1,5 +1,6 @@
 import { fail } from '@sveltejs/kit';
 import { z } from "zod";
+import { error } from '@sveltejs/kit';
 import { getMissions } from "$lib/api/mission";
 import { getTeams } from "$lib/api/team.js"
 import { getMissionWhiteShifts } from "$lib/api/missionShifts";
@@ -50,21 +51,66 @@ export const actions = {
 
 }
 
-export async function load({cookies}) {
+export async function load({ cookies }) {
+    try {
+        const token = cookies.get('auth_token');
+        
+        // Vérification du token
+        if (!token) {
+            throw error(401, 'Token d\'authentification manquant');
+        }
 
-    const token :string = cookies.get('auth_token') as string;
+        // Lance toutes les requêtes en parallèle
+        const [
+            missionsRes,
+            missionShiftsRes,
+            locationRes,
+            teamsRes
+        ] = await Promise.all([
+            getMissions(token),
+            getMissionWhiteShifts(token),
+            getLocationLocationNote(token),
+            getTeams(token)
+        ]);
 
-    const apiMissionResponse :Response = await getMissions(token);
-    const missionList = await apiMissionResponse.json();
+        if (!missionsRes.ok) {
+            throw error(missionsRes.status, `Erreur missions: ${await missionsRes.text()}`);
+        }
+        if (!missionShiftsRes.ok) {
+            throw error(missionShiftsRes.status, `Erreur shifts: ${await missionShiftsRes.text()}`);
+        }
+        if (!locationRes.ok) {
+            throw error(locationRes.status, `Erreur location: ${await locationRes.text()}`);
+        }
+        if (!teamsRes.ok) {
+            throw error(teamsRes.status, `Erreur teams: ${await teamsRes.text()}`);
+        }
 
-    const apiMissionShiftsResponse :Response = await getMissionWhiteShifts(token);
-    const missionShifts = await apiMissionShiftsResponse.json();
+        // Traite les réponses en parallèle
+        const [
+            missionList,
+            missionShifts,
+            location,
+            teamList
+        ] = await Promise.all([
+            missionsRes.json(),
+            missionShiftsRes.json(),
+            locationRes.json(),
+            teamsRes.json()
+        ]);
 
-    const apiLocationResponse :Response = await getLocationLocationNote(token);
-    const location = await apiLocationResponse.json();
+        return {
+            missionList,
+            missionShifts,
+            location,
+            teamList
+        };
 
-    const apiTeamsResponse :Response = await getTeams(token);
-    const teamList = await apiTeamsResponse.json();
-    
-    return {missionList,missionShifts,location,teamList};
+    } catch (err) {
+        // Gestion des erreurs
+        if (err instanceof Error) {
+            console.error('Erreur dans load:', err.message);
+        }
+        throw error(500, 'Échec du chargement des données');
+    }
 }

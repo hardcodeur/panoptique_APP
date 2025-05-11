@@ -9,7 +9,7 @@
 
 <div class="border size-fit border-th-black-light rounded-lg flex flex-col sm:flex-row mt-10 sm:mt-4">
     <div class="flex flex-col">
-        <div class="p-4 border-b border-th-black-light">
+        <div class="p-4 border-b border-th-black-light bg-white rounded-t-lg">
             <h2 class="ts-text-sub-title text-th-blue">Mes périodes de travail cette semaine</h2>
         </div>
         <div class="flex flex-col p-4">

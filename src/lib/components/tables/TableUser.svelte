@@ -93,7 +93,7 @@
 					<TableBodyRow class={cellRowClass}>
 						<TableBodyCell class="px-4 py-3">{item.fullName}</TableBodyCell>
 						<TableBodyCell class="px-4 py-3"><RoleBadge role={item.role} /></TableBodyCell>
-						<TableBodyCell class="px-4 py-3">{item.team}</TableBodyCell>
+						<TableBodyCell class="px-4 py-3 capitalize">{item.team}</TableBodyCell>
 						<TableBodyCell class="px-4 py-3">{item.email}</TableBodyCell>
 						<TableBodyCell class="px-4 py-3"><StatusBadge status={item.status} /></TableBodyCell>
 						<TableBodyCell class="px-4 py-3"><Button outline size="xs" class={btnViewClass} on:click={() => (openDrawer(FormAgent,`Agent - ${item.fullName}`),userSelected(item))}><ProfileCardSolid class={btnIconClass} />Profil</Button></TableBodyCell>
@@ -104,7 +104,7 @@
 					<TableBodyRow class={cellRowClass}>
 						<TableBodyCell class="px-4 py-3">{item.fullName}</TableBodyCell>
 						<TableBodyCell class="px-4 py-3"><RoleBadge role={item.role} /></TableBodyCell>
-						<TableBodyCell class="px-4 py-3">{item.team}</TableBodyCell>
+						<TableBodyCell class="px-4 py-3 capitalize">{item.team}</TableBodyCell>
 						<TableBodyCell class="px-4 py-3">{item.email}</TableBodyCell>
 						<TableBodyCell class="px-4 py-3"><StatusBadge status={item.status} /></TableBodyCell>
 						<TableBodyCell class="px-4 py-3"><Button outline size="xs" class={btnViewClass} on:click={() => (openDrawer(FormAgent,`Agent - ${item.fullName}`),userSelected(item))}><ProfileCardSolid class={btnIconClass} />Profil</Button></TableBodyCell>

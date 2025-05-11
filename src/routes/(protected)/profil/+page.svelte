@@ -17,7 +17,6 @@
     };
     
     const profil = data.profil;
-    console.log("user",data.userId);
     
     const getRoleLabel = (role: string): string => {
         return roles[role as RoleKey];
@@ -47,7 +46,7 @@
 <section>
     <div class={cardClass} >
         <div class={cardTitleRowClass}>
-            <h2 class={cartTitle}>Profile</h2>
+            <h2 class={cartTitle}>Profil</h2>
         </div>
         <div class={cardContend}>
             <span class={dataRowClass}><UserSolid class={iconClass}/>Nom:<span class={dataClass}>{profil.firstName} {profil.lastName}</span></span>
@@ -57,7 +56,7 @@
     </div>
     <div class={cardClass}>
         <div class={cardTitleRowClass}>
-            <h2 class={cartTitle}>Données personnel</h2>
+            <h2 class={cartTitle}>Données personnelles</h2>
             <Button size="sm" class={btnClass} on:click={() => {openDrawer("Modifier mes données personnel")}}><CogSolid class={btnIconClass} />Modifier</Button>
         </div>
         <div class={cardContend}>
