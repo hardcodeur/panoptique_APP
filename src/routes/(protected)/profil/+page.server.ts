@@ -1,5 +1,5 @@
 import { getUsersById } from "$lib/api/user"
-import { authUserStore } from "$lib/stores/authUserStore.js"
+import { authUserStore } from "$lib/stores/UserStore.js"
 import { error } from '@sveltejs/kit';
 
 export async function load({ cookies }) {

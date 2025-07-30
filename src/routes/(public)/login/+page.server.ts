@@ -1,7 +1,7 @@
 import { fail } from '@sveltejs/kit';
 import { z } from "zod";
 import { getAuthToken } from "$lib/api/auth";
-import { authUserStore,Role } from "$lib/stores/authUserStore";
+import { userStore,Role } from "$lib/stores/UserStore";
 import type { Actions } from './$types';
 
 const schema = z.object({
@@ -13,8 +13,8 @@ const schema = z.object({
         ,
     password: z.string()
         .min(1, 'Champ obligatoire')
-        .min(8,("Le mot de passe doit faire au moins 8 caractères"))
-        .max(32, "Le mot de passe ne doit pas dépasser 32 caractères")
+        // .min(8,("Le mot de passe doit faire au moins 8 caractères"))
+        // .max(32, "Le mot de passe ne doit pas dépasser 32 caractères")
         // .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).*$/,"Le mot de passe doit contenir au moins 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial(!@#$%^&*)")
 });
 
@@ -39,33 +39,51 @@ function roleTrad(authRole: string): Role{
 export const actions : Actions = {
     default: async ({ request, cookies }) => {
 
+    // Parse form data
     const formData = Object.fromEntries(await request.formData()) as Partial<FormData> ;
+    // Zod check form requirement 
     const result = schema.safeParse(formData);
 
     const email : string = formData.email?.toString() || "";
 
+    // Form error manager
     if (!result.success) {
-        const errors = result.error.flatten().fieldErrors;
-        return fail(400, { errors,email});
+        const error = result.error.flatten().fieldErrors;
+        return fail(400, { error,email});
     }
 
     try {
+      // Call api
       const apiLoginResponse = await getAuthToken(result.data.email, result.data.password)
-
+      // Api error manager
       if (!apiLoginResponse.ok) {
-        return fail(401, { errors: {_global: ['Identifiants invalides']}});
+        return fail(401, { error: {_global: ['Identifiants invalides']}});
       }
-      const {token,userId,userRole} = await apiLoginResponse.json();
+
+      // Get api tokens
+      const {token,refresh_token} = await apiLoginResponse.json();
   
-      if(!token || !userId){
+      if(!token || !refresh_token){
         return fail(400, { error: { _global: ["Un problème technique a été détecté. Si l'erreur persiste après un nouvel essai, merci de signaler l'incident au service informatique."] }});
       }
-  
-      cookies.set('auth_token', token, { path: '/', httpOnly: true, secure: true, sameSite: 'lax', maxAge: 86400,});
-      authUserStore.set({ userId:userId, role: roleTrad(userRole) });
       
-      return { success: true };
-      
+      // Insert access and refresh token in secure cookies 
+      cookies.set('access_token', token, { 
+        path: '/', 
+        httpOnly: true, 
+        secure: true, 
+        sameSite: 'lax', 
+        maxAge: 900, // 15 min
+      });
+
+      cookies.set('refresh_token', token, { 
+        path: '/', 
+        httpOnly: true, 
+        secure: true, 
+        sameSite: 'lax', 
+        maxAge: 36000, // 10h
+      });
+            
     } catch (error) {
       return fail(500, { error: { _global: ["Erreur serveur"] } 
     });

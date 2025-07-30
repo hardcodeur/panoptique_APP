@@ -7,13 +7,13 @@ AchivmentWidget
 
 let { data } : { data: PageData}  = $props();
 
-const user = data.user;
-const weekShifts = data.currentWeekShifts.shifts;
-const shiftMetric = data.currentMonthShiftsMetric;
-const shiftMetricActivities=shiftMetric.activitiesCount;
+// const user = data.user;
+// const weekShifts = data.currentWeekShifts.shifts;
+// const shiftMetric = data.currentMonthShiftsMetric;
+// const shiftMetricActivities=shiftMetric.activitiesCount;
 </script>
 
-<div class="py-4">
+<!-- <div class="py-4">
     <h1 class="ts-title-2 text-th-red">Bonjour, {user.firstName+" "+user.lastName}</h1>
 </div>
 <div class="grid grid-cols-3 gap-4">
@@ -23,5 +23,4 @@ const shiftMetricActivities=shiftMetric.activitiesCount;
 </div>
 <div class="grid grid-cols-2 gap-4">
     <WeekShiftWidget shifts={weekShifts} />
-    
-</div>
+</div> -->

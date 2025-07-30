@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { authUserStore, type Role } from '$lib/stores/authUserStore';
     import { userStore } from "$lib/stores/userFrontStore"
   
     let {
@@ -10,6 +9,7 @@
       anyRole?: Role[];
     }>();
     
+    console.log("access composent hasAnyRole 3 ",userStore.hasAnyRole(...anyRole));
     const hasAccess = $derived(
       role ? userStore.hasRole(role) :
       anyRole?.length ? userStore.hasAnyRole(...anyRole) :

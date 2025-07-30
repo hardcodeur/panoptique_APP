@@ -5,7 +5,7 @@ import { getTeams } from "$lib/api/team.js"
 import { error } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';
 import { getTeamsWhiteUsers,getTeamUnassignedUsers } from "$lib/api/teamUsers.js";
-import { authUserStore,Role } from "$lib/stores/authUserStore"
+import { userStore,Role } from "$lib/stores/userFrontStore"
 
 
 const roles = ['admin', 'manager', 'team_manager', 'agent'] as const;
@@ -27,10 +27,10 @@ const schema = z.object({
     team: z.string().min(1, 'Champ obligatoire'),
 });
 
-  
-if(!authUserStore.hasAnyRole(Role.ADMIN, Role.MANAGER, Role.TEAM_MANAGER)){
-    throw redirect(302, '/403');
-}
+// console.log("serveur agents",userStore.get().role );
+// if (!userStore.hasAnyRole(Role.ADMIN, Role.MANAGER, Role.TEAM_MANAGER)) {
+//     throw redirect(302, '/403');
+// }
 
 
 export const actions = {
