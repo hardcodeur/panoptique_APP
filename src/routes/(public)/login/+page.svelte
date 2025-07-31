@@ -14,8 +14,6 @@
 	// Handle form action
 	function handleLogin() {    
 		return async ({ result, update }) => {
-			console.log(result);
-
 			if (result.type === 'success') {
 				await goto('/');
 			}
@@ -23,8 +21,6 @@
 			await update();
 		};
 	}
-
-  console.log(form);
 </script>
 
 <Section name="login" sectionClass="max-w-md mx-auto">

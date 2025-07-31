@@ -1,8 +1,8 @@
 import { fail } from '@sveltejs/kit';
 import { z } from "zod";
-import { getAuthToken } from "$lib/api/auth";
-import { userStore,Role } from "$lib/stores/UserStore";
+import { apiAuthToken } from "$lib/api/auth";
 import type { Actions } from './$types';
+import { ACCESS_TOKEN_LIFETIME,REFRESH_TOKEN_LIFETIME} from '$env/static/private';
 
 const schema = z.object({
     email: z.string()
@@ -21,27 +21,12 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 
-function roleTrad(authRole: string): Role{
-  switch (authRole) {
-    case "admin":
-      return Role.ADMIN
-    case "manager":
-      return Role.MANAGER
-    case "team_manager":
-      return Role.TEAM_MANAGER
-    case "agent":
-      return Role.USER
-    default:
-      return Role.USER
-  }
-} 
-
 export const actions : Actions = {
     default: async ({ request, cookies }) => {
 
     // Parse form data
     const formData = Object.fromEntries(await request.formData()) as Partial<FormData> ;
-    // Zod check form requirement 
+    // Zod check Form requirement 
     const result = schema.safeParse(formData);
 
     const email : string = formData.email?.toString() || "";
@@ -54,16 +39,9 @@ export const actions : Actions = {
 
     try {
       // Call api
-      const apiLoginResponse = await getAuthToken(result.data.email, result.data.password)
-      // Api error manager
-      if (!apiLoginResponse.ok) {
-        return fail(401, { error: {_global: ['Identifiants invalides']}});
-      }
-
-      // Get api tokens
-      const {token,refresh_token} = await apiLoginResponse.json();
-  
-      if(!token || !refresh_token){
+      const {token,refresh_token} = await apiAuthToken(result.data.email, result.data.password);
+            
+      if(!token && !refresh_token){
         return fail(400, { error: { _global: ["Un problème technique a été détecté. Si l'erreur persiste après un nouvel essai, merci de signaler l'incident au service informatique."] }});
       }
       
@@ -73,20 +51,24 @@ export const actions : Actions = {
         httpOnly: true, 
         secure: true, 
         sameSite: 'lax', 
-        maxAge: 900, // 15 min
+        maxAge: parseInt(ACCESS_TOKEN_LIFETIME, 10)
       });
 
-      cookies.set('refresh_token', token, { 
+      cookies.set('refresh_token', refresh_token, { 
         path: '/', 
         httpOnly: true, 
         secure: true, 
         sameSite: 'lax', 
-        maxAge: 36000, // 10h
+        maxAge: parseInt(REFRESH_TOKEN_LIFETIME, 10)
       });
             
     } catch (error) {
-      return fail(500, { error: { _global: ["Erreur serveur"] } 
-    });
+      // call api error management
+      if(error?.code === 401 && error?.message?.includes('Invalid credentials.')){
+        return fail(400, { error: { _global: ["Identifiant invalide"] }});
+      }
+
+      return fail(500, { error: { _global: ["Erreur serveur"] }});
     }
 
   }

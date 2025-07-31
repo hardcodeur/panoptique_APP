@@ -1,54 +1,70 @@
-
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { actions } from './+page.server';
 import * as apiAuth from '$lib/api/auth';
-import { authUserStore } from '$lib/stores/UserStore';
+
+// Mock des variables d'environnement privées
+vi.mock('$env/static/private', () => ({
+    ACCESS_TOKEN_LIFETIME: '900', // 15 minutes
+    REFRESH_TOKEN_LIFETIME: '86400' // 24 heures
+}));
 
 describe('Login Actions', () => {
+
+    // Créer un mock pour l'objet cookies
     const mockCookies = {
         set: vi.fn(),
     };
+
+    // Réinitialiser les mocks avant chaque test
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
 
     it('should return 400 for invalid form data', async () => {
         const request = new Request('http://localhost/login', {
             method: 'POST',
             body: new URLSearchParams({
-                email: 'invalid-email',
-                password: 'short'
+                email: 'not-an-email',
+                password: '' // Mot de passe vide pour déclencher l'erreur
             })
         });
 
         const result = await actions.default({ request, cookies: mockCookies });
+        
         expect(result.status).toBe(400);
-        expect(result.data.errors.email).toBeDefined();
-        expect(result.data.errors.password).toBeDefined();
+        expect(result.data.error.email).toBeDefined();
+        expect(result.data.error.password).toBeDefined();
     });
 
-    it('should return 401 for invalid credentials', async () => {
-        vi.spyOn(apiAuth, 'getAuthToken').mockResolvedValue(new Response(null, { status: 401 }));
+    it('should return 400 on API failure (invalid credentials)', async () => {
+        // Simuler l'échec de l'appel API
+        vi.spyOn(apiAuth, 'apiAuthToken').mockRejectedValue({
+            code: 401,
+            message: 'Invalid credentials.'
+        });
 
         const request = new Request('http://localhost/login', {
             method: 'POST',
             body: new URLSearchParams({
-                email: 'test@sgs.com',
-                password: 'password123'
+                email: 'test@example.com',
+                password: 'wrongpassword'
             })
         });
 
         const result = await actions.default({ request, cookies: mockCookies });
-        expect(result.status).toBe(401);
-        expect(result.data.errors._global).toContain('Identifiants invalides');
+
+        expect(result.status).toBe(400);
+        expect(result.data.error._global).toContain('Identifiant invalide');
     });
 
-    it('should return 400 if token or userId is missing from API response', async () => {
-        vi.spyOn(apiAuth, 'getAuthToken').mockResolvedValue(
-            new Response(JSON.stringify({ userRole: 'agent' }), { status: 200 })
-        );
+    it('should return 400 if tokens are missing from API response', async () => {
+        // Simuler une réponse API valide mais sans tokens
+        vi.spyOn(apiAuth, 'apiAuthToken').mockResolvedValue({});
 
         const request = new Request('http://localhost/login', {
             method: 'POST',
             body: new URLSearchParams({
-                email: 'test@sgs.com',
+                email: 'test@example.com',
                 password: 'password123'
             })
         });
@@ -58,38 +74,53 @@ describe('Login Actions', () => {
         expect(result.data.error._global).toBeDefined();
     });
 
-    it('should succeed and set cookie on valid login', async () => {
-        const token = 'fake-token';
-        const userId = 'user-123';
-        const userRole = 'admin';
+    it('should succeed and set cookies correctly on valid login', async () => {
+        const fakeToken = 'fake-access-token';
+        const fakeRefreshToken = 'fake-refresh-token';
 
-        vi.spyOn(apiAuth, 'getAuthToken').mockResolvedValue(
-            new Response(JSON.stringify({ token, userId, userRole }), { status: 200 })
-        );
-        const authUserStoreSpy = vi.spyOn(authUserStore, 'set');
+        // Simuler une réponse API réussie
+        vi.spyOn(apiAuth, 'apiAuthToken').mockResolvedValue({
+            token: fakeToken,
+            refresh_token: fakeRefreshToken
+        });
 
         const request = new Request('http://localhost/login', {
             method: 'POST',
             body: new URLSearchParams({
-                email: 'admin@sgs.com',
-                password: 'Password123!'
+                email: 'test@example.com',
+                password: 'password123'
             })
         });
 
-        const result = await actions.default({ request, cookies: mockCookies });
+        await actions.default({ request, cookies: mockCookies });
 
-        expect(result.success).toBe(true);
-        expect(mockCookies.set).toHaveBeenCalledWith('auth_token', token, expect.any(Object));
-        expect(authUserStoreSpy).toHaveBeenCalled();
+        // Vérifier que cookies.set a été appelé pour l'access token
+        expect(mockCookies.set).toHaveBeenCalledWith('access_token', fakeToken, {
+            path: '/',
+            httpOnly: true,
+            secure: true,
+            sameSite: 'lax',
+            maxAge: 900 // Correspond à ACCESS_TOKEN_LIFETIME mocké
+        });
+
+        // Vérifier que cookies.set a été appelé pour le refresh token
+        expect(mockCookies.set).toHaveBeenCalledWith('refresh_token', fakeRefreshToken, {
+            path: '/',
+            httpOnly: true,
+            secure: true,
+            sameSite: 'lax',
+            maxAge: 86400 // Correspond à REFRESH_TOKEN_LIFETIME mocké
+        });
     });
     
-    it('should return 500 on server error', async () => {
-        vi.spyOn(apiAuth, 'getAuthToken').mockRejectedValue(new Error('Server error'));
+    it('should return 500 on unexpected server error', async () => {
+        // Simuler une erreur générique
+        vi.spyOn(apiAuth, 'apiAuthToken').mockRejectedValue(new Error('Something went wrong'));
 
         const request = new Request('http://localhost/login', {
             method: 'POST',
             body: new URLSearchParams({
-                email: 'test@sgs.com',
+                email: 'test@example.com',
                 password: 'password123'
             })
         });

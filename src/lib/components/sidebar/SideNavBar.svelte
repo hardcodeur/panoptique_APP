@@ -1,11 +1,9 @@
 <script lang="ts">
     import { Sidebar, SidebarGroup, SidebarItem, SidebarWrapper, SidebarDropdownItem, SidebarDropdownWrapper } from 'flowbite-svelte';
     import { HomeSolid, BellSolid, UsersGroupSolid, RectangleListSolid, ChartPieSolid, UserSolid, EditOutline } from 'flowbite-svelte-icons';
-    import AccessControl from "$lib/components/AccessControl.svelte";
-    import { Role} from "$lib/stores/UserStore"
+    //import AccessControl from "$lib/components/AccessControl.svelte";
     import { goto } from '$app/navigation';
     import { page } from "$app/state";
-    import { userStore} from "$lib/stores/userFrontStore"
 
     let activeUrl = $state(page.url.pathname);
 
@@ -23,7 +21,6 @@
       await fetch('/logout', {
         method: 'POST'
       });
-      userStore.reset();
       goto("/login");
     }
 

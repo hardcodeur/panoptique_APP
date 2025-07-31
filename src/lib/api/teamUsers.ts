@@ -1,7 +1,7 @@
-const API_URL :string = import.meta.env.VITE_API_URL;
+import { PUBLIC_API_URL } from '$env/static/public';
 
 export async function getTeamsWhiteUsers(token: string): Promise<Response> {
-    const response = await fetch(`${API_URL}/team/users`, {
+    const response = await fetch(`${PUBLIC_API_URL}/team/users`, {
         method: 'GET',
         headers: { 
             'Authorization': `Bearer ${token}`,
@@ -13,7 +13,7 @@ export async function getTeamsWhiteUsers(token: string): Promise<Response> {
 }
 
 export async function getTeamUnassignedUsers(token: string): Promise<Response> {
-    const response = await fetch(`${API_URL}/team/unassigned-users`, {
+    const response = await fetch(`${PUBLIC_API_URL}/team/unassigned-users`, {
         method: 'GET',
         headers: { 
             'Authorization': `Bearer ${token}`,

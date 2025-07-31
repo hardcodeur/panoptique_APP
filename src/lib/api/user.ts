@@ -1,50 +1,17 @@
-const API_URL :string = import.meta.env.VITE_API_URL;
+import apiClient from '../services/apiClient';
 
-export async function getUsers(token: string): Promise<Response> {
-    const response = await fetch(`${API_URL}/users`, {
-        method: 'GET',
-        headers: { 
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        }
-    });
-    
-    return response;
+export function getUsers(): Promise<any> {
+    return apiClient.get('/users');
 }
 
-export async function getUsersById(token: string,userId: string): Promise<Response> {
-    
-    const response = await fetch(`${API_URL}/users/${userId}`, {
-        method: 'GET',
-        headers: { 
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        }
-    });
-    
-    return response;
+export function getUsersById(userId: string): Promise<any> {
+    return apiClient.get(`/users/${userId}`);
 }
 
-export async function getUserCurrentWeekShifts(token: string,userId: string): Promise<Response> {
-    const response = await fetch(`${API_URL}/users/${userId}/current-week-shifts`, {
-        method: 'GET',
-        headers: { 
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        }
-    });
-    
-    return response;
+export function getUserCurrentWeekShifts(userId: string): Promise<any> {
+    return apiClient.get(`/users/${userId}/current-week-shifts`);
 }
 
-export async function getUserCurrentMonthShiftsMetric(token: string,userId: string): Promise<Response> {
-    const response = await fetch(`${API_URL}/users/${userId}/metric-shift`, {
-        method: 'GET',
-        headers: { 
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        }
-    });
-    
-    return response;
+export function getUserCurrentMonthShiftsMetric(userId: string): Promise<any> {
+    return apiClient.get(`/users/${userId}/metric-shift`);
 }

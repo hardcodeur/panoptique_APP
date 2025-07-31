@@ -1,7 +1,7 @@
-const API_URL :string = import.meta.env.VITE_API_URL;
+import { PUBLIC_API_URL } from '$env/static/public';
 
 export async function getMissionWhiteShifts(token: string): Promise<Response> {
-    const response = await fetch(`${API_URL}/missions/shifts`, {
+    const response = await fetch(`${PUBLIC_API_URL}/missions/shifts`, {
         method: 'GET',
         headers: { 
             'Authorization': `Bearer ${token}`,
