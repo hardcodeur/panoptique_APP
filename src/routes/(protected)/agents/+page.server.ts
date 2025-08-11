@@ -5,7 +5,7 @@ import { getTeams } from "$lib/api/team.js"
 import { error } from '@sveltejs/kit';
 import { redirect } from '@sveltejs/kit';
 import { getTeamsWhiteUsers,getTeamUnassignedUsers } from "$lib/api/teamUsers.js";
-import { userStore,Role } from "$lib/stores/userFrontStore"
+import { userStore,Role } from "$lib/stores/UserStore"
 
 
 const roles = ['admin', 'manager', 'team_manager', 'agent'] as const;

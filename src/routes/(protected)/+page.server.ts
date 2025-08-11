@@ -1,21 +1,37 @@
-// import { getUsersById } from "$lib/api/user"
-// import { getUserCurrentWeekShifts,getUserCurrentMonthShiftsMetric } from "$lib/api/user"
-// import { authUserStore } from "$lib/stores/UserStore"
+import { getUserCurrentWeekShifts, getUserCurrentMonthShiftsMetric } from "$lib/api/user"
+import type { PageServerLoad } from "./$types";
 
-// export async function load({cookies}) {
-
-//     const token :string = cookies.get('auth_token') as string;
+export const load: PageServerLoad = async (event) => {
+    const { parent } = event;
+    const { user } = await parent();
     
-//     const userId = authUserStore.getUserId();
+    if (!user?.id) {
+        return {
+            user,
+            currentWeekShifts: { shifts: [] },
+            currentMonthShiftsMetric: { totalHours: 0, totalShifts: 0, activitiesCount: [] }
+        };
+    }
+
+    const userId = user.id;
+
+    try {
+        const [currentWeekShifts, currentMonthShiftsMetric] = await Promise.all([
+            getUserCurrentWeekShifts(userId, event),
+            getUserCurrentMonthShiftsMetric(userId, event)
+        ]);
     
-//     const apiUserResponse :Response = await getUsersById(token,userId);
-//     const user = await apiUserResponse.json();
-
-//     const apiUserCurrentWeekShiftsResponse :Response = await getUserCurrentWeekShifts(token,userId);
-//     const currentWeekShifts = await apiUserCurrentWeekShiftsResponse.json();
-
-//     const apiUserCurrentMonthShiftsMetricResponse :Response = await getUserCurrentMonthShiftsMetric(token,userId);
-//     const currentMonthShiftsMetric = await apiUserCurrentMonthShiftsMetricResponse.json();
-
-//     return {user,currentWeekShifts,currentMonthShiftsMetric};
-// }
+        return {
+            user,
+            currentWeekShifts,
+            currentMonthShiftsMetric
+        };
+    } catch (error) {
+        console.error("Error loading dashboard data:", error);
+        return {
+            user,
+            currentWeekShifts: { shifts: [] },
+            currentMonthShiftsMetric: { totalHours: 0, totalShifts: 0, activitiesCount: [] }
+        };
+    }
+}

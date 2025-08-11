@@ -1,4 +1,4 @@
-
+import type { Cookies } from '@sveltejs/kit';
 
 export interface SelectInputValue {
     value: string;
@@ -11,8 +11,6 @@ export type FormSchemas = {
     [key in FormField]?: string;
 };
 
-export interface FormStore {
-    errors: FormSchemas;
-    values: FormSchemas;
-}
+
+export type ServerEvent = { cookies: Cookies; fetch: typeof fetch };
 

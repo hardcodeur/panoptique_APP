@@ -1,4 +1,4 @@
-import { json, error } from '@sveltejs/kit';
+import { json, error,redirect } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { PUBLIC_API_URL} from '$env/static/public';
 import { ACCESS_TOKEN_LIFETIME} from '$env/static/private';
@@ -19,8 +19,6 @@ export const POST: RequestHandler = async ({ cookies }) => {
             body: JSON.stringify({ refresh_token: refreshToken })
         });
 
-
-        // Fail - clean cookies
         if (!response.ok) {
             const errorData = await response.json();
             throw error(response.status, errorData.message || 'Failed to refresh token');
@@ -31,20 +29,20 @@ export const POST: RequestHandler = async ({ cookies }) => {
         // Create new acces_token, the refresh token not change
         cookies.set('access_token', token, { 
             path: '/', 
-            httpOnly: true, 
             secure: true, 
             sameSite: 'lax', 
             maxAge: parseInt(ACCESS_TOKEN_LIFETIME, 10),
         });
 
-        return json({ success: true });
+        return json({
+            code : 200,
+            message : "Token refresh success"
+        });
 
     } catch (err: any) {
         cookies.delete('access_token', { path: '/' });
         cookies.delete('refresh_token', { path: '/' });
-        if (err.status) {
-            throw err;
-        }
-        throw error(500, 'An unexpected error occurred during token refresh');
+        console.log(err);
+        throw redirect(303, '/login');
     }
 };

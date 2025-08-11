@@ -28,10 +28,9 @@ $effect(()=>{
 })
 
 onMount(() => {
-    // Start the proactive token refresh mechanism and get the cleanup function.
+    // Refresh access token auto
     const cleanup = startProactiveTokenRefresh();
-
-    // Return the cleanup function to be called when the component is destroyed.
+    // Return the cleanup when the component is destroyed.
     return cleanup;
 });
 

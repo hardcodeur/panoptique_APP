@@ -1,7 +1,13 @@
+import { ACCESS_TOKEN_LIFETIME } from '$env/static/private';
 
 export function startProactiveTokenRefresh(): () => void {
+
     let refreshInterval: NodeJS.Timeout;
+    const refreshIntervalValue = parseInt(ACCESS_TOKEN_LIFETIME)-2
     let lastRefresh = Date.now();
+
+
+
 
     const refreshToken = async () => {
         try {
@@ -17,8 +23,10 @@ export function startProactiveTokenRefresh(): () => void {
     };
 
     const startTimer = () => {
-        if (refreshInterval) clearInterval(refreshInterval);
-        refreshInterval = setInterval(refreshToken, 10 * 60 * 1000);
+        if (refreshInterval){
+            clearInterval(refreshInterval);
+        }
+        refreshInterval = setInterval(refreshToken, refreshIntervalValue * 60 * 1000);
     };
 
     const stopTimer = () => {

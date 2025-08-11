@@ -45,15 +45,15 @@ export const actions : Actions = {
         return fail(400, { error: { _global: ["Un problème technique a été détecté. Si l'erreur persiste après un nouvel essai, merci de signaler l'incident au service informatique."] }});
       }
       
-      // Insert access and refresh token in secure cookies 
+      // Insert access token in classic cookies 
       cookies.set('access_token', token, { 
         path: '/', 
-        httpOnly: true, 
         secure: true, 
         sameSite: 'lax', 
         maxAge: parseInt(ACCESS_TOKEN_LIFETIME, 10)
       });
 
+      // Insert refresh token in secure cookies http only
       cookies.set('refresh_token', refresh_token, { 
         path: '/', 
         httpOnly: true, 
