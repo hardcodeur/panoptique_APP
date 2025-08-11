@@ -1,31 +1,103 @@
-import { redirect } from "@sveltejs/kit";
+// src/routes/(protected)/+layout.server.ts
 
-export function load({cookies}) {
+import { redirect, type Cookies } from "@sveltejs/kit";
+import jwt from 'jsonwebtoken';
+import fs from 'fs';
+import path from 'path';
+import { PUBLIC_API_URL } from '$env/static/public';
+import { ACCESS_TOKEN_LIFETIME } from '$env/static/private';
 
-    const refreshToken=cookies.get("refresh_token");
+// get public signature key
+const publicKey = fs.readFileSync(path.resolve('./key/public_key.pem'));
 
-    // cookie expired
-    if (!refreshToken){
-        throw redirect(303, '/login');
+export async function load({ cookies, fetch }) {
+    
+    const refreshToken = cookies.get("refresh_token");
+    const accessToken = cookies.get("access_token");
+    let userPayload = null;
+
+    // no refresh no session
+    if (!refreshToken) {
+        return logout(cookies);
     }
 
-    try {
-        // base64 decode payload
-        const payloadB64 = refreshToken.split('.');
-        const payload = JSON.parse(Buffer.from(payloadB64[1], 'base64url').toString('utf8'));
-        
-        const user = {
-            "id" : payload['id'],
-            "email" : payload['userEmail'],
-            "fullName" : payload['userName'],
-            "role" : payload['role'],
+    if (accessToken) {
+        try {
+            // Check the signature of token for security the cookie of access token is not http only
+            const payload = jwt.verify(accessToken, publicKey, { algorithms: ['RS256'] });
+            
+            if (typeof payload === 'object') {
+                userPayload = {
+                    "id": payload.id,
+                    "email": payload.userEmail,
+                    "fullName": payload.userName,
+                    "role": payload.role,
+                };
+            }
+        } catch (error) {
+            console.log("Access token expiré");
         }
-
-        return {
-            user : user,
-        }
-    } catch (error) {
-        cookies.delete("access_token",{path:"/"})
-        throw redirect(303, '/login');
     }
+
+    // if userPayload is null, access token not exist, i make a refresh
+    if (!userPayload) {
+        try {
+            const newAccessToken = await makeRefreshToken(cookies, refreshToken);
+
+            const newPayload = jwt.verify(newAccessToken, publicKey, { algorithms: ['RS256'] });
+
+            if (typeof newPayload !== 'object') {
+                throw new Error("Le nouveau token reçu de l'API est malformé.");
+            }
+
+            userPayload = {
+                    "id": newPayload.id,
+                    "email": newPayload.userEmail,
+                    "fullName": newPayload.userName,
+                    "role": newPayload.role,
+            };
+
+        } catch (refreshError: any) {
+            // refresh fail disconnection
+            console.error("Échec : le rafraîchissement du token a échoué déconnexion.", refreshError.message);
+            return logout(cookies);
+        }
+    }
+
+    // return user
+    return { user: userPayload };
+}
+
+// call Api and replaces access token
+async function makeRefreshToken(cookies: Cookies, refreshToken: string) {
+    // Appel direct à l'API externe, car nous sommes côté serveur.
+    const config = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refresh_token: refreshToken })
+    }
+    const response = await fetch(`${PUBLIC_API_URL}/token/refresh`,config);
+
+    if (!response.ok) {
+        throw new Error("L'API n'as pas reussit à rafraichire le token");
+    }
+
+    const { token: newAccessToken } = await response.json();
+
+    // add cookie with the new access token, cookie public
+    cookies.set('access_token', newAccessToken, {
+        path: '/',
+        secure: true,
+        sameSite: 'lax',
+        maxAge: parseInt(ACCESS_TOKEN_LIFETIME, 10)
+    });
+
+    return newAccessToken
+}
+
+// delete all auth cookie and redirect
+function logout(cookies: Cookies) {
+    cookies.delete("access_token", { path: "/" });
+    cookies.delete("refresh_token", { path: "/" });
+    throw redirect(303, '/login');
 }

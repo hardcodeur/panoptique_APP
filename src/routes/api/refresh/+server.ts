@@ -6,12 +6,13 @@ import { ACCESS_TOKEN_LIFETIME} from '$env/static/private';
 export const POST: RequestHandler = async ({ cookies }) => {
     const refreshToken = cookies.get('refresh_token');
 
-    // No token
-    if (!refreshToken) {
-        throw error(401, 'No refresh token found');
-    }
-
     try {
+
+        // No token
+        if (!refreshToken) {
+            throw error(401, 'No refresh token found');
+        }
+
         // Backen API query
         const response = await fetch(`${PUBLIC_API_URL}/token/refresh`, {
             method: 'POST',
