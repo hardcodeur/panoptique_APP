@@ -51,26 +51,18 @@ export const actions = {
 
 }
 
-export async function load({ cookies }) {
+export async function load({ cookies, fetch }) {
     try {
-        const token = cookies.get('auth_token');
-        
-        // Vérification du token
-        if (!token) {
-            throw error(401, 'Token d\'authentification manquant');
-        }
-
-        // Lance toutes les requêtes en parallèle
         const [
             missionsRes,
             missionShiftsRes,
             locationRes,
             teamsRes
         ] = await Promise.all([
-            getMissions(token),
-            getMissionWhiteShifts(token),
-            getLocationLocationNote(token),
-            getTeams(token)
+            getMissions({ cookies, fetch }),
+            getMissionWhiteShifts({ cookies, fetch }),
+            getLocationLocationNote({ cookies, fetch }),
+            getTeams({ cookies, fetch })
         ]);
 
         if (!missionsRes.ok) {

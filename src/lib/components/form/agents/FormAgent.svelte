@@ -1,70 +1,52 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
     import {Button,Label, Input, Helper,Select} from "flowbite-svelte";
-    import { formStore,userSelectedStore,resetFormStore } from "$lib/stores/form/agentStore";
     import type {SelectInputValue} from "$lib/types"
+    import type { ActionData } from './$types';
 
     let { 
         form,
-        resetForm,
-        formProps
-    } = $props();
+        formProps,
+        initialData = null
+    } : { form: ActionData | null; formProps: any; initialData?: any } = $props();
 
-    let roleSelected:string = $state("");
-    let teamSelected:string = $state("");
-    let initialLoad = $state(true);
+    let errors= $derived(form?.errors);
+    let submittedData= $derived(form?.formData);
+
+    let firstName= $state("");
+    let lastName= $state("");
+    let email= $state("");
+    let phone= $state("");
+    let roleSelected= $state("");
+    let teamSelected= $state("");
+
+    $effect(()=>{
+        if (initialData) {
+            firstName= initialData.firstName || '';
+            lastName= initialData.lastName || '';
+            email= initialData.email || '';
+            phone= initialData.phone || '';
+            roleSelected= initialData.role || '';
+            teamSelected= initialData.team || '';
+        } else if (submittedData) {
+            firstName=  submittedData.firstName || '';
+            lastName= submittedData.lastName || '';
+            email= submittedData.email || '';
+            phone= submittedData.phone || '';
+            roleSelected= submittedData.role || '';
+            teamSelected= submittedData.team || '';
+        }else{
+            firstName= '';
+            lastName= '';
+            email= '';
+            phone= '';
+            roleSelected= '';
+            teamSelected= '';
+        }
+    });
+
     const teamList = formProps.teamList
 
-    $effect(() => {
-        if (resetForm) {
-            resetFormStore()
-            roleSelected = "";
-            teamSelected = "";
-            initialLoad = true;
-        }
-    });
-
-    $effect(() => {
-
-        if ($userSelectedStore && initialLoad) {
-            formStore.update(store => ({
-                ...store,
-                values: {
-                    ...store.values,
-                    firstName: $userSelectedStore.firstName || "",
-                    lastName: $userSelectedStore.lastName || "",
-                    email: $userSelectedStore.email || "",
-                    phone: $userSelectedStore.phone || "",
-                    role: $userSelectedStore.role || "",
-                    team: $userSelectedStore.team || ""
-                }
-            }));
-            
-            roleSelected = $userSelectedStore.role || "";
-            teamSelected = $userSelectedStore.team || "";
-
-            initialLoad = false
-        }
-    });
-
-    $effect(() => {
-
-        if (form) {
-            formStore.update(store => ({
-                errors: form.errors || {},
-                values: { ...store.values, ...form.formData }
-            }));
-
-            if (form.formData?.role !== roleSelected) {
-                roleSelected = form.formData.role;
-            }
-            if (form.formData?.team !== teamSelected) {
-                teamSelected = form.formData.team;
-            }
-        }
-    });
-
-        
     let roleItems :SelectInputValue[] = [
         { value: 'admin', name: 'Administrateur' },
         { value: 'manager', name: "Directeur d'agence" },
@@ -85,37 +67,37 @@
 <form use:enhance method="POST" action="?/add" class="mb-6">
     <div class="mb-6">
         <Label for="firstName" class="ts-text-bold block mb-2">Nom</Label>
-        <Input class="text-th-black-light" id="firstName" bind:value={$formStore.values.firstName} name="firstName" placeholder="Jean" />
-        {#if $formStore.errors?.firstName}
+        <Input class="text-th-black-light" id="firstName" bind:value={firstName} name="firstName" placeholder="Jean" />
+        {#if errors?.firstName}
         <Helper class={helperClass}> 
-            {$formStore.errors.firstName}
+            {errors.firstName[0]}
         </Helper>
         {/if}
     </div>
     <div class="mb-6">
         <Label for="lastName" class="ts-text-bold block mb-2">Prénom</Label>
-        <Input class="text-th-black-light" id="lastName" bind:value={$formStore.values.lastName} name="lastName" placeholder="Dupont" />
-        {#if $formStore.errors?.lastName}
+        <Input class="text-th-black-light" id="lastName" bind:value={lastName} name="lastName" placeholder="Dupont" />
+        {#if errors?.lastName}
         <Helper class={helperClass}> 
-            {$formStore.errors.lastName}
+            {errors.lastName[0]}
         </Helper>
         {/if}
     </div>
     <div class="mb-6">
         <Label for="email" class="ts-text-bold block mb-2">Email</Label>
-        <Input class="text-th-black-light" id="email" bind:value={$formStore.values.email} name="email" placeholder="j.dupont@sgs.com" />
-        {#if $formStore.errors?.email}
+        <Input class="text-th-black-light" id="email" bind:value={email} name="email" placeholder="j.dupont@sgs.com" />
+        {#if errors?.email}
         <Helper class={helperClass}> 
-            {$formStore.errors.email}
+            {errors.email[0]}
         </Helper>
         {/if}
     </div>
     <div class="mb-6">
         <Label for="phone" class="ts-text-bold block mb-2">Téléphone</Label>
-        <Input class="text-th-black-light" id="phone" bind:value={$formStore.values.phone} name="phone" placeholder="0621516978" />
-        {#if $formStore.errors?.phone}
+        <Input class="text-th-black-light" id="phone" bind:value={phone} name="phone" placeholder="0621516978" />
+        {#if errors?.phone}
         <Helper class={helperClass}> 
-            {$formStore.errors.phone}
+            {errors.phone[0]}
         </Helper>
         {/if}
     </div>
@@ -124,9 +106,9 @@
             Role
             <Select name="role" class="mt-2 ts-text text-th-black-light capitalize" placeholder="Liste des roles" items={roleItems} bind:value={roleSelected} />
         </Label>
-        {#if $formStore.errors?.role}
+        {#if errors?.role}
         <Helper class={helperClass}> 
-            {$formStore.errors.role}
+            {errors.role[0]}
         </Helper>
         {/if}
     </div>
@@ -135,9 +117,9 @@
             Équipe
             <Select name="team" class="mt-2 ts-text text-th-black-light capitalize" placeholder="Liste des équipes" items={teamItems} bind:value={teamSelected} />
         </Label>
-        {#if $formStore.errors?.team}
+        {#if errors?.team}
         <Helper class={helperClass}> 
-            {$formStore.errors.team}
+            {errors.team[0]}
         </Helper>
         {/if}
     </div>

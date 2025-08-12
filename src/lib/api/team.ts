@@ -1,13 +1,8 @@
-import { PUBLIC_API_URL } from '$env/static/public';
+import { apiClient } from '../services/apiClient';
+import type { Cookies } from '@sveltejs/kit';
 
-export async function getTeams(token: string): Promise<Response> {
-    const response = await fetch(`${PUBLIC_API_URL}/teams`, {
-        method: 'GET',
-        headers: { 
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        }
-    });
-    
-    return response;
+type ServerEvent = { cookies: Cookies; fetch: typeof fetch };
+
+export function getTeams(event?: ServerEvent): Promise<any> {
+    return apiClient.get('/teams', event);
 }

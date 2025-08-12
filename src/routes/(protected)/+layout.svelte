@@ -7,8 +7,7 @@ import { userStore } from "$lib/stores/UserStore"
 
 import Header from "$lib/components/header/Header.svelte";
 import SideNavBar from "$lib/components/sidebar/SideNavBar.svelte";
-import { onMount } from 'svelte';
-import { startProactiveTokenRefresh } from '$lib/services/refreshManager';
+
 
 let {children} = $props();
 
@@ -26,14 +25,6 @@ $effect(()=>{
 		})
 	}	
 })
-
-onMount(() => {
-    // Refresh access token auto
-    const cleanup = startProactiveTokenRefresh();
-    // Return the cleanup when the component is destroyed.
-    return cleanup;
-});
-
 </script>
 
 <Header/>

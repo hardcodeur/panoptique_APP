@@ -8,7 +8,8 @@
         sidbarTitle,
         form,
         FormComponent,
-        formProps = null
+        formProps = null,
+        initialData = null
     } = $props()
 
     let resetForm  :boolean = $state(false) 
@@ -34,7 +35,7 @@
             <CloseButton on:click={() => (hidden = true)} class="mb-4 dark:text-white" />
         </div>
         {#if FormComponent}
-           <FormComponent {form} {formProps} {resetForm} />
+           <FormComponent {form} {formProps} {resetForm} initialData={initialData} />
         {/if}
     </Drawer>
 </Section>

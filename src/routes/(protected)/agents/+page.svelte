@@ -7,26 +7,28 @@
     import TableUser from "$lib/components/tables/TableUser.svelte";
     import TeamCard from "$lib/components/card/TeamCard.svelte"
     import type { ActionData,PageData } from './$types';
-    import { resetUserSelectedStore } from "$lib/stores/form/agentStore";
-	import type {  ComponentType } from 'svelte';
+
+    type agentFormComponent = typeof FormAgent | typeof FormTeam;
 
     let { form,data } : { form: ActionData,data: PageData}  = $props();
  
     let drawerHidden: boolean = $state(true);
-    let FormComponent: ComponentType = $state(FormAgent);
+    let FormComponent: agentFormComponent = $state(FormAgent);
     let sidbarTitle :string = $state("");
+    let initialFormData: any = $state(null);
 
-    function openDrawer(component: ComponentType,DrawerTitle :string): void {
+    function openDrawer(component: agentFormComponent,DrawerTitle :string, dataToEdit?: any): void {
         FormComponent = component;
         drawerHidden = false;
         sidbarTitle = DrawerTitle
-        form = null
+        form = null;
+        initialFormData = dataToEdit;
     }
 
     const tabsTitleAgent="Agents"
     const tabsTitleTeam="Équipes"
+
     const tabsClass="mt-4";
-    
     const tabItemTitleRow="flex flex-col items-center sm:flex-row sm:justify-between gap-4 py-4"
     const tabItemActiveClass="inline-block ts-text-bold text-center disabled:cursor-not-allowed p-4 text-th-blue border-b-2 border-th-blue active"
     const tabItemInactiveClass="inline-block ts-text text-center disabled:cursor-not-allowed p-4 border-b-2 border-transparent hover:text-th-black text-th-black"
@@ -45,14 +47,14 @@
     <TabItem open title={tabsTitleAgent} activeClasses={tabItemActiveClass} inactiveClasses={tabItemInactiveClass}>
         <div class={tabItemTitleRow}>
             <h1 class={tabItemTitle}>{tabsTitleAgent}</h1>
-            <Button size="lg" class={btnClass} on:click={() => {openDrawer(FormAgent,"Nouvel agent"),resetUserSelectedStore()}}><CirclePlusSolid class={btnIconClass} />Ajouter un agent</Button>
+            <Button size="lg" class={btnClass} on:click={() => {openDrawer(FormAgent,"Nouvel agent")}}><CirclePlusSolid class={btnIconClass} />Ajouter un agent</Button>
         </div>
         <TableUser userList={userList}  openDrawer={openDrawer} />
     </TabItem>
     <TabItem title={tabsTitleTeam} activeClasses={tabItemActiveClass} inactiveClasses={tabItemInactiveClass}>
         <div class={tabItemTitleRow}>
             <h1 class={tabItemTitle}>{tabsTitleTeam}</h1>
-            <Button size="lg" class={btnClass} on:click={() => (openDrawer(FormTeam,"Nouvelle équipe"))}><CirclePlusSolid class={btnIconClass} />Ajouter une équipe</Button>
+            <Button size="lg" class={btnClass} on:click={() => {openDrawer(FormTeam,"Nouvelle équipe")}}><CirclePlusSolid class={btnIconClass} />Ajouter une équipe</Button>
         </div>
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 grid-cols-1 gap-x-8 gap-y-4">
             {#each teamsUsers as teamUsers (teamUsers.id)}
@@ -61,4 +63,4 @@
         </div>
     </TabItem>
 </Tabs>
-<SidebarForm bind:hidden={drawerHidden} formProps={{teamList:teamList,teamWhiteUsers:teamsUsers,unassignedUsers:unassignedUsers}} {sidbarTitle} {form} {FormComponent} />
+<SidebarForm bind:hidden={drawerHidden} formProps={{teamList:teamList,teamWhiteUsers:teamsUsers,unassignedUsers:unassignedUsers}} {sidbarTitle} {form} {FormComponent} initialData={initialFormData} />

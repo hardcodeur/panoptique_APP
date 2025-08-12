@@ -8,7 +8,7 @@ import { PUBLIC_API_URL } from '$env/static/public';
 import { ACCESS_TOKEN_LIFETIME } from '$env/static/private';
 
 // get public signature key
-const publicKey = fs.readFileSync(path.resolve('./key/public_key.pem'));
+const publicKey = fs.readFileSync(path.resolve('./key/public.pem'));
 
 export async function load({ cookies, fetch }) {
     
@@ -44,6 +44,7 @@ export async function load({ cookies, fetch }) {
         try {
             const newAccessToken = await makeRefreshToken(cookies, refreshToken);
 
+            // Check the signature of token for security the cookie of access token is not http only
             const newPayload = jwt.verify(newAccessToken, publicKey, { algorithms: ['RS256'] });
 
             if (typeof newPayload !== 'object') {
@@ -70,7 +71,7 @@ export async function load({ cookies, fetch }) {
 
 // call Api and replaces access token
 async function makeRefreshToken(cookies: Cookies, refreshToken: string) {
-    // Appel direct à l'API externe, car nous sommes côté serveur.
+    
     const config = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

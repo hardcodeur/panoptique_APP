@@ -1,11 +1,10 @@
-import { fail } from '@sveltejs/kit';
+import { fail, error } from '@sveltejs/kit';
 import { z } from "zod";
+
+// Call API
 import { getUsers } from "$lib/api/user"
-import { getTeams } from "$lib/api/team.js"
-import { error } from '@sveltejs/kit';
-import { redirect } from '@sveltejs/kit';
-import { getTeamsWhiteUsers,getTeamUnassignedUsers } from "$lib/api/teamUsers.js";
-import { userStore,Role } from "$lib/stores/UserStore"
+import { getTeams } from "$lib/api/team"
+import { getTeamsWhiteUsers,getTeamUnassignedUsers } from "$lib/api/teamUsers";
 
 
 const roles = ['admin', 'manager', 'team_manager', 'agent'] as const;
@@ -27,21 +26,17 @@ const schema = z.object({
     team: z.string().min(1, 'Champ obligatoire'),
 });
 
-// console.log("serveur agents",userStore.get().role );
-// if (!userStore.hasAnyRole(Role.ADMIN, Role.MANAGER, Role.TEAM_MANAGER)) {
-//     throw redirect(302, '/403');
-// }
-
-
 export const actions = {
 
-    add: async ({ request, cookies }) => {
+    add: async ({request}) => {
 
-        const formData = Object.fromEntries(await request.formData());
+        // Parse form data
+        const formData = Object.fromEntries(await request.formData()) as Partial<FormData> ;
+        // Zod check Form requirement 
         const result = schema.safeParse(formData);
 
         if (!result.success) {
-            const errors = result.error.flatten().fieldErrors;
+            const errors = result.error.flatten().fieldErrors;            
             return fail(400, { errors,formData});
         }
 
@@ -51,41 +46,19 @@ export const actions = {
 
 }
 
-export async function load({cookies}) {
+export async function load({cookies, fetch}) {
     try {
-        const token: string = cookies.get('auth_token') as string;
-        if (!token) throw error(401, 'Non autorisé');
-
         const [
-            apiUsersResponse,
-            apiTeamsResponse, 
-            apiTeamsWhiteUsersResponse, 
-            apiTeamUnassignedUsersResponse
-        ] = 
-            await Promise.all([
-                getUsers(token),
-                getTeams(token),
-                getTeamsWhiteUsers(token),
-                getTeamUnassignedUsers(token)
-            ]);
-
-        if (!apiUsersResponse.ok) throw error(apiUsersResponse.status, await apiUsersResponse.text());
-        if (!apiTeamsResponse.ok) throw error(apiTeamsResponse.status, await apiTeamsResponse.text());
-        if (!apiTeamsWhiteUsersResponse.ok) throw error(apiTeamsWhiteUsersResponse.status, await apiTeamsWhiteUsersResponse.text());
-        if (!apiTeamUnassignedUsersResponse.ok) throw error(apiTeamUnassignedUsersResponse.status, await apiTeamUnassignedUsersResponse.text());
-
-        const [
-            userList, 
+            userList,
             teamList, 
             teamWhiteUsers, 
             teamUnassignedUsers
         ] = await Promise.all([
-            apiUsersResponse.json(),
-            apiTeamsResponse.json(),
-            apiTeamsWhiteUsersResponse.json(),
-            apiTeamUnassignedUsersResponse.json()
+            getUsers({ cookies, fetch }),
+            getTeams({ cookies, fetch }),
+            getTeamsWhiteUsers({ cookies, fetch }),
+            getTeamUnassignedUsers({ cookies, fetch })
         ]);
-
         return { userList, teamList, teamWhiteUsers, teamUnassignedUsers };
     } catch (err) {
         throw error(500, 'Erreur lors du chargement des données');

@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell, TableSearch, Button, ButtonGroup } from 'flowbite-svelte';
 	import { Section } from 'flowbite-svelte-blocks';
-	import { userSelectedStore } from "$lib/stores/form/agentStore";
 	import { ProfileCardSolid,ChevronRightOutline, ChevronLeftOutline } from 'flowbite-svelte-icons';
 	import RoleBadge from "$lib/components/badge/RoleBadge.svelte"
     import StatusBadge from "$lib/components/badge/StatusBadge.svelte"
@@ -53,9 +52,6 @@
 		updateDataAndPagination();
 	};
 
-	const userSelected = (user)=>{
-		userSelectedStore.set(user);
-	}
 
 	let startRange = $derived(currentPosition + 1);
 	let endRange = $derived(Math.min(currentPosition + itemsPerPage, totalItems));
@@ -96,7 +92,7 @@
 						<TableBodyCell class="px-4 py-3 capitalize">{item.team}</TableBodyCell>
 						<TableBodyCell class="px-4 py-3">{item.email}</TableBodyCell>
 						<TableBodyCell class="px-4 py-3"><StatusBadge status={item.status} /></TableBodyCell>
-						<TableBodyCell class="px-4 py-3"><Button outline size="xs" class={btnViewClass} on:click={() => (openDrawer(FormAgent,`Agent - ${item.fullName}`),userSelected(item))}><ProfileCardSolid class={btnIconClass} />Profil</Button></TableBodyCell>
+						<TableBodyCell class="px-4 py-3"><Button outline size="xs" class={btnViewClass} on:click={() => (openDrawer(FormAgent,`Agent - ${item.fullName}`, item))}><ProfileCardSolid class={btnIconClass} />Profil</Button></TableBodyCell>
 					</TableBodyRow>
 				{/each}
 			{:else}
@@ -107,7 +103,7 @@
 						<TableBodyCell class="px-4 py-3 capitalize">{item.team}</TableBodyCell>
 						<TableBodyCell class="px-4 py-3">{item.email}</TableBodyCell>
 						<TableBodyCell class="px-4 py-3"><StatusBadge status={item.status} /></TableBodyCell>
-						<TableBodyCell class="px-4 py-3"><Button outline size="xs" class={btnViewClass} on:click={() => (openDrawer(FormAgent,`Agent - ${item.fullName}`),userSelected(item))}><ProfileCardSolid class={btnIconClass} />Profil</Button></TableBodyCell>
+						<TableBodyCell class="px-4 py-3"><Button outline size="xs" class={btnViewClass} on:click={() => (openDrawer(FormAgent,`Agent - ${item.fullName}`, item))}><ProfileCardSolid class={btnIconClass} />Profil</Button></TableBodyCell>
 					</TableBodyRow>
 				{/each}
 			{/if}

@@ -1,25 +1,12 @@
-import { PUBLIC_API_URL } from '$env/static/public';
+import { apiClient } from '../services/apiClient';
+import type { Cookies } from '@sveltejs/kit';
 
-export async function getTeamsWhiteUsers(token: string): Promise<Response> {
-    const response = await fetch(`${PUBLIC_API_URL}/team/users`, {
-        method: 'GET',
-        headers: { 
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        }
-    });
-    
-    return response;
+type ServerEvent = { cookies: Cookies; fetch: typeof fetch };
+
+export function getTeamsWhiteUsers(event?: ServerEvent): Promise<any> {
+    return apiClient.get('/team/users', event);
 }
 
-export async function getTeamUnassignedUsers(token: string): Promise<Response> {
-    const response = await fetch(`${PUBLIC_API_URL}/team/unassigned-users`, {
-        method: 'GET',
-        headers: { 
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        }
-    });
-    
-    return response;
+export function getTeamUnassignedUsers(event?: ServerEvent): Promise<any> {
+    return apiClient.get('/team/unassigned-users', event);
 }
