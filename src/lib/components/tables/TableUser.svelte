@@ -6,7 +6,7 @@
     import StatusBadge from "$lib/components/badge/StatusBadge.svelte"
 	import FormAgent from "$lib/components/form/agents/FormAgent.svelte"
 
-	let { userList,openDrawer } = $props();
+	let { userList,sideBarFormConfig } = $props();
 	let searchTerm = $state('');
 	let currentPosition = $state(0);
 	const itemsPerPage = 10;
@@ -92,7 +92,7 @@
 						<TableBodyCell class="px-4 py-3 capitalize">{item.team}</TableBodyCell>
 						<TableBodyCell class="px-4 py-3">{item.email}</TableBodyCell>
 						<TableBodyCell class="px-4 py-3"><StatusBadge status={item.status} /></TableBodyCell>
-						<TableBodyCell class="px-4 py-3"><Button outline size="xs" class={btnViewClass} on:click={() => (openDrawer(FormAgent,`Agent - ${item.fullName}`, item))}><ProfileCardSolid class={btnIconClass} />Profil</Button></TableBodyCell>
+						<TableBodyCell class="px-4 py-3"><Button outline size="xs" class={btnViewClass} on:click={() => (sideBarFormConfig(FormAgent,`Agent - ${item.fullName}`, item))}><ProfileCardSolid class={btnIconClass} />Profil</Button></TableBodyCell>
 					</TableBodyRow>
 				{/each}
 			{:else}
@@ -103,7 +103,7 @@
 						<TableBodyCell class="px-4 py-3 capitalize">{item.team}</TableBodyCell>
 						<TableBodyCell class="px-4 py-3">{item.email}</TableBodyCell>
 						<TableBodyCell class="px-4 py-3"><StatusBadge status={item.status} /></TableBodyCell>
-						<TableBodyCell class="px-4 py-3"><Button outline size="xs" class={btnViewClass} on:click={() => (openDrawer(FormAgent,`Agent - ${item.fullName}`, item))}><ProfileCardSolid class={btnIconClass} />Profil</Button></TableBodyCell>
+						<TableBodyCell class="px-4 py-3"><Button outline size="xs" class={btnViewClass} on:click={() => (sideBarFormConfig(FormAgent,`Agent - ${item.fullName}`, item))}><ProfileCardSolid class={btnIconClass} />Profil</Button></TableBodyCell>
 					</TableBodyRow>
 				{/each}
 			{/if}

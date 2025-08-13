@@ -27,14 +27,14 @@
 
     let { form,data } : { form: ActionData,data: PageData}  = $props();
  
-    let drawerHidden: boolean = $state(true);
+    let sideBarHidden: boolean = $state(true);
     let FormComponent: ComponentType = $state(FormAgent);
     let sidbarTitle :string = $state("");
     let resetKey = $state(0)
 
     function openDrawer(component: ComponentType,DrawerTitle :string): void {
         FormComponent = component;
-        drawerHidden = false;
+        sideBarHidden = false;
         sidbarTitle = DrawerTitle;
     }
 
@@ -141,4 +141,4 @@
         
     </TabItem>
 </Tabs>
-<SidebarForm bind:hidden={drawerHidden} formProps={{teamList:data.teamList}} {sidbarTitle} {form} {FormComponent} />
+<SidebarForm bind:hidden={sideBarHidden} formProps={{teamList:data.teamList}} {sidbarTitle} {form} {FormComponent} />

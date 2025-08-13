@@ -23,11 +23,11 @@
     };
 
     
-    let drawerHidden: boolean = $state(true);
+    let sideBarHidden: boolean = $state(true);
     let FormComponent = FormProfil;
     let sidbarTitle :string = $state("");
     function openDrawer(DrawerTitle :string): void {
-        drawerHidden = false;
+        sideBarHidden = false;
         sidbarTitle = DrawerTitle
     }
 
@@ -71,5 +71,5 @@
             <Button size="lg" class={btnClass} on:click={() => {openDrawer("Modifier mes données personnel")}}><CogSolid class={btnIconClass} />Modifier</Button>
         </div>
     </div>
-    <SidebarForm bind:hidden={drawerHidden} formProps="" {sidbarTitle} {form} {FormComponent} />
+    <SidebarForm bind:hidden={sideBarHidden} formProps="" {sidbarTitle} {form} {FormComponent} />
 </section>

@@ -5,13 +5,13 @@
     import type { ActionData } from './$types';
 
     let { 
-        form,
-        formProps,
-        initialData = null
-    } : { form: ActionData | null; formProps: any; initialData?: any } = $props();
+        formReturn,
+        formData,
+        itemUpdate = null
+    } : { formReturn: ActionData | null; formData: any; itemUpdate?: any } = $props();
 
-    let errors= $derived(form?.errors);
-    let submittedData= $derived(form?.formData);
+    let errors= $derived(formReturn?.errors);
+    let submittedData= $derived(formReturn?.formData);
 
     let firstName= $state("");
     let lastName= $state("");
@@ -21,13 +21,13 @@
     let teamSelected= $state("");
 
     $effect(()=>{
-        if (initialData) {
-            firstName= initialData.firstName || '';
-            lastName= initialData.lastName || '';
-            email= initialData.email || '';
-            phone= initialData.phone || '';
-            roleSelected= initialData.role || '';
-            teamSelected= initialData.team || '';
+        if (itemUpdate) {
+            firstName= itemUpdate.firstName || '';
+            lastName= itemUpdate.lastName || '';
+            email= itemUpdate.email || '';
+            phone= itemUpdate.phone || '';
+            roleSelected= itemUpdate.role || '';
+            teamSelected= itemUpdate.team || '';
         } else if (submittedData) {
             firstName=  submittedData.firstName || '';
             lastName= submittedData.lastName || '';
@@ -45,7 +45,7 @@
         }
     });
 
-    const teamList = formProps.teamList
+    const teamList = formData.teamList
 
     let roleItems :SelectInputValue[] = [
         { value: 'admin', name: 'Administrateur' },

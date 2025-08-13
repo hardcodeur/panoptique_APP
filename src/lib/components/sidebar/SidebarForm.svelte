@@ -1,30 +1,25 @@
 <script lang="ts">
+    import type { SidebarFormConfig } from '$lib/types';
     import { Section } from "flowbite-svelte-blocks";
     import { Drawer, CloseButton } from "flowbite-svelte";
     import { sineIn } from "svelte/easing";
 
     let { 
         hidden = $bindable(false),
-        sidbarTitle,
-        form,
-        FormComponent,
-        formProps = null,
-        initialData = null
-    } = $props()
+        formData,
+        config
+    } : { hidden?: boolean; formData: any; config: SidebarFormConfig | null } = $props();
 
-    let resetForm  :boolean = $state(false) 
 
+
+    let sidbarTitle = $derived(config?.title);
+    let FormComponent = $derived(config?.component);
+    
     let transitionParams = {
       x: 320,
       duration: 200,
       easing: sineIn
     };
-
-    $effect(() => {
-        if(!hidden){
-            resetForm = true
-        }
-    });
 
 </script>
     
@@ -34,8 +29,8 @@
             <h5 id="drawer-label" class="inline-flex items-center mb-6 text-base font-semibold text-gray-500 uppercase dark:text-gray-400">{sidbarTitle}</h5>
             <CloseButton on:click={() => (hidden = true)} class="mb-4 dark:text-white" />
         </div>
-        {#if FormComponent}
-           <FormComponent {form} {formProps} {resetForm} initialData={initialData} />
+        {#if FormComponent && config}
+           <FormComponent formReturn={config.formReturn} {formData} itemUpdate={config.itemUpdate} />
         {/if}
     </Drawer>
 </Section>

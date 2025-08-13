@@ -3,13 +3,12 @@
     import {AccordionItem, Accordion,Button,Label, Input, Helper,Checkbox} from "flowbite-svelte";
 
     const { 
-        form,
-        resetForm,
-        formProps
+        formReturn,
+        formData
     } = $props();
 
-    const teamsUsers= formProps.teamWhiteUsers;
-    const unassignedUsers = formProps.unassignedUsers
+    const teamsUsers= formData.teamsUsers;
+    const unassignedUsers = formData.unassignedUsers
 
     const helperClass="text-sm text-th-red mt-2"
     const btnClass="text-center focus-within:ring-4 focus-within:outline-hidden inline-flex items-center justify-center px-5 py-2.5 text-white bg-th-blue hover:bg-primary-800 rounded-lg"

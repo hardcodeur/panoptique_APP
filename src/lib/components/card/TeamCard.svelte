@@ -7,7 +7,7 @@
     const {
         teamName,
         users,
-        openDrawer
+        sideBarFormConfig
     } = $props();
 
     const countUsersStatus = (users) => {
@@ -32,7 +32,7 @@
     <div class="flex flex-col">
         <div class="flex flex-col lg:flex-row justify-center lg:justify-between items-center gap-2">
             <span class="ts-text-title md:text-center">Équipe <span class="capitalize">{teamName}</span></span>
-            <Button outline size="xs" class={btnEditClass} on:click={() => (openDrawer(FormTeam,`Equipe - ${teamName}`))}>Modifier</Button>
+            <Button outline size="xs" class={btnEditClass} on:click={() => (sideBarFormConfig(FormTeam,`Equipe - ${teamName}`))}>Modifier</Button>
         </div>
     </div>
     <div class="flex justify-center mt-3">

@@ -9,6 +9,7 @@ import { getTeamsWhiteUsers,getTeamUnassignedUsers } from "$lib/api/teamUsers";
 
 const roles = ['admin', 'manager', 'team_manager', 'agent'] as const;
 
+// field rules
 const schema = z.object({
     firstName: z.string()
         .min(1, 'Champ obligatoire')
@@ -47,6 +48,7 @@ export const actions = {
 }
 
 export async function load({cookies, fetch}) {
+    // Get all data
     try {
         const [
             userList,
