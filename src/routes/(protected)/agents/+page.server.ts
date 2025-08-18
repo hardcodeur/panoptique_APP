@@ -2,9 +2,10 @@ import { fail, error } from '@sveltejs/kit';
 import { z } from "zod";
 
 // Call API
-import { getUsers } from "$lib/api/user"
+import { getUsers,addUser } from "$lib/api/user"
 import { getTeams } from "$lib/api/team"
 import { getTeamsWhiteUsers,getTeamUnassignedUsers } from "$lib/api/teamUsers";
+
 
 
 const roles = ['admin', 'manager', 'team_manager', 'agent'] as const;
@@ -29,8 +30,7 @@ const schema = z.object({
 
 export const actions = {
 
-    add: async ({request}) => {
-
+    add: async ({request,cookies, fetch}) => {
         // Parse form data
         const formData = Object.fromEntries(await request.formData()) as Partial<FormData> ;
         // Zod check Form requirement 
@@ -41,7 +41,12 @@ export const actions = {
             return fail(400, { errors,formData});
         }
 
-        console.log("send");
+        const rep = await addUser(formData,{ cookies, fetch });
+
+        if(!rep.ok){
+            return fail(400, {formData});
+        }
+        
         return { success: true };
   }
 
@@ -61,6 +66,7 @@ export async function load({cookies, fetch}) {
             getTeamsWhiteUsers({ cookies, fetch }),
             getTeamUnassignedUsers({ cookies, fetch })
         ]);
+        
         return { userList, teamList, teamWhiteUsers, teamUnassignedUsers };
     } catch (err) {
         throw error(500, 'Erreur lors du chargement des données');

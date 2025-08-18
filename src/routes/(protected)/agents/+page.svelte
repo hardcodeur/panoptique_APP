@@ -20,11 +20,11 @@
         sidebarConfig = {
             title: sidebarTitle,
             component: component,
-            formReturn: form,
-            itemUpdate: itemUpdate
+            formReturn: form, // form error and data in form send
+            itemUpdate: itemUpdate // item to update in form
 
         };
-        form = null
+        form = null // reset form
     }
 
     // Dynamic zod form error return
@@ -45,15 +45,11 @@
     const btnIconClass="mr-2"
     const tabItemTitle="ts-title-2" 
 
-    const userList=data.userList;
-    const teamList = data.teamList
-    const teamsUsers = data.teamWhiteUsers;
-    const unassignedUsers=data.teamUnassignedUsers;
-
     const formData = {
-        teamList,
-        teamsUsers,
-        unassignedUsers
+        teamList : data.teamList,
+        userList: data.userList,
+        teamsUsers: data.teamWhiteUsers,
+        unassignedUsers: data.teamUnassignedUsers,
     } 
 
 </script>
@@ -64,7 +60,7 @@
             <h1 class={tabItemTitle}>{tabsTitleAgent}</h1>
             <Button size="lg" class={btnClass} on:click={() => {sideBarFormConfig(FormAgent,"Nouvel agent")}}><CirclePlusSolid class={btnIconClass} />Ajouter un agent</Button>
         </div>
-        <TableUser userList={userList}  sideBarFormConfig={sideBarFormConfig} />
+        <TableUser userList={formData.userList}  sideBarFormConfig={sideBarFormConfig} />
     </TabItem>
     <TabItem title={tabsTitleTeam} activeClasses={tabItemActiveClass} inactiveClasses={tabItemInactiveClass}>
         <div class={tabItemTitleRow}>
@@ -72,7 +68,7 @@
             <Button size="lg" class={btnClass} on:click={() => {sideBarFormConfig(FormTeam,"Nouvelle équipe")}}><CirclePlusSolid class={btnIconClass} />Ajouter une équipe</Button>
         </div>
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 grid-cols-1 gap-x-8 gap-y-4">
-            {#each teamsUsers as teamUsers (teamUsers.id)}
+            {#each formData.teamsUsers as teamUsers (teamUsers.id)}
                 <TeamCard teamName={teamUsers.teamName} users={teamUsers.users} sideBarFormConfig={sideBarFormConfig}/>
             {/each}
         </div>

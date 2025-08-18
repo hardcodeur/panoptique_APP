@@ -20,28 +20,41 @@
     let roleSelected= $state("");
     let teamSelected= $state("");
 
+    // form config
+    let formConfig={
+        method : "POST",
+        action: "?/add"
+    }
+
     $effect(()=>{
-        if (itemUpdate) {
+        // field values
+        if (itemUpdate) { // update user
             firstName= itemUpdate.firstName || '';
             lastName= itemUpdate.lastName || '';
             email= itemUpdate.email || '';
             phone= itemUpdate.phone || '';
             roleSelected= itemUpdate.role || '';
             teamSelected= itemUpdate.team || '';
-        } else if (submittedData) {
+        } else if (submittedData) { // data user return if error in form last submited
             firstName=  submittedData.firstName || '';
             lastName= submittedData.lastName || '';
             email= submittedData.email || '';
             phone= submittedData.phone || '';
             roleSelected= submittedData.role || '';
             teamSelected= submittedData.team || '';
-        }else{
+        }else{ // default
             firstName= '';
             lastName= '';
             email= '';
             phone= '';
             roleSelected= '';
             teamSelected= '';
+        }
+
+        // form config update
+        if (itemUpdate){
+            formConfig.method = "PUT"
+            formConfig.action = `?/update/${itemUpdate.id}`
         }
     });
 
@@ -51,12 +64,13 @@
         { value: 'admin', name: 'Administrateur' },
         { value: 'manager', name: "Directeur d'agence" },
         { value: 'team_manager', name: "Chef d'équipe" },
-        { value: 'user', name: "Agent" },
+        { value: 'agent', name: "Agent" },
     ];
     
     let teamItems :SelectInputValue[] = [];
+    
     teamList.forEach(team => {
-        teamItems = [...teamItems, { value: team.teamName, name: team.teamName }];
+        teamItems = [...teamItems, { value: `/api/teams/${team.id}`, name: team.teamName }];
     });
 
     const btnClass="text-center focus-within:ring-4 focus-within:outline-hidden inline-flex items-center justify-center px-5 py-2.5 text-white bg-th-blue hover:bg-primary-800 rounded-lg"

@@ -5,6 +5,9 @@ import type { Cookies } from '@sveltejs/kit';
 // On le rend optionnel avec `?` pour qu'il puisse être omis côté client.
 type ServerEvent = { cookies: Cookies; fetch: typeof fetch };
 
+// Multiple users
+
+// GET
 export function getUsers(event?: ServerEvent): Promise<any> {
     return apiClient.get('/users', event);
 }
@@ -19,4 +22,11 @@ export function getUserCurrentWeekShifts(userId: string, event?: ServerEvent): P
 
 export function getUserCurrentMonthShiftsMetric(userId: string, event?: ServerEvent): Promise<any> {
     return apiClient.get(`/users/${userId}/metric-shift`, event);
+}
+
+// Unique user
+
+// ADD
+export function addUser(body: any,event?: ServerEvent): Promise<any> {
+    return apiClient.post('/users',body,event);
 }
