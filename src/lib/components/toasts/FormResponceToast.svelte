@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Toast } from "flowbite-svelte";
-  import { CheckCircleSolid,CloseCircleSolid,FireSolid } from "flowbite-svelte-icons";
-  import type { toastStatus } from "$lib/types";
+  import { CheckCircleSolid,CloseCircleSolid,FireSolid,InfoCircleSolid } from "flowbite-svelte-icons";
+  import type { ToastStatus } from "$lib/types";
 
   type typeIcone = typeof CheckCircleSolid | typeof CloseCircleSolid | typeof FireSolid
 
@@ -10,11 +10,11 @@
     message
   }: 
   {
-    status:toastStatus,
+    status:ToastStatus,
     message:string} 
   = $props();
 
-  const config: Record<toastStatus,{
+  const config: Record<ToastStatus,{
     toastColor: string,
     icon: typeIcone
     iconColor: string
@@ -32,10 +32,16 @@
       iconColor:"text-th-red",
       dismissable : false
     },
-    delete:{
+    warning:{
       toastColor :"text-red-500 border-red-500",
       icon: FireSolid,
       iconColor:"text-red-500",
+      dismissable : true
+    },
+    info:{
+      toastColor :"text-blue-500 border-blue-500",
+      icon: InfoCircleSolid,
+      iconColor:"text-blue-500",
       dismissable : true
     },
   }

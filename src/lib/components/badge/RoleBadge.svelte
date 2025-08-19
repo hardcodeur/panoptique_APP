@@ -1,5 +1,5 @@
 <script lang="ts">
-  type Roles = 'admin' | 'manager' | 'team_manager' | 'user';
+  type Roles = 'admin' | 'manager' | 'team_manager' | 'agent';
 
   let { role }: { role: Roles } = $props();
 
@@ -7,14 +7,14 @@
     admin: 'bg-pink-100 text-pink-800',
     manager: 'bg-purple-100 text-purple-800',
     team_manager: 'bg-blue-100 text-blue-800',
-    user: 'bg-indigo-100 text-indigo-800'
+    agent: 'bg-indigo-100 text-indigo-800'
   };
 
   const roleText: Record<Roles, string> = {
     admin: 'administrateur',
     manager: "directeur d'agence",
     team_manager: "chef d'équipe",
-    user: 'agent'
+    agent: 'agent'
   };
 </script>
 

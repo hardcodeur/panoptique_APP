@@ -15,7 +15,7 @@
 
     let errors= $derived(formReturn?.errors);
     let submittedData= $derived(formReturn?.formData);
-    let formAction: string= $derived(itemUpdate ? `?/update/${itemUpdate.id}`: '?/add')
+    let formAction: string= $derived(itemUpdate ? `?/update`: '?/add')
 
     let firstName= $state("");
     let lastName= $state("");
@@ -36,20 +36,20 @@
 
     $effect(()=>{
         // field values
-        if (itemUpdate) { // update user
+        if (itemUpdate) { // update user            
             firstName= itemUpdate.firstName || '';
             lastName= itemUpdate.lastName || '';
             email= itemUpdate.email || '';
-            phone= itemUpdate.phone || '';
+            phone= itemUpdate.phone || '';       
             roleSelected= itemUpdate.role || '';
-            teamSelected= itemUpdate.team || '';
+            teamSelected= itemUpdate.teamId || '';  
         } else if (submittedData) { // data user return if error in form last submited
             firstName=  submittedData.firstName || '';
             lastName= submittedData.lastName || '';
             email= submittedData.email || '';
             phone= submittedData.phone || '';
             roleSelected= submittedData.role || '';
-            teamSelected= submittedData.team || '';
+            teamSelected= submittedData.teamId || '';
         }else{ // default
             firstName= '';
             lastName= '';
@@ -62,7 +62,7 @@
     });
 
     const teamList = formData.teamList
-
+    
     let roleItems :SelectInputValue[] = [
         { value: 'admin', name: 'Administrateur' },
         { value: 'manager', name: "Directeur d'agence" },
@@ -71,9 +71,8 @@
     ];
     
     let teamItems :SelectInputValue[] = [];
-    
     teamList.forEach(team => {
-        teamItems = [...teamItems, { value: `/api/teams/${team.id}`, name: team.teamName }];
+        teamItems = [...teamItems, { value: team.id, name: team.teamName }];
     });
 
     const btnClass="text-center focus-within:ring-4 focus-within:outline-hidden inline-flex items-center justify-center px-5 py-2.5 text-white bg-th-blue hover:bg-primary-800 rounded-lg"
@@ -82,6 +81,7 @@
 </script>
 
 <form use:enhance={handleEnhance} method="POST" action={formAction} class="mb-6">
+    <input type="hidden" name="userId" value="{itemUpdate.id}">
     <div class="mb-6">
         <Label for="firstName" class="ts-text-bold block mb-2">Nom</Label>
         <Input class="text-th-black-light" id="firstName" bind:value={firstName} name="firstName" placeholder="Jean" />

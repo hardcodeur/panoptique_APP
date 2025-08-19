@@ -44,6 +44,10 @@ export const apiClient = {
         return this.request('PUT', url, body, event, options);
     },
 
+    async patch(url: string, body: any, event?: ServerEvent, options: RequestInit = {}) {
+        return this.request('PATCH', url, body, event, options);
+    },
+
     async delete(url: string, event?: ServerEvent, options: RequestInit = {}) {
         return this.request('DELETE', url, null, event, options);
     },

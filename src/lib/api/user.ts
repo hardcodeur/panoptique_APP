@@ -12,7 +12,7 @@ export function getUsers(event?: ServerEvent): Promise<any> {
     return apiClient.get('/users', event);
 }
 
-export function getUsersById(userId: string, event?: ServerEvent): Promise<any> {
+export function getUserById(userId: string, event?: ServerEvent): Promise<any> {
     return apiClient.get(`/users/${userId}`, event);
 }
 
@@ -29,4 +29,10 @@ export function getUserCurrentMonthShiftsMetric(userId: string, event?: ServerEv
 // ADD
 export function addUser(body: any,event?: ServerEvent): Promise<any> {
     return apiClient.post('/users',body,event);
+}
+
+// UPDATE
+
+export function updateUserPartial(userId: string,body: any,event?: ServerEvent): Promise<any> {
+    return apiClient.patch(`/users/${userId}`,body,event);
 }

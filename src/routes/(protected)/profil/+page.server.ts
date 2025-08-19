@@ -1,4 +1,4 @@
-import { getUsersById } from "$lib/api/user"
+import { getUserById } from "$lib/api/user"
 import { authUserStore } from "$lib/stores/UserStore.js"
 import { error } from '@sveltejs/kit';
 
@@ -18,7 +18,7 @@ export async function load({ cookies }) {
         }
 
 
-        const userResponse = await getUsersById(token, userId);
+        const userResponse = await getUserById(token, userId);
 
         if (!userResponse.ok) {
             const errorText = await userResponse.text();
