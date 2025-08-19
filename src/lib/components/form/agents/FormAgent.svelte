@@ -15,6 +15,7 @@
 
     let errors= $derived(formReturn?.errors);
     let submittedData= $derived(formReturn?.formData);
+    let formAction: string= $derived(itemUpdate ? `?/update/${itemUpdate.id}`: '?/add')
 
     let firstName= $state("");
     let lastName= $state("");
@@ -23,12 +24,7 @@
     let roleSelected= $state("");
     let teamSelected= $state("");
 
-    // form config
-    let formConfig={
-        method : "POST",
-        action: "?/add"
-    }
-
+    // reload component after submit form
     const handleEnhance = ()=>{
         return async ({ result,update }: { result: ActionResult,update:()=>void })=>{
             if (result.type === 'success'){
@@ -63,11 +59,6 @@
             teamSelected= '';
         }
 
-        // form config update
-        if (itemUpdate){
-            formConfig.method = "PUT"
-            formConfig.action = `?/update/${itemUpdate.id}`
-        }
     });
 
     const teamList = formData.teamList
@@ -90,7 +81,7 @@
 
 </script>
 
-<form use:enhance={handleEnhance} method="POST" action="?/add" class="mb-6">
+<form use:enhance={handleEnhance} method="POST" action={formAction} class="mb-6">
     <div class="mb-6">
         <Label for="firstName" class="ts-text-bold block mb-2">Nom</Label>
         <Input class="text-th-black-light" id="firstName" bind:value={firstName} name="firstName" placeholder="Jean" />
