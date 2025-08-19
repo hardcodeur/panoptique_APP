@@ -1,6 +1,9 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
+    import { invalidateAll } from '$app/navigation';
     import {Button,Label, Input, Helper,Select} from "flowbite-svelte";
+    
+    import type { ActionResult } from '@sveltejs/kit';
     import type {SelectInputValue} from "$lib/types"
     import type { ActionData } from './$types';
 
@@ -24,6 +27,15 @@
     let formConfig={
         method : "POST",
         action: "?/add"
+    }
+
+    const handleEnhance = ()=>{
+        return async ({ result,update }: { result: ActionResult,update:()=>void })=>{
+            if (result.type === 'success'){
+                await invalidateAll();
+            }
+            update();
+        }
     }
 
     $effect(()=>{
@@ -78,7 +90,7 @@
 
 </script>
 
-<form use:enhance method="POST" action="?/add" class="mb-6">
+<form use:enhance={handleEnhance} method="POST" action="?/add" class="mb-6">
     <div class="mb-6">
         <Label for="firstName" class="ts-text-bold block mb-2">Nom</Label>
         <Input class="text-th-black-light" id="firstName" bind:value={firstName} name="firstName" placeholder="Jean" />

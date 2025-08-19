@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { SidebarFormConfig } from '$lib/types';
+    import type { SidebarFormConfig,ApiReturn } from '$lib/types';
     import { Section } from "flowbite-svelte-blocks";
     import { Drawer, CloseButton } from "flowbite-svelte";
     import { sineIn } from "svelte/easing";
@@ -8,7 +8,7 @@
     let { 
         hidden = $bindable(false),
         formData,
-        config
+        config,
     } : { 
         hidden: boolean; 
         formData: any; 
@@ -16,8 +16,9 @@
     } = $props();
 
 
-    let sidbarTitle = $derived(config?.title);
+    let sidbarTitle: string | undefined = $derived(config?.title);
     let FormComponent = $derived(config?.component);
+    let toastResponce: ApiReturn | undefined = $derived(config?.formReturn?.apiReturn);
 
     let transitionParams = {
       x: 320,
@@ -33,7 +34,9 @@
             <h5 id="drawer-label" class="inline-flex items-center mb-6 text-base font-semibold text-gray-500 uppercase dark:text-gray-400">{sidbarTitle}</h5>
             <CloseButton on:click={() => (hidden = true)} class="mb-4 dark:text-white" />
         </div>
-        <FormResponceToast status="delete" message="bouh" />
+        {#if toastResponce}
+        <FormResponceToast status={toastResponce.status} message={toastResponce.message} />
+        {/if}
         {#if FormComponent && config}
            <FormComponent formReturn={config.formReturn} {formData} itemUpdate={config.itemUpdate} />
         {/if}

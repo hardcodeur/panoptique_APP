@@ -10,7 +10,10 @@
     import type { AgentFormComponent, SidebarFormConfig } from '$lib/types';
 
     // Data from backend
+    // - form for the action part 
+    // - data for the load part
     let { form,data } : { form: ActionData,data: PageData}  = $props();
+
  
     let sideBarHidden: boolean = $state(true);
     let sidebarConfig: SidebarFormConfig | null = $state(null);
@@ -45,12 +48,12 @@
     const btnIconClass="mr-2"
     const tabItemTitle="ts-title-2" 
 
-    const formData = {
+    const formData = $derived({
         teamList : data.teamList,
         userList: data.userList,
         teamsUsers: data.teamWhiteUsers,
         unassignedUsers: data.teamUnassignedUsers,
-    } 
+    });
 
 </script>
   
