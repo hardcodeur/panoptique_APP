@@ -39,9 +39,9 @@
       dismissable : true
     },
     info:{
-      toastColor :"text-blue-500 border-blue-500",
+      toastColor :"text-th-blue border-th-blue",
       icon: InfoCircleSolid,
-      iconColor:"text-blue-500",
+      iconColor:"text-th-blue",
       dismissable : true
     },
   }

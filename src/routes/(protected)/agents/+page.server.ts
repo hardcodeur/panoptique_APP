@@ -7,10 +7,14 @@ import { getUsers,addUser,updateUserPartial,getUserById } from "$lib/api/user"
 import { getTeams } from "$lib/api/team"
 import { getTeamsWhiteUsers,getTeamUnassignedUsers } from "$lib/api/teamUsers";
 
-const roles = ['admin', 'manager', 'team_manager', 'agent'] as const;
+const enumRoles = ['admin', 'manager', 'team_manager', 'agent'] as const;
+enum enumStatus {
+    "dispo" = 1,
+    "indispo" = 0
+}
 
 // field rules
-const schema = z.object({
+const schemaAddUser = z.object({
     firstName: z.string()
         .min(1, 'Champ obligatoire')
         .min(2,("Le nom doit contenir au moins 2 caractères"))
@@ -24,28 +28,44 @@ const schema = z.object({
         .email("Email invalide")
         .regex(/^[a-zA-Z0-9._-]+@sgs\.(com|fr)$/,"L'email doit être une adresse sgs"),
     phone: z.string().min(1, 'Champ obligatoire'),
-    role: z.enum(roles),
+    role: z.enum(enumRoles),
+    team: z.string().min(1, 'Champ obligatoire'),
+});
+
+const schemaUpdateUser = z.object({
+    userId:z.string(),
+    firstName: z.string()
+        .min(1, 'Champ obligatoire')
+        .min(2,("Le nom doit contenir au moins 2 caractères"))
+        .max(100,("Le nom ne peut pas dépasser 100 caractères")),
+    lastName: z.string()
+        .min(1, 'Champ obligatoire')
+        .min(2,("Le nom doit contenir au moins 2 caractères"))
+        .max(100,("Le nom ne peut pas dépasser 100 caractères")),
+    phone: z.string().min(1, 'Champ obligatoire'),
+    status: z.nativeEnum(enumStatus),
+    role: z.enum(enumRoles),
     team: z.string().min(1, 'Champ obligatoire'),
 });
 
 function getChangedFields(originalData: any, newData: any): { [key: string]: any } {
     const changedFields: { [key: string]: any } = {};
     for (const key in newData) {
-        if (key !== 'id' && key !== 'userId' && originalData.hasOwnProperty(key) && originalData[key] !== newData[key]) {
+        if (key !== 'id' && originalData.hasOwnProperty(key) && originalData[key] !== newData[key]) {
             changedFields[key] = newData[key];
         }
     }
     return changedFields;
 }
 
-export const actions = {
+export const actions = { 
 
     add: async ({request,cookies, fetch}) => {
 
         // Parse form data
         const formData = Object.fromEntries(await request.formData()) as Partial<FormData> ;
         // Zod check Form requirement 
-        const result = schema.safeParse(formData);
+        const result = schemaAddUser.safeParse(formData);
 
         if (!result.success) {
             const errors = result.error.flatten().fieldErrors;            
@@ -65,6 +85,7 @@ export const actions = {
                 } as ApiReturn
             }
         } catch (error: any) {
+            console.log(error.data?.detail ||  error.data?.message);
             return fail(400, {
                 formData,
                 apiReturn:{
@@ -78,22 +99,28 @@ export const actions = {
 
         // Parse form data
         const formData = Object.fromEntries(await request.formData()) as Partial<FormData> ;
-        console.log(formData);
+
+        if(formData.status){
+            formData.status = parseInt(formData.status);
+        }
+
         // Zod check Form requirement 
-        const result = schema.safeParse(formData);
+        const result = schemaUpdateUser.safeParse(formData);
 
         if (!result.success) {
+            console.log(result.error.issues);
             const errors = result.error.flatten().fieldErrors;          
             return fail(400, { errors,formData});
         }
 
-        const userId = formData.userId
+        const userId = result.data.userId
 
         //get original user data
         let originalUser;
         try {
             originalUser = await getUserById(userId, { cookies, fetch });
         } catch (error: any) {
+            console.log(error.data?.detail ||  error.data?.message);
             return {
                 apiReturn:{
                     status:"error",
@@ -104,8 +131,7 @@ export const actions = {
 
         // Compare data if have change
         const updatedFields = getChangedFields(originalUser, result.data);
-
-        // fields not change 
+        // fields not change return message
         if (Object.keys(updatedFields).length === 0) {
             return {
                 apiReturn:{
@@ -123,13 +149,16 @@ export const actions = {
         // update
         try {
             const rep = await updateUserPartial(userId,updatedFields,{ cookies, fetch });
+            console.log("rep: ",rep);
             return {
+                formData : rep,
                 apiReturn:{
                     status:"success",
                     message:`Agent ${rep.firstName+" "+rep.lastName } mis à jour avec succès!`
                 } as ApiReturn
             }
         } catch (error: any) {
+            console.log(error.data?.detail ||  error.data?.message);
             return fail(400, {
                 formData,
                 apiReturn:{

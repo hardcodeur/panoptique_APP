@@ -61,7 +61,8 @@ export const actions : Actions = {
         maxAge: parseInt(REFRESH_TOKEN_LIFETIME, 10)
       });
             
-    } catch (error) {
+    } catch (error: any) {
+      console.log(error?.message);
       // call api error management
       if(error?.code === 401 && error?.message?.includes('Invalid credentials.')){
         return fail(400, { error: { _global: ["Identifiant invalide"] }});

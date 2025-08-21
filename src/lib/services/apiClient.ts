@@ -70,7 +70,14 @@ export const apiClient = {
             }
 
             if (body && !(body instanceof FormData)) {
-                headers.append('Content-Type', 'application/json');
+
+                if(method !== "PATCH"){
+                    headers.append('Content-Type', 'application/json');
+                }
+
+                if(method === "PATCH"){
+                    headers.append('Content-Type', 'application/merge-patch+json');
+                }
             }
 
             const config: RequestInit = {

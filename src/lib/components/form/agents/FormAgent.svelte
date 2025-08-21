@@ -1,8 +1,7 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
     import { invalidateAll } from '$app/navigation';
-    import {Button,Label, Input, Helper,Select} from "flowbite-svelte";
-    
+    import {Button,Label, Input, Helper,Select,Radio} from "flowbite-svelte";
     import type { ActionResult } from '@sveltejs/kit';
     import type {SelectInputValue} from "$lib/types"
     import type { ActionData } from './$types';
@@ -21,6 +20,7 @@
     let lastName= $state("");
     let email= $state("");
     let phone= $state("");
+    let status= $state("");
     let roleSelected= $state("");
     let teamSelected= $state("");
 
@@ -36,18 +36,20 @@
 
     $effect(()=>{
         // field values
-        if (itemUpdate) { // update user            
+        if (itemUpdate && !submittedData) { // update user            
             firstName= itemUpdate.firstName || '';
             lastName= itemUpdate.lastName || '';
             email= itemUpdate.email || '';
-            phone= itemUpdate.phone || '';       
+            phone= itemUpdate.phone || '';
+            status= itemUpdate.status || '';       
             roleSelected= itemUpdate.role || '';
-            teamSelected= itemUpdate.teamId || '';  
-        } else if (submittedData) { // data user return if error in form last submited
+            teamSelected= itemUpdate.teamId || ''; 
+        } else if (submittedData) { // data user return last submited or update in form 
             firstName=  submittedData.firstName || '';
             lastName= submittedData.lastName || '';
             email= submittedData.email || '';
             phone= submittedData.phone || '';
+            status= submittedData.status || '';
             roleSelected= submittedData.role || '';
             teamSelected= submittedData.teamId || '';
         }else{ // default
@@ -55,11 +57,13 @@
             lastName= '';
             email= '';
             phone= '';
+            status= '';
             roleSelected= '';
             teamSelected= '';
         }
 
     });
+
 
     const teamList = formData.teamList
     
@@ -75,16 +79,19 @@
         teamItems = [...teamItems, { value: team.id, name: team.teamName }];
     });
 
+    const inputDisabled = (itemUpdate) ? true  : false
     const btnClass="text-center focus-within:ring-4 focus-within:outline-hidden inline-flex items-center justify-center px-5 py-2.5 text-white bg-th-blue hover:bg-primary-800 rounded-lg"
     const helperClass="text-sm text-th-red mt-2"
 
 </script>
 
 <form use:enhance={handleEnhance} method="POST" action={formAction} class="mb-6">
+    {#if itemUpdate}
     <input type="hidden" name="userId" value="{itemUpdate.id}">
+    {/if}
     <div class="mb-6">
         <Label for="firstName" class="ts-text-bold block mb-2">Nom</Label>
-        <Input class="text-th-black-light" id="firstName" bind:value={firstName} name="firstName" placeholder="Jean" />
+        <Input class="text-th-black border-th-black-light" id="firstName" bind:value={firstName} name="firstName" placeholder="Jean" />
         {#if errors?.firstName}
         <Helper class={helperClass}> 
             {errors.firstName[0]}
@@ -93,7 +100,7 @@
     </div>
     <div class="mb-6">
         <Label for="lastName" class="ts-text-bold block mb-2">Prénom</Label>
-        <Input class="text-th-black-light" id="lastName" bind:value={lastName} name="lastName" placeholder="Dupont" />
+        <Input class="text-th-black border-th-black-light" id="lastName" bind:value={lastName} name="lastName" placeholder="Dupont" />
         {#if errors?.lastName}
         <Helper class={helperClass}> 
             {errors.lastName[0]}
@@ -102,16 +109,25 @@
     </div>
     <div class="mb-6">
         <Label for="email" class="ts-text-bold block mb-2">Email</Label>
-        <Input class="text-th-black-light" id="email" bind:value={email} name="email" placeholder="j.dupont@sgs.com" />
+        <Input disabled={inputDisabled} class="text-th-black border-th-black-light" id="email" bind:value={email} name="email" placeholder="j.dupont@sgs.com" />
         {#if errors?.email}
         <Helper class={helperClass}> 
             {errors.email[0]}
         </Helper>
         {/if}
     </div>
+    {#if itemUpdate}
+    <div class="mb-6">
+        <p class="ts-text-bold block mb-2">Status</p>
+        <ul class="w-full items-center divide-x divide-th-black-light rounded-lg border border-th-black-light sm:flex rtl:divide-x-reverse">
+            <li class="w-full"><Radio name=status value="1" bind:group={status} class="p-3">Disponible</Radio></li>
+            <li class="w-full"><Radio name=status value="0" bind:group={status} class="p-3">Indisponible</Radio></li>
+        </ul>
+    </div>
+    {/if}
     <div class="mb-6">
         <Label for="phone" class="ts-text-bold block mb-2">Téléphone</Label>
-        <Input class="text-th-black-light" id="phone" bind:value={phone} name="phone" placeholder="0621516978" />
+        <Input class="text-th-black border-th-black-light" id="phone" bind:value={phone} name="phone" placeholder="0621516978" />
         {#if errors?.phone}
         <Helper class={helperClass}> 
             {errors.phone[0]}
@@ -121,7 +137,7 @@
     <div class="mb-6">
         <Label class="ts-text-bold mb-2">
             Role
-            <Select name="role" class="mt-2 ts-text text-th-black-light capitalize" placeholder="Liste des roles" items={roleItems} bind:value={roleSelected} />
+            <Select name="role" class="mt-2 ts-text text-th-black border-th-black-light capitalize" placeholder="Liste des roles" items={roleItems} bind:value={roleSelected} />
         </Label>
         {#if errors?.role}
         <Helper class={helperClass}> 
@@ -132,7 +148,7 @@
     <div class="mb-6">
         <Label class="ts-text-bold mb-2">
             Équipe
-            <Select name="team" class="mt-2 ts-text text-th-black-light capitalize" placeholder="Liste des équipes" items={teamItems} bind:value={teamSelected} />
+            <Select name="team" class="mt-2 ts-text text-th-black border-th-black-light capitalize" placeholder="Liste des équipes" items={teamItems} bind:value={teamSelected} />
         </Label>
         {#if errors?.team}
         <Helper class={helperClass}> 
