@@ -4,6 +4,7 @@
     import { Drawer, CloseButton } from "flowbite-svelte";
     import { sineIn } from "svelte/easing";
     import FormResponceToast from "$lib/components/toasts/FormResponceToast.svelte";
+    import FormAccountOptions from '$lib/components/form/agents/FormAccountOptions.svelte';
 
     let { 
         hidden = $bindable(false),
@@ -29,7 +30,7 @@
 </script>
     
 <Section name="default">
-    <Drawer transitionType="fly" placement="right" {transitionParams} bind:hidden id="crudForm">
+    <Drawer transitionType="fly" width="w-110" placement="right" {transitionParams} bind:hidden id="crudForm">
         <div class="flex items-center">
             <h5 id="drawer-label" class="inline-flex items-center mb-6 text-base font-semibold text-gray-500 uppercase dark:text-gray-400">{sidbarTitle}</h5>
             <CloseButton on:click={() => (hidden = true)} class="mb-4 dark:text-white" />
@@ -38,7 +39,10 @@
         <FormResponceToast status={toastResponce.status} message={toastResponce.message} />
         {/if}
         {#if FormComponent && config}
-           <FormComponent formReturn={config.formReturn} {formData} itemUpdate={config.itemUpdate} />
+            <FormComponent formReturn={config.formReturn} {formData} itemUpdate={config.itemUpdate} />
+        {/if}
+        {#if config?.itemUpdate}
+            <FormAccountOptions userId={config.itemUpdate.id}/>
         {/if}
     </Drawer>
 </Section>

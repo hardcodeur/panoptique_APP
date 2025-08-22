@@ -1,9 +1,6 @@
 import {apiClient} from '../services/apiClient';
-import type { Cookies } from '@sveltejs/kit';
+import type {ServerEvent} from "$lib/types"
 
-// Définition du type pour l'événement serveur partiel que nos fonctions accepteront
-// On le rend optionnel avec `?` pour qu'il puisse être omis côté client.
-type ServerEvent = { cookies: Cookies; fetch: typeof fetch };
 
 // Multiple users
 
@@ -35,4 +32,10 @@ export function addUser(body: any,event?: ServerEvent): Promise<any> {
 
 export function updateUserPartial(userId: string,body: any,event?: ServerEvent): Promise<any> {
     return apiClient.patch(`/users/${userId}`,body,event);
+}
+
+// DELETE
+
+export function deleteUser(userId: string,event?: ServerEvent): Promise<any> {
+    return apiClient.patch(`/users/${userId}`,event);
 }

@@ -14,7 +14,7 @@
 
     let errors= $derived(formReturn?.errors);
     let submittedData= $derived(formReturn?.formData);
-    let formAction: string= $derived(itemUpdate ? `?/update`: '?/add')
+    let formAction: string= $derived(itemUpdate ? `?/userUpdate`: '?/userAdd')
 
     let firstName= $state("");
     let lastName= $state("");

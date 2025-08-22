@@ -1,5 +1,11 @@
-import {apiClient} from '../services/apiClient';
+import {apiClient} from '$lib/services/apiClient';
+import type {ServerEvent} from "$lib/types"
 
 export function apiAuthToken(email: string, password: string): Promise<any> {
     return apiClient.post('/login', { email, password });
 }
+
+export function apiResetPassword(body: any,event?: ServerEvent): Promise<any> {
+    return apiClient.post('/reset/password',body,event);
+}
+

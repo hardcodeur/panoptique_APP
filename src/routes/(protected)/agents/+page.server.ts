@@ -3,8 +3,9 @@ import { z } from "zod";
 import type { ApiReturn } from '$lib/types';
 
 // Call API
-import { getUsers,addUser,updateUserPartial,getUserById } from "$lib/api/user"
+import { getUsers,addUser,updateUserPartial,getUserById,deleteUser } from "$lib/api/user"
 import { getTeams } from "$lib/api/team"
+import { apiResetPassword } from "$lib/api/auth"
 import { getTeamsWhiteUsers,getTeamUnassignedUsers } from "$lib/api/teamUsers";
 
 const enumRoles = ['admin', 'manager', 'team_manager', 'agent'] as const;
@@ -48,6 +49,10 @@ const schemaUpdateUser = z.object({
     team: z.string().min(1, 'Champ obligatoire'),
 });
 
+const schemaDeleteAndResetPass = z.object({
+    userId:z.string() // Ajouter un message
+});
+
 function getChangedFields(originalData: any, newData: any): { [key: string]: any } {
     const changedFields: { [key: string]: any } = {};
     for (const key in newData) {
@@ -60,7 +65,7 @@ function getChangedFields(originalData: any, newData: any): { [key: string]: any
 
 export const actions = { 
 
-    add: async ({request,cookies, fetch}) => {
+    userAdd: async ({request,cookies, fetch}) => {
 
         // Parse form data
         const formData = Object.fromEntries(await request.formData()) as Partial<FormData> ;
@@ -95,7 +100,7 @@ export const actions = {
             });
         }
     },
-    update: async ({request,cookies, fetch}) => {
+    userUpdate: async ({request,cookies, fetch}) => {
 
         // Parse form data
         const formData = Object.fromEntries(await request.formData()) as Partial<FormData> ;
@@ -149,12 +154,11 @@ export const actions = {
         // update
         try {
             const rep = await updateUserPartial(userId,updatedFields,{ cookies, fetch });
-            console.log("rep: ",rep);
             return {
                 formData : rep,
                 apiReturn:{
                     status:"success",
-                    message:`Agent ${rep.firstName+" "+rep.lastName } mis à jour avec succès!`
+                    message:`Agent ${rep.firstName+" "+rep.lastName } mis à jour avec succès !`
                 } as ApiReturn
             }
         } catch (error: any) {
@@ -166,6 +170,69 @@ export const actions = {
                     message: error.data?.detail ||  error.data?.message || "Une erreur est survenue à l'enregistrement de l'utilisateur."
                 } as ApiReturn
             });
+        }
+    },
+    userDelete : async ({request,cookies, fetch}) => {
+        const formData = Object.fromEntries(await request.formData()) as Partial<FormData> ;
+        // Zod check Form requirement 
+        const result = schemaDeleteAndResetPass.safeParse(formData);
+        
+        if (!result.success) {
+            console.log(result.error.issues);
+            const errors = result.error.flatten().fieldErrors;          
+            return fail(400, { errors,formData});
+        }
+
+        const userId = result.data.userId
+
+        try {
+            await deleteUser(userId,{ cookies, fetch });
+            return {
+                apiReturn:{
+                    status:"success",
+                    message:"Utilisateur supprimé avec succès !"
+                } as ApiReturn
+            }
+        } catch (error: any) {
+            console.log(error.data?.detail ||  error.data?.message);
+            return fail(400,{
+                apiReturn:{
+                    status:"error",
+                    message:"Une erreur inattendue est survenue lors de la suppression de l'utilisateur !"
+                } as ApiReturn
+            })
+        }
+
+    },
+    userResetPassword : async ({request,cookies, fetch}) => {
+        const formData = Object.fromEntries(await request.formData()) as Partial<FormData> ;
+        // Zod check Form requirement 
+        const result = schemaDeleteAndResetPass.safeParse(formData);
+        
+        if (!result.success) {
+            console.log(result.error.issues);
+            const errors = result.error.flatten().fieldErrors;          
+            return fail(400, { errors,formData});
+        }
+
+        const userId = result.data.userId
+
+        try {
+            await apiResetPassword({userId},{ cookies, fetch });
+            return {
+                apiReturn:{
+                    status:"success",
+                    message:"Mot de passe réinitialisé avec succès"
+                } as ApiReturn
+            }
+        } catch (error: any) {
+            console.log(error.data?.detail ||  error.data?.message);
+            return fail(400,{
+                apiReturn:{
+                    status:"error",
+                    message:"Une erreur inattendue est survenue lors de la réinitialisation du mot de passe."
+                } as ApiReturn
+            })
         }
     }
 
