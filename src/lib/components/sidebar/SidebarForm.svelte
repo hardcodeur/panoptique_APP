@@ -27,6 +27,12 @@
       easing: sineIn
     };
 
+    const userdeleteOrRestPassAction= ()=>{
+        if(hidden === false){
+            hidden = true;
+        }
+    }
+
 </script>
     
 <Section name="default">
@@ -36,13 +42,15 @@
             <CloseButton on:click={() => (hidden = true)} class="mb-4 dark:text-white" />
         </div>
         {#if toastResponce}
-        <FormResponceToast status={toastResponce.status} message={toastResponce.message} />
+        <div class="flex justify-center items-center">
+            <FormResponceToast status={toastResponce.status} message={toastResponce.message} />
+        </div>
         {/if}
         {#if FormComponent && config}
             <FormComponent formReturn={config.formReturn} {formData} itemUpdate={config.itemUpdate} />
         {/if}
         {#if config?.itemUpdate}
-            <FormAccountOptions userId={config.itemUpdate.id}/>
+            <FormAccountOptions onUserdeleteOrRestPass={userdeleteOrRestPassAction} userId={config.itemUpdate.id}/>
         {/if}
     </Drawer>
 </Section>

@@ -37,5 +37,5 @@ export function updateUserPartial(userId: string,body: any,event?: ServerEvent):
 // DELETE
 
 export function deleteUser(userId: string,event?: ServerEvent): Promise<any> {
-    return apiClient.patch(`/users/${userId}`,event);
+    return apiClient.delete(`/users/${userId}`,event);
 }

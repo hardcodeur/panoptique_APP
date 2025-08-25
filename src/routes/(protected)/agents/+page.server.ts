@@ -55,12 +55,34 @@ const schemaDeleteAndResetPass = z.object({
 
 function getChangedFields(originalData: any, newData: any): { [key: string]: any } {
     const changedFields: { [key: string]: any } = {};
-    for (const key in newData) {
+    for ( let key in newData) {
         if (key !== 'id' && originalData.hasOwnProperty(key) && originalData[key] !== newData[key]) {
             changedFields[key] = newData[key];
         }
     }
     return changedFields;
+}
+
+
+export async function load({cookies, fetch}) {
+    // Get all data
+    try {
+        const [
+            userList,
+            teamList, 
+            teamWhiteUsers, 
+            teamUnassignedUsers
+        ] = await Promise.all([
+            getUsers({ cookies, fetch }),
+            getTeams({ cookies, fetch }),
+            getTeamsWhiteUsers({ cookies, fetch }),
+            getTeamUnassignedUsers({ cookies, fetch })
+        ]);
+        return { userList, teamList, teamWhiteUsers, teamUnassignedUsers };
+    } catch (err: any) {
+        console.log(err);
+        throw error(500, 'Erreur lors du chargement des données');
+    }
 }
 
 export const actions = { 
@@ -84,6 +106,7 @@ export const actions = {
         try {
             const rep = await addUser(result.data,{ cookies, fetch });
             return {
+                actionName: 'userAdd',
                 apiReturn:{
                     status:"success",
                     message:`Agent ${rep.firstName+" "+rep.lastName } ajouté avec succès!`
@@ -136,6 +159,7 @@ export const actions = {
 
         // Compare data if have change
         const updatedFields = getChangedFields(originalUser, result.data);
+        
         // fields not change return message
         if (Object.keys(updatedFields).length === 0) {
             return {
@@ -156,6 +180,7 @@ export const actions = {
             const rep = await updateUserPartial(userId,updatedFields,{ cookies, fetch });
             return {
                 formData : rep,
+                actionName: 'userUpdate',
                 apiReturn:{
                     status:"success",
                     message:`Agent ${rep.firstName+" "+rep.lastName } mis à jour avec succès !`
@@ -188,6 +213,7 @@ export const actions = {
         try {
             await deleteUser(userId,{ cookies, fetch });
             return {
+                actionName: 'userDelete',
                 apiReturn:{
                     status:"success",
                     message:"Utilisateur supprimé avec succès !"
@@ -220,6 +246,7 @@ export const actions = {
         try {
             await apiResetPassword({userId},{ cookies, fetch });
             return {
+                actionName: 'resetPassword',
                 apiReturn:{
                     status:"success",
                     message:"Mot de passe réinitialisé avec succès"
@@ -238,23 +265,4 @@ export const actions = {
 
 }
 
-export async function load({cookies, fetch}) {
-    // Get all data
-    try {
-        const [
-            userList,
-            teamList, 
-            teamWhiteUsers, 
-            teamUnassignedUsers
-        ] = await Promise.all([
-            getUsers({ cookies, fetch }),
-            getTeams({ cookies, fetch }),
-            getTeamsWhiteUsers({ cookies, fetch }),
-            getTeamUnassignedUsers({ cookies, fetch })
-        ]);
-        return { userList, teamList, teamWhiteUsers, teamUnassignedUsers };
-    } catch (err: any) {
-        console.log(err);
-        throw error(500, 'Erreur lors du chargement des données');
-    }
-}
+

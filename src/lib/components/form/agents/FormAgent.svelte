@@ -34,37 +34,6 @@
         }
     }
 
-    $effect(()=>{
-        // field values
-        if (itemUpdate && !submittedData) { // update user            
-            firstName= itemUpdate.firstName || '';
-            lastName= itemUpdate.lastName || '';
-            email= itemUpdate.email || '';
-            phone= itemUpdate.phone || '';
-            status= itemUpdate.status || '';       
-            roleSelected= itemUpdate.role || '';
-            teamSelected= itemUpdate.teamId || ''; 
-        } else if (submittedData) { // data user return last submited or update in form 
-            firstName=  submittedData.firstName || '';
-            lastName= submittedData.lastName || '';
-            email= submittedData.email || '';
-            phone= submittedData.phone || '';
-            status= submittedData.status || '';
-            roleSelected= submittedData.role || '';
-            teamSelected= submittedData.teamId || '';
-        }else{ // default
-            firstName= '';
-            lastName= '';
-            email= '';
-            phone= '';
-            status= '';
-            roleSelected= '';
-            teamSelected= '';
-        }
-
-    });
-
-
     const teamList = formData.teamList
     
     let roleItems :SelectInputValue[] = [
@@ -76,7 +45,38 @@
     
     let teamItems :SelectInputValue[] = [];
     teamList.forEach(team => {
-        teamItems = [...teamItems, { value: team.id, name: team.teamName }];
+        teamItems = [...teamItems, { value: String(team.id), name: team.teamName }];
+    });
+
+    
+    $effect(()=>{
+        // field values
+        if (itemUpdate && !submittedData) { // update user         
+            firstName= itemUpdate.firstName || '';
+            lastName= itemUpdate.lastName || '';
+            email= itemUpdate.email || '';
+            phone= itemUpdate.phone || '';
+            status= itemUpdate.status || '';       
+            roleSelected= itemUpdate.role || '';
+            teamSelected= String(itemUpdate.teamId) || ''; 
+        } else if (submittedData) { // data user return last submited or update in form 
+            firstName=  submittedData.firstName || '';
+            lastName= submittedData.lastName || '';
+            email= submittedData.email || '';
+            phone= submittedData.phone || '';
+            status= String(submittedData.status) || '';
+            roleSelected= submittedData.role || '';
+            teamSelected= submittedData.team || String(submittedData.teamId) || '';
+        }else{ // default
+            firstName= '';
+            lastName= '';
+            email= '';
+            phone= '';
+            status= '';
+            roleSelected= '';
+            teamSelected= '';
+        }
+
     });
 
     const inputDisabled = (itemUpdate) ? true  : false
@@ -109,9 +109,9 @@
     </div>
     <div class="mb-6">
         <Label for="email" class="ts-text-bold block mb-2">Email</Label>
-        <Input disabled={inputDisabled} class="text-th-black border-th-black-light" id="email" bind:value={email} name="email" placeholder="j.dupont@sgs.com" />
+        <Input readonly={inputDisabled} class="text-th-black border-th-black-light" id="email" bind:value={email} name="email" placeholder="j.dupont@sgs.com" />
         {#if errors?.email}
-        <Helper class={helperClass}> 
+        <Helper class={helperClass}>
             {errors.email[0]}
         </Helper>
         {/if}

@@ -5,7 +5,8 @@
     import FormAgent from "$lib/components/form/agents/FormAgent.svelte"
     import FormTeam from "$lib/components/form/Team/FormTeam.svelte"
     import TableUser from "$lib/components/tables/TableUser.svelte";
-    import TeamCard from "$lib/components/card/TeamCard.svelte"
+    import TeamCard from "$lib/components/card/TeamCard.svelte";
+    import FormResponceToast from "$lib/components/toasts/FormResponceToast.svelte";
     import type { ActionData,PageData } from './$types';
     import type { AgentFormComponent, SidebarFormConfig } from '$lib/types';
 
@@ -59,6 +60,11 @@
   
 <Tabs contentClass={tabsClass} tabStyle="underline" >
     <TabItem open title={tabsTitleAgent} activeClasses={tabItemActiveClass} inactiveClasses={tabItemInactiveClass}>
+        <div class="flex justify-center items-center">
+            {#if (form?.actionName === "resetPassword" || form?.actionName === "userDelete") && form?.apiReturn && sideBarHidden}
+            <FormResponceToast status={form?.apiReturn.status} message={form?.apiReturn.message} />
+            {/if}
+        </div>
         <div class={tabItemTitleRow}>
             <h1 class={tabItemTitle}>{tabsTitleAgent}</h1>
             <Button size="lg" class={btnClass} on:click={() => {sideBarFormConfig(FormAgent,"Nouvel agent")}}><CirclePlusSolid class={btnIconClass} />Ajouter un agent</Button>
