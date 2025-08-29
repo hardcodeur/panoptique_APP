@@ -8,11 +8,11 @@
 
     let { 
         hidden = $bindable(false),
-        formData,
+        formComponentData,
         config,
     } : { 
         hidden: boolean; 
-        formData: any; 
+        formComponentData: any; 
         config: SidebarFormConfig | null 
     } = $props();
 
@@ -47,7 +47,7 @@
         </div>
         {/if}
         {#if FormComponent && config}
-            <FormComponent formReturn={config.formReturn} {formData} itemUpdate={config.itemUpdate} />
+            <FormComponent formReturn={config.formReturn} {formComponentData} itemUpdate={config.itemUpdate} />
         {/if}
         {#if config?.itemUpdate}
             <FormAccountOptions onUserdeleteOrRestPass={userdeleteOrRestPassAction} userId={config.itemUpdate.id}/>

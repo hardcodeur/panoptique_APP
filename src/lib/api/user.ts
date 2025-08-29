@@ -9,10 +9,6 @@ export function getUsers(event?: ServerEvent): Promise<any> {
     return apiClient.get('/users', event);
 }
 
-export function getUserById(userId: string, event?: ServerEvent): Promise<any> {
-    return apiClient.get(`/users/${userId}`, event);
-}
-
 export function getUserCurrentWeekShifts(userId: string, event?: ServerEvent): Promise<any> {
     return apiClient.get(`/users/${userId}/current-week-shifts`, event);
 }
@@ -22,6 +18,12 @@ export function getUserCurrentMonthShiftsMetric(userId: string, event?: ServerEv
 }
 
 // Unique user
+
+// GET
+
+export function getUserById(userId: string, event?: ServerEvent): Promise<any> {
+    return apiClient.get(`/users/${userId}`, event);
+}
 
 // ADD
 export function addUser(body: any,event?: ServerEvent): Promise<any> {

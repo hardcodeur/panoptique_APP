@@ -4,15 +4,12 @@ import type { ApiReturn } from '$lib/types';
 
 // Call API
 import { getUsers,addUser,updateUserPartial,getUserById,deleteUser } from "$lib/api/user"
-import { getTeams } from "$lib/api/team"
+import { getTeams,addTeam,getTeamById,deleteTeam,updateTeamPartial } from "$lib/api/team"
 import { apiResetPassword } from "$lib/api/auth"
-import { getTeamsWhiteUsers,getTeamUnassignedUsers } from "$lib/api/teamUsers";
+import { getTeamsWhiteUsers,getTeamUnassignedUsers} from "$lib/api/teamUsers";
 
 const enumRoles = ['admin', 'manager', 'team_manager', 'agent'] as const;
-enum enumStatus {
-    "dispo" = 1,
-    "indispo" = 0
-}
+const enumStatus = ["0","1"] as const;
 
 // field rules
 const schemaAddUser = z.object({
@@ -44,13 +41,32 @@ const schemaUpdateUser = z.object({
         .min(2,("Le nom doit contenir au moins 2 caractères"))
         .max(100,("Le nom ne peut pas dépasser 100 caractères")),
     phone: z.string().min(1, 'Champ obligatoire'),
-    status: z.nativeEnum(enumStatus),
+    status: z.enum(enumStatus),
     role: z.enum(enumRoles),
     team: z.string().min(1, 'Champ obligatoire'),
 });
 
 const schemaDeleteAndResetPass = z.object({
-    userId:z.string() // Ajouter un message
+    userId:z.string()
+});
+
+const schemaAddTeam = z.object({
+    teamName:z.string()
+    .min(1, 'Champ obligatoire')
+    .min(2,("Le nom doit contenir au moins 2 caractères"))
+    .max(50,("Le nom ne peut pas dépasser 50 caractères")),
+});
+
+const schemaUpdateTeam = z.object({
+    teamId:z.string(),
+    teamName:z.string()
+    .min(1, 'Champ obligatoire')
+    .min(2,("Le nom doit contenir au moins 2 caractères"))
+    .max(50,("Le nom ne peut pas dépasser 50 caractères")),
+});
+
+const schemaDeleteTeam = z.object({
+    teamId:z.string()
 });
 
 function getChangedFields(originalData: any, newData: any): { [key: string]: any } {
@@ -69,16 +85,14 @@ export async function load({cookies, fetch}) {
     try {
         const [
             userList,
-            teamList, 
-            teamWhiteUsers, 
-            teamUnassignedUsers
+            teamList,
+            teamWhiteUsers,
         ] = await Promise.all([
             getUsers({ cookies, fetch }),
             getTeams({ cookies, fetch }),
             getTeamsWhiteUsers({ cookies, fetch }),
-            getTeamUnassignedUsers({ cookies, fetch })
         ]);
-        return { userList, teamList, teamWhiteUsers, teamUnassignedUsers };
+        return { userList, teamList, teamWhiteUsers};
     } catch (err: any) {
         console.log(err);
         throw error(500, 'Erreur lors du chargement des données');
@@ -98,9 +112,6 @@ export const actions = {
             const errors = result.error.flatten().fieldErrors;            
             return fail(400, { errors,formData});
         }
-
-        // Serialization API
-        result.data.team = `/api/teams/${result.data.team}`;
 
         // add
         try {
@@ -127,10 +138,6 @@ export const actions = {
 
         // Parse form data
         const formData = Object.fromEntries(await request.formData()) as Partial<FormData> ;
-
-        if(formData.status){
-            formData.status = parseInt(formData.status);
-        }
 
         // Zod check Form requirement 
         const result = schemaUpdateUser.safeParse(formData);
@@ -261,7 +268,137 @@ export const actions = {
                 } as ApiReturn
             })
         }
-    }
+    },
+    addTeam : async({request,cookies, fetch})=>{
+
+        const formData = Object.fromEntries(await request.formData()) as Partial<FormData> ;
+        // Zod check Form requirement 
+        const result = schemaAddTeam.safeParse(formData);
+
+        if (!result.success) {
+            console.log(result.error.issues);
+            const errors = result.error.flatten().fieldErrors;          
+            return fail(400, { errors,formData});
+        }
+
+        try {
+            const rep = await addTeam(result.data,{ cookies, fetch });
+            return {
+                actionName: 'teamAdd',
+                apiReturn:{
+                    status:"success",
+                    message:`Equipe ${rep.teamName} ajouté avec succès!`
+                } as ApiReturn
+            }
+        } catch (error: any) {
+            console.log(error.data?.detail ||  error.data?.message);
+            return fail(400, {
+                formData,
+                apiReturn:{
+                    status:"error",
+                    message: error.data?.detail ||  error.data?.message || "Une erreur est survenue à l'enregistrement de l'équipe"
+                } as ApiReturn
+            });
+        }
+    },
+    teamUpdate: async ({request,cookies, fetch}) => {
+
+        // Parse form data
+        const formData = Object.fromEntries(await request.formData()) as Partial<FormData> ;
+        // Zod check Form requirement 
+        const result = schemaUpdateTeam.safeParse(formData);
+
+        if (!result.success) {
+            console.log(result.error.issues);
+            const errors = result.error.flatten().fieldErrors;          
+            return fail(400, { errors,formData});
+        }
+
+        const teamId = result.data.teamId
+
+        //get original user data
+        let originalTeam;
+        try {
+            originalTeam = await getTeamById(teamId, { cookies, fetch });
+        } catch (error: any) {
+            console.log(error.data?.detail ||  error.data?.message);
+            return {
+                apiReturn:{
+                    status:"error",
+                    message: error.data?.detail ||  error.data?.message || "Utilisateur introuvable."
+                } as ApiReturn
+            };
+        }
+
+        // Compare data if have change
+        const updatedFields = getChangedFields(originalTeam, result.data);
+        
+        // fields not change return message
+        if (Object.keys(updatedFields).length === 0) {
+            return {
+                apiReturn:{
+                    status:"info",
+                    message: 'Aucune modification détectée.'
+                } as ApiReturn
+            };
+        }
+
+        // update
+        try {
+            const rep = await updateTeamPartial(teamId,updatedFields,{ cookies, fetch });
+            return {
+                formData : rep,
+                actionName: 'teamUpdate',
+                apiReturn:{
+                    status:"success",
+                    message:`L'équipe ${rep.teamName} mis à jour avec succès !`
+                } as ApiReturn
+            }
+        } catch (error: any) {
+            console.log(error.data?.detail ||  error.data?.message);
+            return fail(400, {
+                formData,
+                apiReturn:{
+                    status:"error",
+                    message: error.data?.detail ||  error.data?.message || "Une erreur est survenue à l'enregistrement de l'équipe."
+                } as ApiReturn
+            });
+        }
+    },
+    teamDelete : async ({request,cookies, fetch}) => {
+        
+        const formData = Object.fromEntries(await request.formData()) as Partial<FormData> ;
+        //Zod check Form requirement 
+        const result = schemaDeleteTeam.safeParse(formData);
+        
+        if (!result.success) {
+            console.log(result.error.issues);
+            const errors = result.error.flatten().fieldErrors;          
+            return fail(400, { errors,formData});
+        }
+
+        const teamId = result.data.teamId
+
+        try {
+            await deleteTeam(teamId,{ cookies, fetch });
+            return {
+                actionName: 'userDelete',
+                apiReturn:{
+                    status:"success",
+                    message:"L'équipe supprimé avec succès !"
+                } as ApiReturn
+            }
+        } catch (error: any) {
+            console.log(error.data?.detail ||  error.data?.message);
+            return fail(400,{
+                apiReturn:{
+                    status:"error",
+                    message:"Une erreur inattendue est survenue lors de la suppression de l'équipe !"
+                } as ApiReturn
+            })
+        }
+
+    },
 
 }
 

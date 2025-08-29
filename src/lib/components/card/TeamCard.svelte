@@ -3,15 +3,18 @@
     import FormTeam from "$lib/components/form/Team/FormTeam.svelte";
     import RoleBadge from "$lib/components/badge/RoleBadge.svelte"
     import StatusBadge from "$lib/components/badge/StatusBadge.svelte"
+    import ActionFormDotDropdown from "$lib/components/dropdown/ActionFormDotDropdown.svelte";
 
     const {
+        teamId,
         teamName,
         users,
         sideBarFormConfig
     } = $props();
 
     const countUsersStatus = (users) => {
-        let available = 0, unavailable = 0;
+        let available = 0; 
+        let unavailable = 0;
         
         users.forEach(user => {
             user.status === "0" ? unavailable++ : available++;
@@ -23,7 +26,6 @@
     const nbUsers = users.length
     const usersStatus = countUsersStatus(users);
 
-    const btnEditClass="ts-text-bold text-th-blue hover:text-th-white hover:bg-th-blue"
     const accordionItemClass= "flex items-center justify-between w-full ts-text text-left group-first:rounded-t-xl border-b border-th-black-light py-5 text-th-black"
 
 </script>
@@ -32,7 +34,7 @@
     <div class="flex flex-col">
         <div class="flex flex-col lg:flex-row justify-center lg:justify-between items-center gap-2">
             <span class="ts-text-title md:text-center">Équipe <span class="capitalize">{teamName}</span></span>
-            <Button outline size="xs" class={btnEditClass} on:click={() => (sideBarFormConfig(FormTeam,`Equipe - ${teamName}`))}>Modifier</Button>
+            <ActionFormDotDropdown deleteAction="?/teamDelete" itemId={teamId} sideBarFormConfig={sideBarFormConfig(FormTeam,`Equipe - ${teamName}`,{id:teamId,teamName:teamName})} />
         </div>
     </div>
     <div class="flex justify-center mt-3">

@@ -20,15 +20,17 @@
     let sidebarConfig: SidebarFormConfig | null = $state(null);
 
     function sideBarFormConfig(component: AgentFormComponent,sidebarTitle :string, itemUpdate?: any): void {
-        sideBarHidden = false; // trigger show/hidden
-        sidebarConfig = {
-            title: sidebarTitle,
-            component: component,
-            formReturn: form, // form error and data in form send
-            itemUpdate: itemUpdate // item to update in form
-
-        };
-        form = null // reset form
+        // to delay updating the component until last (no conflict)
+        setTimeout(()=>{
+            sideBarHidden = false; // trigger show/hidden
+            sidebarConfig = {
+                title: sidebarTitle,
+                component: component,
+                formReturn: form, // form error and data in form send
+                itemUpdate: itemUpdate // item to update in form
+            };
+            form = null // reset form
+        },0)
     }
 
     // Dynamic zod form error return
@@ -49,12 +51,9 @@
     const btnIconClass="mr-2"
     const tabItemTitle="ts-title-2" 
 
-    const formData = $derived({
-        teamList : data.teamList,
-        userList: data.userList,
-        teamsUsers: data.teamWhiteUsers,
-        unassignedUsers: data.teamUnassignedUsers,
-    });
+    const teamList = $derived(data.teamList);
+    const userList = $derived(data.userList);
+    const teamsUsers = $derived(data.teamWhiteUsers);
 
 </script>
   
@@ -69,7 +68,7 @@
             <h1 class={tabItemTitle}>{tabsTitleAgent}</h1>
             <Button size="lg" class={btnClass} on:click={() => {sideBarFormConfig(FormAgent,"Nouvel agent")}}><CirclePlusSolid class={btnIconClass} />Ajouter un agent</Button>
         </div>
-        <TableUser userList={formData.userList}  sideBarFormConfig={sideBarFormConfig} />
+        <TableUser {userList} sideBarFormConfig={sideBarFormConfig} />
     </TabItem>
     <TabItem title={tabsTitleTeam} activeClasses={tabItemActiveClass} inactiveClasses={tabItemInactiveClass}>
         <div class={tabItemTitleRow}>
@@ -77,10 +76,10 @@
             <Button size="lg" class={btnClass} on:click={() => {sideBarFormConfig(FormTeam,"Nouvelle équipe")}}><CirclePlusSolid class={btnIconClass} />Ajouter une équipe</Button>
         </div>
         <div class="grid sm:grid-cols-2 lg:grid-cols-3 grid-cols-1 gap-x-8 gap-y-4">
-            {#each formData.teamsUsers as teamUsers (teamUsers.id)}
-                <TeamCard teamName={teamUsers.teamName} users={teamUsers.users} sideBarFormConfig={sideBarFormConfig}/>
+            {#each teamsUsers as teamUsers}
+                <TeamCard teamId={teamUsers.id} teamName={teamUsers.teamName} users={teamUsers.users} sideBarFormConfig={sideBarFormConfig}/>
             {/each}
         </div>
     </TabItem>
 </Tabs>
-<SidebarForm bind:hidden={sideBarHidden} {formData} config={sidebarConfig} />
+<SidebarForm bind:hidden={sideBarHidden} formComponentData={{teamList}} config={sidebarConfig} />

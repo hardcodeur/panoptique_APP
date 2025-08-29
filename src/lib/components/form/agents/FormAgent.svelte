@@ -8,9 +8,12 @@
 
     let { 
         formReturn,
-        formData,
+        formComponentData,
         itemUpdate = null
-    } : { formReturn: ActionData | null; formData: any; itemUpdate?: any } = $props();
+    } : { formReturn: ActionData | null; 
+        formComponentData: any; 
+        itemUpdate?: any 
+    } = $props();
 
     let errors= $derived(formReturn?.errors);
     let submittedData= $derived(formReturn?.formData);
@@ -34,7 +37,7 @@
         }
     }
 
-    const teamList = formData.teamList
+    const teamList = formComponentData.teamList
     
     let roleItems :SelectInputValue[] = [
         { value: 'admin', name: 'Administrateur' },
@@ -45,7 +48,7 @@
     
     let teamItems :SelectInputValue[] = [];
     teamList.forEach(team => {
-        teamItems = [...teamItems, { value: String(team.id), name: team.teamName }];
+        teamItems = [...teamItems, { value: team.id, name: team.teamName }];
     });
 
     
@@ -58,13 +61,13 @@
             phone= itemUpdate.phone || '';
             status= itemUpdate.status || '';       
             roleSelected= itemUpdate.role || '';
-            teamSelected= String(itemUpdate.teamId) || ''; 
+            teamSelected= itemUpdate.teamId || ''; 
         } else if (submittedData) { // data user return last submited or update in form 
             firstName=  submittedData.firstName || '';
             lastName= submittedData.lastName || '';
             email= submittedData.email || '';
             phone= submittedData.phone || '';
-            status= String(submittedData.status) || '';
+            status= submittedData.status || '';
             roleSelected= submittedData.role || '';
             teamSelected= submittedData.team || String(submittedData.teamId) || '';
         }else{ // default
