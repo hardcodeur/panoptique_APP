@@ -59,11 +59,11 @@
   
 <Tabs contentClass={tabsClass} tabStyle="underline" >
     <TabItem open title={tabsTitleAgent} activeClasses={tabItemActiveClass} inactiveClasses={tabItemInactiveClass}>
+        {#if (form?.actionName === "resetPassword" || form?.actionName === "userDelete") && form?.apiReturn && sideBarHidden}
         <div class="flex justify-center items-center">
-            {#if (form?.actionName === "resetPassword" || form?.actionName === "userDelete") && form?.apiReturn && sideBarHidden}
             <FormResponceToast status={form?.apiReturn.status} message={form?.apiReturn.message} />
-            {/if}
         </div>
+        {/if}
         <div class={tabItemTitleRow}>
             <h1 class={tabItemTitle}>{tabsTitleAgent}</h1>
             <Button size="lg" class={btnClass} on:click={() => {sideBarFormConfig(FormAgent,"Nouvel agent")}}><CirclePlusSolid class={btnIconClass} />Ajouter un agent</Button>
@@ -71,6 +71,11 @@
         <TableUser {userList} sideBarFormConfig={sideBarFormConfig} />
     </TabItem>
     <TabItem title={tabsTitleTeam} activeClasses={tabItemActiveClass} inactiveClasses={tabItemInactiveClass}>
+        {#if form?.actionName === "teamDelete" && form?.apiReturn && sideBarHidden}
+        <div class="flex justify-center items-center">
+            <FormResponceToast status={form?.apiReturn.status} message={form?.apiReturn.message} />
+        </div>
+        {/if}
         <div class={tabItemTitleRow}>
             <h1 class={tabItemTitle}>{tabsTitleTeam}</h1>
             <Button size="lg" class={btnClass} on:click={() => {sideBarFormConfig(FormTeam,"Nouvelle équipe")}}><CirclePlusSolid class={btnIconClass} />Ajouter une équipe</Button>

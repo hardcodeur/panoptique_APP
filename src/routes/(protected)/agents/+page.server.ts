@@ -46,8 +46,12 @@ const schemaUpdateUser = z.object({
     team: z.string().min(1, 'Champ obligatoire'),
 });
 
-const schemaDeleteAndResetPass = z.object({
+const schemaResetPass = z.object({
     userId:z.string()
+});
+
+const schemaDeleteUser = z.object({
+    deleteId:z.string()
 });
 
 const schemaAddTeam = z.object({
@@ -66,7 +70,7 @@ const schemaUpdateTeam = z.object({
 });
 
 const schemaDeleteTeam = z.object({
-    teamId:z.string()
+    deleteId:z.string()
 });
 
 function getChangedFields(originalData: any, newData: any): { [key: string]: any } {
@@ -177,11 +181,6 @@ export const actions = {
             };
         }
 
-        // Serialization for API
-        if(updatedFields.team){
-            updatedFields.team = `/api/teams/${result.data.team}`;
-        }
-
         // update
         try {
             const rep = await updateUserPartial(userId,updatedFields,{ cookies, fetch });
@@ -207,7 +206,7 @@ export const actions = {
     userDelete : async ({request,cookies, fetch}) => {
         const formData = Object.fromEntries(await request.formData()) as Partial<FormData> ;
         // Zod check Form requirement 
-        const result = schemaDeleteAndResetPass.safeParse(formData);
+        const result = schemaDeleteUser.safeParse(formData);
         
         if (!result.success) {
             console.log(result.error.issues);
@@ -215,7 +214,7 @@ export const actions = {
             return fail(400, { errors,formData});
         }
 
-        const userId = result.data.userId
+        const userId = result.data.deleteId
 
         try {
             await deleteUser(userId,{ cookies, fetch });
@@ -240,7 +239,7 @@ export const actions = {
     userResetPassword : async ({request,cookies, fetch}) => {
         const formData = Object.fromEntries(await request.formData()) as Partial<FormData> ;
         // Zod check Form requirement 
-        const result = schemaDeleteAndResetPass.safeParse(formData);
+        const result = schemaResetPass.safeParse(formData);
         
         if (!result.success) {
             console.log(result.error.issues);
@@ -377,12 +376,12 @@ export const actions = {
             return fail(400, { errors,formData});
         }
 
-        const teamId = result.data.teamId
+        const teamId = result.data.deleteId
 
         try {
             await deleteTeam(teamId,{ cookies, fetch });
             return {
-                actionName: 'userDelete',
+                actionName: 'teamDelete',
                 apiReturn:{
                     status:"success",
                     message:"L'équipe supprimé avec succès !"

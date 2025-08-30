@@ -25,6 +25,7 @@
 
     const nbUsers = users.length
     const usersStatus = countUsersStatus(users);
+    const deleteMsg = "Êtes-vous sûr de vouloir supprimer cette équipe ? Cette action est irréversible et entraînera la suppression de tous les agents qui lui sont rattachés."
 
     const accordionItemClass= "flex items-center justify-between w-full ts-text text-left group-first:rounded-t-xl border-b border-th-black-light py-5 text-th-black"
 
@@ -32,12 +33,12 @@
 
 <div class="max-w-sm h-fit py-6 px-4 border border-th-black-light rounded-lg">
     <div class="flex flex-col">
-        <div class="flex flex-col lg:flex-row justify-center lg:justify-between items-center gap-2">
+        <div class="flex justify-between items-center gap-2">
             <span class="ts-text-title md:text-center">Équipe <span class="capitalize">{teamName}</span></span>
-            <ActionFormDotDropdown deleteAction="?/teamDelete" itemId={teamId} sideBarFormConfig={sideBarFormConfig(FormTeam,`Equipe - ${teamName}`,{id:teamId,teamName:teamName})} />
+            <ActionFormDotDropdown alertMsg={deleteMsg} deleteAction="?/teamDelete" itemId={teamId} sideBarFormConfig={sideBarFormConfig(FormTeam,`Equipe - ${teamName}`,{id:teamId,teamName:teamName})} />
         </div>
     </div>
-    <div class="flex justify-center mt-3">
+    <div class="flex justify-between mt-3">
         {#if usersStatus.available > 0}
         <StatusBadge status="1" indicator={usersStatus.available+"/"+nbUsers} />
         {/if}

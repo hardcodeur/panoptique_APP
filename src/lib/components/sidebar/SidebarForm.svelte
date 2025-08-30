@@ -26,13 +26,6 @@
       duration: 200,
       easing: sineIn
     };
-
-    const userdeleteOrRestPassAction= ()=>{
-        if(hidden === false){
-            hidden = true;
-        }
-    }
-
 </script>
     
 <Section name="default">
@@ -48,9 +41,6 @@
         {/if}
         {#if FormComponent && config}
             <FormComponent formReturn={config.formReturn} {formComponentData} itemUpdate={config.itemUpdate} />
-        {/if}
-        {#if config?.itemUpdate}
-            <FormAccountOptions onUserdeleteOrRestPass={userdeleteOrRestPassAction} userId={config.itemUpdate.id}/>
         {/if}
     </Drawer>
 </Section>

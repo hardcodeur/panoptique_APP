@@ -5,6 +5,7 @@
 	import RoleBadge from "$lib/components/badge/RoleBadge.svelte"
     import StatusBadge from "$lib/components/badge/StatusBadge.svelte"
 	import FormAgent from "$lib/components/form/agents/FormAgent.svelte"
+	import ActionFormDotDropdown from "$lib/components/dropdown/ActionFormDotDropdown.svelte";
 
 	let { userList,sideBarFormConfig } = $props();
 	let searchTerm = $state('');
@@ -64,12 +65,13 @@
 	let currentPageItems = $derived(userList.slice(currentPosition, currentPosition + itemsPerPage));
 	let filteredItems = $derived(userList.filter((item) => item.fullName.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1));
 
+	const deleteMsg = "Êtes-vous sûr de vouloir supprimer cet agent ? Cette action est irréversible."
+
 	const divClass = 'bg-th-white text-th-black relative sm:rounded-lg overflow-x-auto';
 	const innerDivClass = 'flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 py-4';
 	const searchClass = 'w-full md:w-1/2 ts-text relative text-th-black placeholder:ts-text';
 	const cellRowClass="bg-th-white ts-text text-th-black border border-th-black-light"
-	const btnViewClass="ts-text-bold text-th-blue hover:text-th-white hover:bg-th-blue"
-    const btnIconClass="mr-1"
+
 
 </script>
 
@@ -92,7 +94,9 @@
 						<TableBodyCell class="px-4 py-3 capitalize">{item.teamName}</TableBodyCell>
 						<TableBodyCell class="px-4 py-3">{item.email}</TableBodyCell>
 						<TableBodyCell class="px-4 py-3"><StatusBadge status={item.status} /></TableBodyCell>
-						<TableBodyCell class="px-4 py-3"><Button outline size="xs" class={btnViewClass} on:click={() => (sideBarFormConfig(FormAgent,`Agent - ${item.fullName}`, item))}><ProfileCardSolid class={btnIconClass} />Profil</Button></TableBodyCell>
+						<TableBodyCell class="flex justify-center px-4 py-3">
+							<ActionFormDotDropdown alertMsg={deleteMsg} deleteAction="?/userDelete" itemId={item.id} sideBarFormConfig={sideBarFormConfig(FormAgent,`Agent - ${item.fullName}`, item)} />
+						</TableBodyCell>
 					</TableBodyRow>
 				{/each}
 			{:else}
@@ -103,7 +107,9 @@
 						<TableBodyCell class="px-4 py-3 capitalize">{item.teamName}</TableBodyCell>
 						<TableBodyCell class="px-4 py-3">{item.email}</TableBodyCell>
 						<TableBodyCell class="px-4 py-3"><StatusBadge status={item.status} /></TableBodyCell>
-						<TableBodyCell class="px-4 py-3"><Button outline size="xs" class={btnViewClass} on:click={() => (sideBarFormConfig(FormAgent,`Agent - ${item.fullName}`, item))}><ProfileCardSolid class={btnIconClass} />Profil</Button></TableBodyCell>
+						<TableBodyCell class=" flex justify-center px-4 py-3">
+							<ActionFormDotDropdown alertMsg={deleteMsg} deleteAction="?/userDelete" itemId={item.id} sideBarFormConfig={sideBarFormConfig(FormAgent,`Agent - ${item.fullName}`, item)} />
+						</TableBodyCell>
 					</TableBodyRow>
 				{/each}
 			{/if}

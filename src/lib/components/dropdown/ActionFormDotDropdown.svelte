@@ -10,13 +10,20 @@
         itemId,
         sideBarFormConfig,
         deleteAction,
+        alertMsg,
     }:{
         itemId : string,
         sideBarFormConfig : any, // modifier bon type
-        deleteAction: string
+        deleteAction: string,
+        alertMsg: string,
     }=$props()
 
-    const handleEnhance = ()=>{
+    const handleEnhance = ({ cancel }: { cancel: () => void })=>{
+        // alert
+        if(!confirm(alertMsg)){
+            cancel();
+        }
+        // refresh data
         return async ({ result,update }: { result: ActionResult,update:()=>void })=>{
             if (result.type === 'success'){
                 await invalidateAll();
@@ -24,6 +31,7 @@
             update();
         }
     }
+
 </script>
 
 <DotsHorizontalOutline size="lg" class="dots-menu-{itemId}" />
@@ -31,8 +39,8 @@
   <DropdownItem class="px-3 ts-text-bold py-1" on:click={() => (sideBarFormConfig)}>Modifier</DropdownItem>
   <DropdownItem class="w-full p-0">
     <form use:enhance={handleEnhance} method="POST" action={deleteAction} class="mt-3">
-        <input type="hidden" name="teamId" value={itemId}>
-        <Button type="submit" class="xt-center focus-within:ring-0 px-3 py-1 ts-text-bold text-th-red hover:text-primary-800 rounded-lg">Supprimer l'équipe</Button>
+        <input type="hidden" name="deleteId" value={itemId}>
+        <Button type="submit" class="xt-center focus-within:ring-0 px-3 py-1 ts-text-bold text-th-red hover:text-primary-800 rounded-lg">Supprimer</Button>
     </form>
   </DropdownItem>
 </Dropdown>
