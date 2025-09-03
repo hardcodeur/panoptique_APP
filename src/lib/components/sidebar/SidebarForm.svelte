@@ -4,7 +4,6 @@
     import { Drawer, CloseButton } from "flowbite-svelte";
     import { sineIn } from "svelte/easing";
     import FormResponceToast from "$lib/components/toasts/FormResponceToast.svelte";
-    import FormAccountOptions from '$lib/components/form/agents/FormAccountOptions.svelte';
 
     let { 
         hidden = $bindable(false),

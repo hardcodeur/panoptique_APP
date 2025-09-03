@@ -1,18 +1,17 @@
 <script lang="ts">
+    import type { AgentFormComponent, SidebarFormConfig } from '$lib/types';
+    import type { ActionData,PageData } from './$types'
+    
     import { Tabs, TabItem, Button } from 'flowbite-svelte';
     import { CirclePlusSolid } from 'flowbite-svelte-icons';
-    import { Role } from "$lib/stores/UserStore"
     import AccessControl from "$lib/components/AccessControl.svelte";
-    import type { ActionData,PageData } from './$types'
-	import type {  ComponentType } from 'svelte';
     import SidebarForm from "$lib/components/sidebar/SidebarForm.svelte";
     import MissionCard from "$lib/components/card/MissionCard.svelte";
     import MissionShiftCard from "$lib/components/card/MissionShiftCard.svelte";
     import LocationCard from "$lib/components/card/LocationCard.svelte";
     import FormLocation from "$lib/components/form/location/FormLocation.svelte";
+    import FormMission from "$lib/components/form/mission/FormMission.svelte"
 
-    // sup
-    import FormAgent from "$lib/components/form/agents/FormAgent.svelte"
 
     type Mission = {
         id: number;
@@ -25,18 +24,35 @@
         team: string;
     };
 
+    // Data from backend
+    // - form for the action part 
+    // - data for the load part
     let { form,data } : { form: ActionData,data: PageData}  = $props();
+
  
     let sideBarHidden: boolean = $state(true);
-    let FormComponent: ComponentType = $state(FormAgent);
-    let sidbarTitle :string = $state("");
-    let resetKey = $state(0)
-
-    function openDrawer(component: ComponentType,DrawerTitle :string): void {
-        FormComponent = component;
-        sideBarHidden = false;
-        sidbarTitle = DrawerTitle;
+    let sidebarConfig: SidebarFormConfig | null = $state(null);
+    
+    function sideBarFormConfig(component: AgentFormComponent,sidebarTitle :string, itemUpdate?: any): void {
+        // to delay updating the component until last (no conflict)
+        setTimeout(()=>{
+            sideBarHidden = false; // trigger show/hidden
+            sidebarConfig = {
+                title: sidebarTitle,
+                component: component,
+                formReturn: form, // form error and data in form send
+                itemUpdate: itemUpdate // item to update in form
+            };
+            form = null // reset form
+        },0)
     }
+
+    // Dynamic zod form error return
+    $effect(() => {
+        if (sidebarConfig) {
+            sidebarConfig.formReturn = form;
+        }
+    });
 
     function groupMissionsByDate(missions: Mission[]) {
         const today = new Date();
@@ -44,21 +60,11 @@
         const upcomingMissions: Mission[] = [];
 
         for (const mission of missions) {
-            const startDate = new Date(mission.start);
-
-            const isSameDay =
-            startDate.getDate() === today.getDate() &&
-            startDate.getMonth() === today.getMonth() &&
-            startDate.getFullYear() === today.getFullYear();
-
-            const isSameMonth =
-            startDate.getDate() > today.getDate() &&
-            startDate.getMonth() === today.getMonth() &&
-            startDate.getFullYear() === today.getFullYear();
-
+            const startDate = new Date(mission.start);            
+            const isSameDay = startDate.getDate() === today.getDate() && startDate.getMonth() === today.getMonth() && startDate.getFullYear() === today.getFullYear();
             if (isSameDay) {
             todayMissions.push(mission);
-            } else if (isSameMonth) {
+            }else{                
             upcomingMissions.push(mission);
             }
         }
@@ -69,9 +75,11 @@
         };
     }
 
-    const missionList = groupMissionsByDate(data.missionList);
+    const teamList = data.teamList;
+    const customerList = data.customerList;
     const missionShiftsList = data.missionShifts;
     const locationList = data.location;
+    const missionList = groupMissionsByDate(data.missionList);
 
     const tabsTitleMissions="Missions"
     const tabsTitleShift="Quarts"
@@ -90,24 +98,25 @@
 </script>
   
 <Tabs contentClass={tabsClass} tabStyle="underline" >
+    <!-- Mission -->
     <TabItem open title={tabsTitleMissions} activeClasses={tabItemActiveClass} inactiveClasses={tabItemInactiveClass}>
         <div class={tabItemTitleRow}>
             <h1 class={tabItemTitle}>{tabsTitleMissions}</h1>
             <!-- <AccessControl anyRole={[Role.ADMIN, Role.MANAGER,Role.TEAM_MANAGER]}> -->
-            <Button size="sm" class={btnClass} on:click={() => {openDrawer(FormAgent,"Nouvel mission")}}><CirclePlusSolid class={btnIconClass} />Ajouter une mission</Button>
+            <Button size="sm" class={btnClass} on:click={() => {sideBarFormConfig(FormMission,"Nouvel mission")}}><CirclePlusSolid class={btnIconClass} />Ajouter une mission</Button>
             <!-- </AccessControl> -->
         </div>
         {#if missionList.today.length != 0 || missionList.upcoming.length != 0}
             {#if missionList.today.length != 0}
                 <h4 class={missionListTitleClass}>En cours</h4>
                 {#each missionList.today as mission}
-                    <MissionCard {mission}/>
+                    <MissionCard {mission} {sideBarFormConfig}/>
                 {/each}
             {/if}
             {#if missionList.upcoming.length != 0}
-                <h4 class={missionListTitleClass}>À venir</h4>
+                <h4 class={missionListTitleClass+" mt-6"}>À venir</h4>
                 {#each missionList.upcoming as mission}
-                    <MissionCard {mission}/>
+                    <MissionCard {mission} {sideBarFormConfig}/>
                 {/each}
             {/if}
         {:else}
@@ -117,22 +126,24 @@
         {/if}
 
     </TabItem>
+    <!-- Shift -->
     <TabItem title={tabsTitleShift} activeClasses={tabItemActiveClass} inactiveClasses={tabItemInactiveClass}>
         <div class={tabItemTitleRow}>
             <h1 class={tabItemTitle}>{tabsTitleShift}</h1>
             <!-- <AccessControl anyRole={[Role.ADMIN, Role.MANAGER,Role.TEAM_MANAGER]}> -->
-            <!-- <Button size="sm" class={btnClass} on:click={() => (openDrawer(FormAgent,"Nouvelle mission"))}><CirclePlusSolid class={btnIconClass} />Ajouter un lieu</Button> -->
+            <!-- <Button size="sm" class={btnClass} on:click={() => (openDrawer(FormMission,"Nouvelle mission"))}><CirclePlusSolid class={btnIconClass} />Ajouter un lieu</Button> -->
             <!-- </AccessControl> -->
         </div>
         {#each missionShiftsList as missionShifts}
         <MissionShiftCard {missionShifts}/>
         {/each}
     </TabItem>
+    <!-- Location -->
     <TabItem title={tabsTitleLocation} activeClasses={tabItemActiveClass} inactiveClasses={tabItemInactiveClass}>
         <div class={tabItemTitleRow}>
             <h1 class={tabItemTitle}>{tabsTitleLocation}</h1>
             <!-- <AccessControl anyRole={[Role.ADMIN, Role.MANAGER,Role.TEAM_MANAGER]}> -->
-            <Button size="sm" class={btnClass} on:click={() => (openDrawer(FormLocation,"Nouveau lieu"))}><CirclePlusSolid class={btnIconClass} />Ajouter un lieux</Button>
+            <Button size="sm" class={btnClass} on:click={() => (sideBarFormConfig(FormLocation,"Nouveau lieu"))}><CirclePlusSolid class={btnIconClass} />Ajouter un lieux</Button>
             <!-- </AccessControl> -->
         </div>
         {#each locationList as location}
@@ -141,4 +152,4 @@
         
     </TabItem>
 </Tabs>
-<SidebarForm bind:hidden={sideBarHidden} formProps={{teamList:data.teamList}} {sidbarTitle} {form} {FormComponent} />
+<SidebarForm bind:hidden={sideBarHidden} formComponentData={{teamList,customerList}} config={sidebarConfig} />

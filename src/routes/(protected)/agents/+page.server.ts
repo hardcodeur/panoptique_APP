@@ -1,77 +1,14 @@
 import { fail, error } from '@sveltejs/kit';
-import { z } from "zod";
 import type { ApiReturn } from '$lib/types';
 
-// Call API
+// Zod schema
+import { schemaAddUser,schemaUpdateUser,schemaResetPass,schemaDeleteUser } from "$lib/zodSchema/agent/agent";
+import { schemaAddTeam,schemaUpdateTeam,schemaDeleteTeam } from "$lib/zodSchema/agent/team";
+// call API
 import { getUsers,addUser,updateUserPartial,getUserById,deleteUser } from "$lib/api/user"
-import { getTeams,addTeam,getTeamById,deleteTeam,updateTeamPartial } from "$lib/api/team"
+import { getTeamListName,addTeam,getTeamById,deleteTeam,updateTeamPartial } from "$lib/api/team"
 import { apiResetPassword } from "$lib/api/auth"
 import { getTeamsWhiteUsers,getTeamUnassignedUsers} from "$lib/api/teamUsers";
-
-const enumRoles = ['admin', 'manager', 'team_manager', 'agent'] as const;
-const enumStatus = ["0","1"] as const;
-
-// field rules
-const schemaAddUser = z.object({
-    firstName: z.string()
-        .min(1, 'Champ obligatoire')
-        .min(2,("Le nom doit contenir au moins 2 caractères"))
-        .max(100,("Le nom ne peut pas dépasser 100 caractères")),
-    lastName: z.string()
-        .min(1, 'Champ obligatoire')
-        .min(2,("Le nom doit contenir au moins 2 caractères"))
-        .max(100,("Le nom ne peut pas dépasser 100 caractères")),
-    email: z.string()
-        .min(1, 'Champ obligatoire')
-        .email("Email invalide")
-        .regex(/^[a-zA-Z0-9._-]+@sgs\.(com|fr)$/,"L'email doit être une adresse sgs"),
-    phone: z.string().min(1, 'Champ obligatoire'),
-    role: z.enum(enumRoles),
-    team: z.string().min(1, 'Champ obligatoire'),
-});
-
-const schemaUpdateUser = z.object({
-    userId:z.string(),
-    firstName: z.string()
-        .min(1, 'Champ obligatoire')
-        .min(2,("Le nom doit contenir au moins 2 caractères"))
-        .max(100,("Le nom ne peut pas dépasser 100 caractères")),
-    lastName: z.string()
-        .min(1, 'Champ obligatoire')
-        .min(2,("Le nom doit contenir au moins 2 caractères"))
-        .max(100,("Le nom ne peut pas dépasser 100 caractères")),
-    phone: z.string().min(1, 'Champ obligatoire'),
-    status: z.enum(enumStatus),
-    role: z.enum(enumRoles),
-    team: z.string().min(1, 'Champ obligatoire'),
-});
-
-const schemaResetPass = z.object({
-    userId:z.string()
-});
-
-const schemaDeleteUser = z.object({
-    deleteId:z.string()
-});
-
-const schemaAddTeam = z.object({
-    teamName:z.string()
-    .min(1, 'Champ obligatoire')
-    .min(2,("Le nom doit contenir au moins 2 caractères"))
-    .max(50,("Le nom ne peut pas dépasser 50 caractères")),
-});
-
-const schemaUpdateTeam = z.object({
-    teamId:z.string(),
-    teamName:z.string()
-    .min(1, 'Champ obligatoire')
-    .min(2,("Le nom doit contenir au moins 2 caractères"))
-    .max(50,("Le nom ne peut pas dépasser 50 caractères")),
-});
-
-const schemaDeleteTeam = z.object({
-    deleteId:z.string()
-});
 
 function getChangedFields(originalData: any, newData: any): { [key: string]: any } {
     const changedFields: { [key: string]: any } = {};
@@ -93,7 +30,7 @@ export async function load({cookies, fetch}) {
             teamWhiteUsers,
         ] = await Promise.all([
             getUsers({ cookies, fetch }),
-            getTeams({ cookies, fetch }),
+            getTeamListName({ cookies, fetch }),
             getTeamsWhiteUsers({ cookies, fetch }),
         ]);
         return { userList, teamList, teamWhiteUsers};

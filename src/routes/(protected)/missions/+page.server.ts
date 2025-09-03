@@ -1,39 +1,112 @@
 import { fail } from '@sveltejs/kit';
-import { z } from "zod";
 import { error } from '@sveltejs/kit';
-import { getMissions } from "$lib/api/mission";
-import { getTeams } from "$lib/api/team.js"
-import { getMissionWhiteShifts } from "$lib/api/missionShifts";
-import { getLocationLocationNote } from "$lib/api/locationLocationNote.js";
+import type { ApiReturn } from '$lib/types';
+// zod
+import { missionAddSchema,schemaDeleteMission } from "$lib/zodSchema/mission/mission";
+import { locationNoteSchema,schemaLocation } from "$lib/zodSchema/mission/location";
+// Api call
+import { getMissionLocationWhiteNote,getMissionWhiteShifts,getMissions,addMission,updateMission,deleteMission} from "$lib/api/mission";
+import { getTeamListName, } from "$lib/api/team"
+import { getCustomerListName, } from "$lib/api/customer"
 
-const locationNoteSchema = z.object({
-    title: z.string()
-    .min(1, "Champ obligatoire")
-    .max(100, "Ne doit pas dépasser 100 caractères"),
-    content: z.string()
-    .min(1, "Champ obligatoire")
-});
 
-const schemaLocation = z.object({
-    name: z.string()
-        .min(1, 'Champ obligatoire')
-        .min(2,("Doit contenir au moins 2 caractères"))
-        .max(50,("Ne doit pas dépasser 50 caractères")),
-    address: z.string()
-        .min(1, 'Champ obligatoire')
-        .min(2,("Doit contenir au moins 2 caractères"))
-        .max(100,("Ne doit pas dépasser 100 caractères")),
-    team: z.string({
-        required_error: "Sélectionner une équipe",
-        invalid_type_error: "Type invalide"
-    }).min(1, "Sélectionner une équipe"),
-    notes: z.array(locationNoteSchema).optional()
-});
+
+export async function load({ cookies, fetch }) {
+    try {
+        const [
+            missionList,
+            missionShifts,
+            location,
+            teamList,
+            customerList,
+        ] = await Promise.all([
+            getMissions({ cookies, fetch }),
+            getMissionWhiteShifts({ cookies, fetch }),
+            getMissionLocationWhiteNote({ cookies, fetch }),
+            getTeamListName({ cookies, fetch }),
+            getCustomerListName({ cookies, fetch })
+        ]);
+
+        return {missionList,missionShifts,location,teamList,customerList};
+
+    } catch (err) {
+        console.log(err);
+        throw error(500, 'Erreur lors du chargement des données');
+    }
+}
 
 
 
 export const actions = {
 
+    missionAdd : async ({ request, cookies }) => {
+        // Parse form data
+        const formData = Object.fromEntries(await request.formData());
+        // Zod check Form requirement 
+        const result = missionAddSchema.safeParse(formData);
+
+        if (!result.success) {
+            
+            const errors = result.error.flatten().fieldErrors;            
+            return fail(400, { errors,formData});
+        }
+
+        // add
+        try {
+            const rep = await addMission(result.data,{ cookies, fetch });
+            return {
+                actionName: 'missionAdd',
+                apiReturn:{
+                    status:"success",
+                    message:`Mission ${rep.id} ajouté avec succès!`
+                } as ApiReturn
+            }
+        } catch (error: any) {
+            console.log(error.data?.detail ||  error.data?.message);
+            return fail(400, {
+                formData,
+                apiReturn:{
+                    status:"error",
+                    message: error.data?.detail ||  error.data?.message || "Une erreur est survenue à l'enregistrement de l'utilisateur"
+                } as ApiReturn
+            });
+        }
+    },
+    missionUpdate: async ({ request, cookies }) => {
+        
+    },
+    missionDelete: async ({ request, cookies }) => {
+        const formData = Object.fromEntries(await request.formData()) as Partial<FormData> ;
+        // Zod check Form requirement 
+        const result = schemaDeleteMission.safeParse(formData);
+        
+        if (!result.success) {
+            console.log(result.error.issues);
+            const errors = result.error.flatten().fieldErrors;          
+            return fail(400, { errors,formData});
+        }
+
+        const id = result.data.deleteId
+
+        try {
+            await deleteMission(id,{ cookies, fetch });
+            return {
+                actionName: 'missionDelete',
+                apiReturn:{
+                    status:"success",
+                    message:"Mission supprimé avec succès !"
+                } as ApiReturn
+            }
+        } catch (error: any) {
+            console.log(error.data?.detail ||  error.data?.message);
+            return fail(400,{
+                apiReturn:{
+                    status:"error",
+                    message:"Une erreur inattendue est survenue lors de la suppression de la mission !"
+                } as ApiReturn
+            })
+        }
+    },
     addLocation: async ({ request, cookies }) => {
 
         const formData = Object.fromEntries(await request.formData());
@@ -51,58 +124,3 @@ export const actions = {
 
 }
 
-export async function load({ cookies, fetch }) {
-    try {
-        const [
-            missionsRes,
-            missionShiftsRes,
-            locationRes,
-            teamsRes
-        ] = await Promise.all([
-            getMissions({ cookies, fetch }),
-            getMissionWhiteShifts({ cookies, fetch }),
-            getLocationLocationNote({ cookies, fetch }),
-            getTeams({ cookies, fetch })
-        ]);
-
-        if (!missionsRes.ok) {
-            throw error(missionsRes.status, `Erreur missions: ${await missionsRes.text()}`);
-        }
-        if (!missionShiftsRes.ok) {
-            throw error(missionShiftsRes.status, `Erreur shifts: ${await missionShiftsRes.text()}`);
-        }
-        if (!locationRes.ok) {
-            throw error(locationRes.status, `Erreur location: ${await locationRes.text()}`);
-        }
-        if (!teamsRes.ok) {
-            throw error(teamsRes.status, `Erreur teams: ${await teamsRes.text()}`);
-        }
-
-        // Traite les réponses en parallèle
-        const [
-            missionList,
-            missionShifts,
-            location,
-            teamList
-        ] = await Promise.all([
-            missionsRes.json(),
-            missionShiftsRes.json(),
-            locationRes.json(),
-            teamsRes.json()
-        ]);
-
-        return {
-            missionList,
-            missionShifts,
-            location,
-            teamList
-        };
-
-    } catch (err) {
-        // Gestion des erreurs
-        if (err instanceof Error) {
-            console.error('Erreur dans load:', err.message);
-        }
-        throw error(500, 'Échec du chargement des données');
-    }
-}

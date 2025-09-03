@@ -1,7 +1,11 @@
 <script lang="ts">
     import { ClockSolid,UserSolid,LabelSolid,MapPinAltSolid,UsersGroupSolid } from 'flowbite-svelte-icons';
-
-    let {mission} = $props();
+    import ActionFormDotDropdown from "$lib/components/dropdown/ActionFormDotDropdown.svelte";
+    import FormMission from "$lib/components/form/mission/FormMission.svelte";
+    let {
+        mission,
+        sideBarFormConfig
+    } = $props();
 
 
     const dateTitleClass="text-th-black-light ts-text-bold";
@@ -11,7 +15,7 @@
     const dataClass="ts-text-sub-title flex flex-row justify-start items-center"
     const iconClass="mr-2"
 
-    
+    const deleteMsg = "Êtes-vous sûr de vouloir supprimer cette mission ? Cette action est irréversible et entraînera la suppression de tous les quarts qui lui sont rattachés."
 
     
 </script>
@@ -29,6 +33,9 @@
         </div>
     </div>
     <div class="flex-auto">
+        <div class="flex justify-end py-2 pr-4">
+            <ActionFormDotDropdown alertMsg={deleteMsg} deleteAction="?/missionDelete" itemId={mission.id} sideBarFormConfig={sideBarFormConfig(FormMission,`Mission - ${mission.id}`)} />
+        </div>
         <div class="flex justify-center p-4 sm:p-8">
             <span class="ts-title-2">Mission <span class="text-th-red">{mission.id}</span></span>
         </div>
