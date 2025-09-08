@@ -1,7 +1,5 @@
 import { apiClient } from '../services/apiClient';
-import type { Cookies } from '@sveltejs/kit';
-
-type ServerEvent = { cookies: Cookies; fetch: typeof fetch };
+import type { ServerEvent } from "$lib/types";
 
 export function getTeamListName(event?: ServerEvent): Promise<any> {
     return apiClient.get('/team/list/name', event);

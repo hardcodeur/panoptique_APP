@@ -95,7 +95,7 @@
 						<TableBodyCell class="px-4 py-3">{item.email}</TableBodyCell>
 						<TableBodyCell class="px-4 py-3"><StatusBadge status={item.status} /></TableBodyCell>
 						<TableBodyCell class="flex justify-center px-4 py-3">
-							<ActionFormDotDropdown alertMsg={deleteMsg} deleteAction="?/userDelete" itemId={item.id} sideBarFormConfig={sideBarFormConfig(FormAgent,`Agent - ${item.fullName}`, item)} />
+							<ActionFormDotDropdown alertMsg={deleteMsg} deleteAction="?/userDelete" itemId={item.id} sideBarFormConfig={()=>sideBarFormConfig(FormAgent,`Agent - ${item.fullName}`, item)} />
 						</TableBodyCell>
 					</TableBodyRow>
 				{/each}
@@ -108,7 +108,7 @@
 						<TableBodyCell class="px-4 py-3">{item.email}</TableBodyCell>
 						<TableBodyCell class="px-4 py-3"><StatusBadge status={item.status} /></TableBodyCell>
 						<TableBodyCell class=" flex justify-center px-4 py-3">
-							<ActionFormDotDropdown alertMsg={deleteMsg} deleteAction="?/userDelete" itemId={item.id} sideBarFormConfig={sideBarFormConfig(FormAgent,`Agent - ${item.fullName}`, item)} />
+							<ActionFormDotDropdown alertMsg={deleteMsg} deleteAction="?/userDelete" itemId={item.id} sideBarFormConfig={() => sideBarFormConfig(FormAgent,`Agent - ${item.fullName}`, item)} />
 						</TableBodyCell>
 					</TableBodyRow>
 				{/each}

@@ -35,7 +35,7 @@
     <div class="flex flex-col">
         <div class="flex justify-between items-center gap-2">
             <span class="ts-text-title md:text-center">Équipe <span class="capitalize">{teamName}</span></span>
-            <ActionFormDotDropdown alertMsg={deleteMsg} deleteAction="?/teamDelete" itemId={teamId} sideBarFormConfig={sideBarFormConfig(FormTeam,`Equipe - ${teamName}`,{id:teamId,teamName:teamName})} />
+            <ActionFormDotDropdown alertMsg={deleteMsg} deleteAction="?/teamDelete" itemId={teamId} sideBarFormConfig={()=>sideBarFormConfig(FormTeam,`Equipe - ${teamName}`,{id:teamId,teamName:teamName})} />
         </div>
     </div>
     <div class="flex justify-between mt-3">

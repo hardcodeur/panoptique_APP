@@ -34,7 +34,7 @@
     </div>
     <div class="flex-auto">
         <div class="flex justify-end py-2 pr-4">
-            <ActionFormDotDropdown alertMsg={deleteMsg} deleteAction="?/missionDelete" itemId={mission.id} sideBarFormConfig={sideBarFormConfig(FormMission,`Mission - ${mission.id}`)} />
+            <ActionFormDotDropdown alertMsg={deleteMsg} deleteAction="?/missionDelete" itemId={mission.id} sideBarFormConfig={() => sideBarFormConfig(FormMission,`Mission - ${mission.id}`,mission)} />
         </div>
         <div class="flex justify-center p-4 sm:p-8">
             <span class="ts-title-2">Mission <span class="text-th-red">{mission.id}</span></span>

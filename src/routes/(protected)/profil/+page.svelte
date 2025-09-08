@@ -1,13 +1,16 @@
 <script lang="ts">
+    import type { ActionData,PageData } from './$types';
+    import type { ProfilFormComponent, SidebarFormConfig } from '$lib/types';
+    
     import { Button } from 'flowbite-svelte';
     import { CogSolid } from 'flowbite-svelte-icons';
     import { UserSolid,MailBoxSolid,GraduationCapSolid,PhoneSolid} from 'flowbite-svelte-icons';
+    
     import SidebarForm from "$lib/components/sidebar/SidebarForm.svelte";
-    import type { ActionData,PageData } from './$types';
     import FormProfil from "$lib/components/form/profil/FormProfil.svelte"
+    import FormChangePassword from "$lib/components/form/profil/FormChangePassword.svelte";
 
-    let { form,data } : { form: ActionData,data: PageData}  = $props();
-
+    
     type RoleKey = 'admin' | 'manager' | 'team_manager' | 'agent';
     const roles: Record<RoleKey, string> = {
         admin: "Administrateur",
@@ -16,20 +19,38 @@
         agent: "Agent"
     };
     
-    const profil = data.profil;
+    let { form,data } : { form: ActionData,data: PageData}  = $props();
+    
+    let sideBarHidden: boolean = $state(true);
+    let sidebarConfig: SidebarFormConfig | null = $state(null);
+    
+    const profil = $derived(data.profil);
     
     const getRoleLabel = (role: string): string => {
         return roles[role as RoleKey];
     };
 
     
-    let sideBarHidden: boolean = $state(true);
-    let FormComponent = FormProfil;
-    let sidbarTitle :string = $state("");
-    function openDrawer(DrawerTitle :string): void {
-        sideBarHidden = false;
-        sidbarTitle = DrawerTitle
+    function sideBarFormConfig(component: ProfilFormComponent,sidebarTitle :string, itemUpdate?: any): void {
+        // to delay updating the component until last (no conflict)
+        setTimeout(()=>{
+            sideBarHidden = false; // trigger show/hidden
+            sidebarConfig = {
+                title: sidebarTitle,
+                component: component,
+                formReturn: form, // form error and data in form send
+                itemUpdate: itemUpdate // item to update in form
+            };
+            form = null // reset form
+        },0)
     }
+
+    // Dynamic zod form error return
+    $effect(() => {
+        if (sidebarConfig) {
+            sidebarConfig.formReturn = form;
+        }
+    });
 
     const cardClass="max-full border border-th-black-light rounded-lg mt-4 text-th-black";
     const cartTitle="text-th-blue ts-text-title";;
@@ -57,7 +78,7 @@
     <div class={cardClass}>
         <div class={cardTitleRowClass}>
             <h2 class={cartTitle}>Données personnelles</h2>
-            <Button size="sm" class={btnClass} on:click={() => {openDrawer("Modifier mes données personnel")}}><CogSolid class={btnIconClass} />Modifier</Button>
+            <Button size="sm" class={btnClass} on:click={() => {sideBarFormConfig(FormProfil,"Modifier mes données personnel",profil)}}><CogSolid class={btnIconClass} />Modifier</Button>
         </div>
         <div class={cardContend}>
             <span class={dataRowClass}><PhoneSolid class={iconClass}/>Téléphone:<span class={dataClass}>{profil.phone}</span></span>
@@ -68,8 +89,8 @@
             <h2 class={cartTitle}>Mot de passe</h2>
         </div>
         <div class={cardContend}>
-            <Button size="lg" class={btnClass} on:click={() => {openDrawer("Modifier mes données personnel")}}><CogSolid class={btnIconClass} />Modifier</Button>
+            <Button size="lg" class={btnClass} on:click={() => {sideBarFormConfig(FormChangePassword,"Modifier mon mot de passe",profil)}}><CogSolid class={btnIconClass} />Modifier</Button>
         </div>
     </div>
-    <SidebarForm bind:hidden={sideBarHidden} formProps="" {sidbarTitle} {form} {FormComponent} />
+    <SidebarForm bind:hidden={sideBarHidden} formComponentData={{}} config={sidebarConfig} />
 </section>

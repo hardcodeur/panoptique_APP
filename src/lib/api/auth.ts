@@ -9,3 +9,7 @@ export function apiResetPassword(body: any,event?: ServerEvent): Promise<any> {
     return apiClient.post('/reset/password',body,event);
 }
 
+export function apiUpdatePass(userId: string,body: any,event?: ServerEvent): Promise<any> {
+    return apiClient.post(`/change/password`,body,event);
+}
+

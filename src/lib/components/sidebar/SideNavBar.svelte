@@ -50,7 +50,7 @@
         </svelte:fragment>
       </SidebarItem>
 
-      <SidebarItem label="Notifications" href="#" class="flex items-center p-2 ts-text rounded-lg" {nonActiveClass} {activeClass} {spanClass}>
+      <SidebarItem label="Notifications" href="/notifications" class="flex items-center p-2 ts-text rounded-lg" {nonActiveClass} {activeClass} {spanClass}>
         <svelte:fragment slot="icon">
           <BellSolid class="w-6 h-6 {iconeStyle}" />
         </svelte:fragment>
@@ -59,11 +59,11 @@
         </svelte:fragment>
       </SidebarItem>
 
-      <SidebarItem label="Statistiques" href="#" class="flex items-center p-2 ts-text rounded-lg" {nonActiveClass} {activeClass}>
+      <!-- <SidebarItem label="Statistiques" href="#" class="flex items-center p-2 ts-text rounded-lg" {nonActiveClass} {activeClass}>
         <svelte:fragment slot="icon">
           <ChartPieSolid class="w-6 h-6 {iconeStyle}" />
         </svelte:fragment>
-      </SidebarItem>
+      </SidebarItem> -->
 
       <SidebarGroup border borderClass="pt-4 mt-4 border-t border-th-black-light">
         <SidebarItem label="Profil" href="/profil" class="flex items-center p-2 ts-text rounded-lg" {nonActiveClass} {activeClass}>
@@ -71,7 +71,7 @@
             <UserSolid class="w-6 h-6 {iconeStyle}" />
           </svelte:fragment>
         </SidebarItem>
-        <SidebarItem onclick={handLogOut} label="Déconnexion" href="#" class="flex items-center text-th-red hover:text-th-white hover:bg-th-red hover:p-2 transition duration-75 rounded-lg ts-text-bold" spanClass="" />
+        <SidebarItem onclick={()=>handLogOut} label="Déconnexion" href="#" class="flex items-center text-th-red hover:text-th-white hover:bg-th-red hover:p-2 transition duration-75 rounded-lg ts-text-bold" spanClass="" />
       </SidebarGroup>
     </SidebarGroup>
   </SidebarWrapper>

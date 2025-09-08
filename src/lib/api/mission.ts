@@ -8,11 +8,15 @@ export function getMissions(event?: ServerEvent): Promise<any> {
 
 // Unique
 
+export function getMissionsById(id: string,event?: ServerEvent): Promise<any> {
+    return apiClient.get(`/mission/${id}`, event);
+}
+
 export function addMission(body: any,event?: ServerEvent): Promise<any> {
     return apiClient.post("/mission",body,event);
 }
 
-export function updateMission(id: string,body: any,event?: ServerEvent): Promise<any> {
+export function updateMissionPartial(id: string,body: any,event?: ServerEvent): Promise<any> {
     return apiClient.patch(`/mission/${id}`,body,event);
 }
 

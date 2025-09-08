@@ -1,5 +1,4 @@
 <script lang="ts">
-import { userStore } from "$lib/stores/UserStore";
 import WeekShiftWidget from "$lib/components/widget/WeekShiftWidget.svelte";
 import AchivmentWidget from "$lib/components/widget/AchivmentWidget.svelte";
 import MonthShiftsMetricWidget from "$lib/components/widget/MonthShiftsMetricWidget.svelte";
@@ -7,10 +6,10 @@ import type { PageData } from './$types';
 
 let { data } : { data: PageData}  = $props();
 
-const user = data.user;
-const weekShifts = data.currentWeekShifts.shifts;
-const shiftMetric = data.currentMonthShiftsMetric;
-const shiftMetricActivities=shiftMetric.activitiesCount;
+const user = $derived(data.user);
+const weekShifts = $derived(data.currentWeekShifts.shifts);
+const shiftMetric = $derived(data.currentMonthShiftsMetric);
+const shiftMetricActivities=$derived(shiftMetric.activitiesCount);
 </script>
 
 <div class="py-4">

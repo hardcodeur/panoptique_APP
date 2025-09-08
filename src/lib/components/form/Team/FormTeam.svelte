@@ -17,7 +17,8 @@
     let formAction: string= $derived(itemUpdate ? `?/teamUpdate`: '?/addTeam')
     
     let teamName = $state("");
-    let teamId = $state(null);
+
+    let initialized: boolean = $state(false);
 
     const handleEnhance = ()=>{
         return async ({ result,update }: { result: ActionResult,update:()=>void })=>{
@@ -28,17 +29,17 @@
         }
     }
 
-    $effect(()=>{
+    $effect(() => {
         // field values
-        if (itemUpdate && !submittedData) { // update Team 
-            teamId = itemUpdate.id || '';      
+        if (itemUpdate && !initialized) { // init form with update data
             teamName = itemUpdate.teamName || '';
-        } else if (submittedData) { // data Team return last submited or update in form 
-            teamName=  submittedData.teamName || '';
-        }else{ // default
-            teamName= '';
+            initialized = true; // Mark as initialized
+        } else if (submittedData) { // handle form submission errors
+            teamName = submittedData.teamName || '';
+        } else if (!itemUpdate) { // reset form for new item creation
+            teamName = '';
+            initialized = false;
         }
-
     });
 
     const helperClass="text-sm text-th-red mt-2"
@@ -46,12 +47,12 @@
 </script>
 
 <form use:enhance={handleEnhance} method="POST" action={formAction} class="mb-6">
-    {#if itemUpdate && teamId}
-    <input type="hidden" name="teamId" value="{teamId}">
+    {#if itemUpdate}
+    <input type="hidden" name="teamId" value="{itemUpdate.id}">
     {/if}
     <div class="mb-6">
         <Label for="teamName" class="ts-text-bold block mb-2">Nom de l'équipe</Label>
-        <Input class="text-th-black" bind:value={teamName} id="teamName" name="teamName" placeholder="Equipe ..." />
+        <Input type="text" class="text-th-black" bind:value={teamName} id="teamName" name="teamName" placeholder="Equipe ..." />
         {#if errors?.teamName}
         <Helper class={helperClass}> 
             {errors.teamName[0]}

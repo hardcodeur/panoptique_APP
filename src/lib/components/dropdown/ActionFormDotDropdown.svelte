@@ -13,7 +13,7 @@
         alertMsg,
     }:{
         itemId : string,
-        sideBarFormConfig : any, // modifier bon type
+        sideBarFormConfig : ()=>void, // modifier bon type
         deleteAction: string,
         alertMsg: string,
     }=$props()
@@ -36,7 +36,7 @@
 
 <DotsHorizontalOutline size="lg" class="dots-menu-{itemId} border border-th-black-light rounded-md" />
 <Dropdown triggeredBy=".dots-menu-{itemId}">
-  <DropdownItem class="px-3 ts-text-bold py-1" on:click={() => (sideBarFormConfig)}>Modifier</DropdownItem>
+  <DropdownItem class="px-3 ts-text-bold py-1" on:click={sideBarFormConfig}>Modifier</DropdownItem>
   <DropdownItem class="w-full p-0">
     <form use:enhance={handleEnhance} method="POST" action={deleteAction} class="mt-3">
         <input type="hidden" name="deleteId" value={itemId}>

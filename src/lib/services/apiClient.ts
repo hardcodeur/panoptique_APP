@@ -5,16 +5,6 @@ import type { Cookies } from '@sveltejs/kit';
 
 let refreshTokenPromise: Promise<void> | null = null;
 
-function getCookie(name: string): string | undefined {
-    if (typeof document === 'undefined') {
-        return undefined;
-    }
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop()?.split(';').shift();
-}
-
-
 async function refreshToken(fetcher: typeof fetch): Promise<void> {
     const response = await fetcher('/api/refresh', {
         method: 'POST'
@@ -32,38 +22,37 @@ async function refreshToken(fetcher: typeof fetch): Promise<void> {
 type ServerEvent = { cookies: Cookies; fetch: typeof fetch };
 
 export const apiClient = {
-    async get(url: string, event?: ServerEvent, options: RequestInit = {}) {
+    async get(url: string, event: ServerEvent, options: RequestInit = {}) {
         return this.request('GET', url, null, event, options);
     },
 
-    async post(url: string, body: any, event?: ServerEvent, options: RequestInit = {}) {
+    async post(url: string, body: any, event: ServerEvent, options: RequestInit = {}) {
         return this.request('POST', url, body, event, options);
     },
 
-    async put(url: string, body: any, event?: ServerEvent, options: RequestInit = {}) {
+    async put(url: string, body: any, event: ServerEvent, options: RequestInit = {}) {
         return this.request('PUT', url, body, event, options);
     },
 
-    async patch(url: string, body: any, event?: ServerEvent, options: RequestInit = {}) {
+    async patch(url: string, body: any, event: ServerEvent, options: RequestInit = {}) {
         return this.request('PATCH', url, body, event, options);
     },
 
-    async delete(url: string, event?: ServerEvent, options: RequestInit = {}) {
+    async delete(url: string, event: ServerEvent, options: RequestInit = {}) {
         return this.request('DELETE', url, null, event, options);
     },
 
-    async request(method: string, url: string, body: any, event?: ServerEvent, options: RequestInit = {}): Promise<any> {
+    async request(method: string, url: string, body: any, event: ServerEvent, options: RequestInit = {}): Promise<any> {
         
-        // work client side and server side 
-        // if request from server use event fetch or if is client use normal fetch
-        const fetcher = event?.fetch || fetch;
+        const fetcher = event?.fetch;
 
         const requestMaker = async () => {
 
             const headers = new Headers(options.headers);
 
-            // get cookie server or client side
-            const accessToken = event ? event.cookies.get('access_token') : getCookie('access_token');
+            // get cookie server 
+            const accessToken = event.cookies.get('access_token');
+            
 
             if (accessToken) {
                 headers.append('Authorization', `Bearer ${accessToken}`);
@@ -104,7 +93,7 @@ export const apiClient = {
         });
 
         // [secure] if access token is expired send refresh
-        if (response.status === 401 && data?.message?.includes('Expired JWT Token')) {
+        if (response.status === 401 && data?.message?.includes('JWT Token not found')) {
 
             // Protection to prevent simultaneous refreshes request
             if (!refreshTokenPromise) {

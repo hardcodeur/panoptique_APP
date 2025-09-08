@@ -13,11 +13,9 @@
     } = $props();
 
     let errors= $derived(formReturn?.errors);
-    let submittedData= $derived(formReturn?.formData);
-
-    let userPhone = $state("");
-
-    let initialized: boolean = $state(false);
+    
+    let newPass = $state("");
+    let confirmNewPass = $state("");
 
     const handleEnhance = ()=>{
         return async ({ result,update }: { result: ActionResult,update:()=>void })=>{
@@ -28,33 +26,29 @@
         }
     }
 
-    $effect(() => {
-        // field values
-        if (itemUpdate && !initialized) { // init form with update data
-            userPhone = itemUpdate.phone || '';
-            initialized = true; // Mark as initialized
-        } else if (submittedData) { // handle form submission errors
-            userPhone = submittedData.phone || '';
-        } else if (!itemUpdate) { // reset form for new item creation
-            userPhone = '';
-            initialized = false;
-        }
-    });
-
     const helperClass="text-sm text-th-red mt-2"
     const btnClass="text-center focus-within:ring-4 focus-within:outline-hidden inline-flex items-center justify-center px-5 py-2.5 text-white bg-th-blue hover:bg-primary-800 rounded-lg"
 </script>
 
-<form use:enhance={handleEnhance} method="POST" action=?/profilUpdate class="mb-6">
+<form use:enhance={handleEnhance} method="POST" action="?/passUpdate" class="mb-6">
     {#if itemUpdate}
     <input type="hidden" name="profilId" value="{itemUpdate.id}">
     {/if}
     <div class="mb-6">
-        <Label for="phone" class="ts-text-bold block mb-2">Téléphone</Label>
-        <Input type="tel" class="text-th-black" bind:value={userPhone} id="phone" name="phone" />
-        {#if errors?.phone}
+        <Label for="newPass" class="ts-text-bold block mb-2">Nouveau mot de passe</Label>
+        <Input type="password" class="text-th-black" bind:value={newPass} id="newPass" name="newPass"/>
+        {#if errors?.newPass}
         <Helper class={helperClass}> 
-            {errors.phone[0]}
+            {errors.newPass[0]}
+        </Helper>
+        {/if}
+    </div>
+        <div class="mb-6">
+        <Label for="confirmNewPass" class="ts-text-bold block mb-2">Confirmer mot de passe</Label>
+        <Input type="password" class="text-th-black" bind:value={confirmNewPass} id="confirmNewPass" name="confirmNewPass"/>
+        {#if errors?.confirmNewPass}
+        <Helper class={helperClass}> 
+            {errors.confirmNewPass[0]}
         </Helper>
         {/if}
     </div>

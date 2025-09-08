@@ -3,23 +3,35 @@
     import { enhance } from '$app/forms';
     import { CloseCircleSolid } from 'flowbite-svelte-icons';
     import { Button, Label, Input, Helper, Select, Textarea } from "flowbite-svelte";
+    import type { ActionData } from './$types';
 
-    let { 
-        form,
-        formProps
-    }= $props();
-
-    // Champs fixes
-    let name = $state(form?.data?.name || '');
-    let address = $state(form?.data?.address || '');
-    let teamSelected = $state(form?.data?.team || '');
-
-    // Champs dynamiques (notes)
-    let dynamicFields = $state<Array<{
+    type dynamicFieldNote = {
         id: number;
         title: string;
         note: string;
-    }>>(form?.data?.notes?.map((note, index) => ({
+    };
+
+    let { 
+        formReturn,
+        formComponentData,
+        itemUpdate = null
+    } : { formReturn: ActionData | null; 
+        formComponentData: any; 
+        itemUpdate?: any 
+    } = $props();
+
+    let errors= $derived(formReturn?.errors);
+    let submittedData= $derived(formReturn?.formData);
+    let formAction: string= $derived(itemUpdate ? `?/missionUpdate`: '?/missionAdd');
+
+    // input State
+    let name = $state("");
+    let address = $state("");
+    let teamSelected = $state("");
+
+    // Champs dynamiques (notes)
+    let dynamicFields = $state<Array<dynamicFieldNote>>(
+        formReturn?.formData?.notes?.map((note, index) => ({
         id: index,
         title: note.title || '',
         note: note.content || ''
@@ -28,11 +40,12 @@
     let nextId = $state(dynamicFields.length > 0 ? Math.max(...dynamicFields.map(f => f.id)) + 1 : 0);
 
     // Team list
-    let teamList = formProps.teamList || []
-    let teamItems: SelectInputValue[] = teamList.map(team => ({
-        value: team.teamName,
-        name: team.teamName
-    }));
+    const teamList = formComponentData.teamList;
+    let teamItems :SelectInputValue[] = $state([]);
+    teamList.forEach(team => {
+        teamItems = [...teamItems, { value: team.id, name: team.teamName }];
+    });
+
 
     // Fonctions pour gérer les champs dynamiques
     const addField = () => {
@@ -52,28 +65,24 @@
 
 </script>
 
-<form use:enhance method="POST" action="?/addLocation" class="mb-6">
+<form use:enhance method="POST" action={formAction} class="mb-6">
     <!-- Champs fixes -->
     <div class="mb-6">
         <Label for="name" class="ts-text-bold block mb-2">Nom courant du lieu</Label>
-        <Input class="text-th-black-light" id="name" bind:value={name} name="name" required />
-        {#if form?.errors?.name}
-        <Helper class={helperClass}>
-        {#each form.errors.name as nameError}
-            <span>{nameError}</span>
-        {/each} 
+        <Input class="text-th-black border-th-black-light ts-text" id="name" bind:value={name} name="name" required />
+        {#if errors?.name}
+        <Helper class={helperClass}> 
+            {errors.name[0]}
         </Helper>
         {/if}
     </div>
 
     <div class="mb-6">
         <Label for="address" class="ts-text-bold block mb-2">Adresse complète</Label>
-        <Input class="text-th-black-light" id="address" bind:value={address} name="address" required />
-        {#if form?.errors?.address}
+        <Input class="text-th-black border-th-black-light ts-text" id="address" bind:value={address} name="address" required />
+        {#if errors?.address}
         <Helper class={helperClass}>
-        {#each form.errors.address as addressError}
-            <span>{addressError}</span>
-        {/each} 
+            {errors.address[0]}
         </Helper> 
         {/if}
     </div>
@@ -81,13 +90,11 @@
     <div class="mb-6">
         <Label class="ts-text-bold mb-2">
             Équipe
-            <Select name="team" class="mt-2 ts-text text-th-black-light capitalize" placeholder="Liste des équipes" items={teamItems} bind:value={teamSelected} required />
+            <Select name="team" class="mt-2 ts-text text-th-black border-th-black-light ts-text capitalize" placeholder="Liste des équipes" items={teamItems} bind:value={teamSelected} required />
         </Label>
-        {#if form?.errors?.team}
+        {#if errors?.team}
         <Helper class={helperClass}>
-        {#each form.errors.team as teamError}
-            <span>{teamError}</span>
-        {/each} 
+            {errors.team[0]}
         </Helper>
         {/if}
     </div>
@@ -99,27 +106,22 @@
                 <button type="button" onclick={() => removeField(field.id)} class="absolute top-2 right-2 text-th-red hover:text-red-700 text-xl" title="Supprimer cette note">
                     <CloseCircleSolid class="fill-th-red" size="lg"/>
                 </button>
-                
                 <div class="mb-4">
                     <Label for={`title-${field.id}`} class="ts-text-bold block mb-2">Titre</Label>
-                    <Input id={`title-${field.id}`} class="text-th-black-light" bind:value={field.title} name={`notes[${i}].title`} required />
-                    {#if form?.errors?.notes?.[i]?.title}
+                    <Input id={`title-${field.id}`} class="text-th-black border-th-black-light ts-text" bind:value={field.title} name={`notes[${i}].title`} required />
+                    {#if errors?.notes?.[i]?.title}
                     <Helper class={helperClass}>
-                    {#each form.errors.notes[i].title as titleError}
-                        <span>{titleError}</span>
-                    {/each} 
+                        {errors.notes[i].title[0]}
                     </Helper>
                     {/if}
                 </div>
                 
                 <div class="mb-4">
                     <Label for={`note-${field.id}`} class="ts-text-bold block mb-2">Contenu</Label>
-                    <Textarea id={`note-${field.id}`} class="text-th-black-light" bind:value={field.note} name={`notes[${i}].content`} rows={4} required />
-                    {#if form?.errors?.notes?.[i]?.content}
+                    <Textarea id={`note-${field.id}`} class="text-th-black border-th-black-light ts-text"  bind:value={field.note} name={`notes[${i}].content`} rows={4} required />
+                    {#if errors?.notes?.[i]?.content}
                     <Helper class={helperClass}>
-                    {#each form.errors.notes[i].content as contentError}
-                        <span>{contentError}</span>
-                    {/each} 
+                        {errors.notes[i].content[0]}
                     </Helper>
                     {/if}
                 </div>

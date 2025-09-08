@@ -10,6 +10,21 @@ export const missionAddSchema = z.object({
   path: ["end"], // Attach error to the 'end' field
 });
 
+export const missionUpdateSchema = z.object({
+  missionId: z.string({ required_error: "L'ID de la mission est requis." }),
+  start: z.string().datetime("Format de date de début invalide.").optional(),
+  end: z.string().datetime("Format de date de fin invalide.").optional()
+})
+.refine((data) => {
+  if (data.start && data.end) {
+    return new Date(data.end) > new Date(data.start);
+  }
+  return true;
+}, {
+  message: "La date de fin doit être postérieure à la date de début.",
+  path: ["end"],
+});
+
 export const schemaDeleteMission = z.object({
     deleteId:z.string()
 });

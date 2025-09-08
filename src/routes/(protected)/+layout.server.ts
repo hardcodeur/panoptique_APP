@@ -42,7 +42,7 @@ export async function load({ cookies, fetch }) {
     // if userPayload is null, access token not exist, i make a refresh
     if (!userPayload) {
         try {
-            const newAccessToken = await makeRefreshToken(cookies, refreshToken);
+            const newAccessToken = await makeRefreshToken(cookies, refreshToken);            
 
             // Check the signature of token for security the cookie of access token is not http only
             const newPayload = jwt.verify(newAccessToken, publicKey, { algorithms: ['RS256'] });
@@ -58,13 +58,13 @@ export async function load({ cookies, fetch }) {
                     "role": newPayload.role,
             };
 
-        } catch (refreshError: any) {
+        } catch (refreshError: any) {            
             // refresh fail disconnection
             console.error("Échec : le rafraîchissement du token a échoué déconnexion.", refreshError.message);
             return logout(cookies);
         }
     }
-
+    
     // return user
     return { user: userPayload };
 }
@@ -78,7 +78,7 @@ async function makeRefreshToken(cookies: Cookies, refreshToken: string) {
         body: JSON.stringify({ refresh_token: refreshToken })
     }
     const response = await fetch(`${PUBLIC_API_URL}/token/refresh`,config);
-
+    
     if (!response.ok) {
         throw new Error("L'API n'as pas reussit à rafraichire le token");
     }

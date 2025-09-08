@@ -25,6 +25,10 @@ export function getUserById(userId: string, event?: ServerEvent): Promise<any> {
     return apiClient.get(`/users/${userId}`, event);
 }
 
+export function getProfil(userId: string, event?: ServerEvent): Promise<any> {
+    return apiClient.get(`/user/profil/${userId}`, event);
+}
+
 // ADD
 export function addUser(body: any,event?: ServerEvent): Promise<any> {
     return apiClient.post('/users',body,event);

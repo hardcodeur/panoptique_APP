@@ -5,20 +5,13 @@ import type { ApiReturn } from '$lib/types';
 import { schemaAddUser,schemaUpdateUser,schemaResetPass,schemaDeleteUser } from "$lib/zodSchema/agent/agent";
 import { schemaAddTeam,schemaUpdateTeam,schemaDeleteTeam } from "$lib/zodSchema/agent/team";
 // call API
-import { getUsers,addUser,updateUserPartial,getUserById,deleteUser } from "$lib/api/user"
-import { getTeamListName,addTeam,getTeamById,deleteTeam,updateTeamPartial } from "$lib/api/team"
+import { getUsers,addUser,updateUserPartial,deleteUser } from "$lib/api/user"
+import { updateCheckerUser,updateCheckerTeam } from "$lib/api/updateChecker";
+import { getTeamListName,addTeam,deleteTeam,updateTeamPartial } from "$lib/api/team"
 import { apiResetPassword } from "$lib/api/auth"
 import { getTeamsWhiteUsers,getTeamUnassignedUsers} from "$lib/api/teamUsers";
 
-function getChangedFields(originalData: any, newData: any): { [key: string]: any } {
-    const changedFields: { [key: string]: any } = {};
-    for ( let key in newData) {
-        if (key !== 'id' && originalData.hasOwnProperty(key) && originalData[key] !== newData[key]) {
-            changedFields[key] = newData[key];
-        }
-    }
-    return changedFields;
-}
+import { getChangedFields } from "$lib/services/utils";
 
 
 export async function load({cookies, fetch}) {
@@ -94,10 +87,11 @@ export const actions = {
         //get original user data
         let originalUser;
         try {
-            originalUser = await getUserById(userId, { cookies, fetch });
+            originalUser = await updateCheckerUser(userId, { cookies, fetch });
         } catch (error: any) {
             console.log(error.data?.detail ||  error.data?.message);
             return {
+                formData,
                 apiReturn:{
                     status:"error",
                     message: error.data?.detail ||  error.data?.message || "Utilisateur introuvable."
@@ -111,6 +105,7 @@ export const actions = {
         // fields not change return message
         if (Object.keys(updatedFields).length === 0) {
             return {
+                formData,
                 apiReturn:{
                     status:"info",
                     message: 'Aucune modification détectée.'
@@ -255,23 +250,25 @@ export const actions = {
         //get original user data
         let originalTeam;
         try {
-            originalTeam = await getTeamById(teamId, { cookies, fetch });
+            originalTeam = await updateCheckerTeam(teamId, { cookies, fetch });
         } catch (error: any) {
             console.log(error.data?.detail ||  error.data?.message);
             return {
+                formData,
                 apiReturn:{
                     status:"error",
                     message: error.data?.detail ||  error.data?.message || "Utilisateur introuvable."
                 } as ApiReturn
             };
         }
-
+        
         // Compare data if have change
         const updatedFields = getChangedFields(originalTeam, result.data);
         
         // fields not change return message
         if (Object.keys(updatedFields).length === 0) {
             return {
+                formData,
                 apiReturn:{
                     status:"info",
                     message: 'Aucune modification détectée.'
@@ -327,6 +324,7 @@ export const actions = {
         } catch (error: any) {
             console.log(error.data?.detail ||  error.data?.message);
             return fail(400,{
+                actionName: 'teamDelete',
                 apiReturn:{
                     status:"error",
                     message:"Une erreur inattendue est survenue lors de la suppression de l'équipe !"

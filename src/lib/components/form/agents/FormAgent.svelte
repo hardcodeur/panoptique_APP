@@ -27,6 +27,8 @@
     let roleSelected= $state("");
     let teamSelected= $state("");
 
+    let initialized: boolean = $state(false);
+
     // reload component after submit form
     const handleEnhance = ()=>{
         return async ({ result,update }: { result: ActionResult,update:()=>void })=>{
@@ -54,14 +56,15 @@
     
     $effect(()=>{
         // field values
-        if (itemUpdate && !submittedData) { // update user         
+        if (itemUpdate && !initialized) { // init form with update data
             firstName= itemUpdate.firstName || '';
             lastName= itemUpdate.lastName || '';
             email= itemUpdate.email || '';
             phone= itemUpdate.phone || '';
             status= itemUpdate.status || '';       
             roleSelected= itemUpdate.role || '';
-            teamSelected= itemUpdate.teamId || ''; 
+            teamSelected= itemUpdate.teamId || '';
+            initialized = true;
         } else if (submittedData) { // data user return last submited or update in form 
             firstName=  submittedData.firstName || '';
             lastName= submittedData.lastName || '';
@@ -70,7 +73,7 @@
             status= submittedData.status || '';
             roleSelected= submittedData.role || '';
             teamSelected= submittedData.team || String(submittedData.teamId) || '';
-        }else{ // default
+        }else if (!itemUpdate){ // default
             firstName= '';
             lastName= '';
             email= '';
@@ -78,6 +81,7 @@
             status= '';
             roleSelected= '';
             teamSelected= '';
+            initialized = false;
         }
 
     });
@@ -94,7 +98,7 @@
     {/if}
     <div class="mb-6">
         <Label for="firstName" class="ts-text-bold block mb-2">Nom</Label>
-        <Input class="text-th-black border-th-black-light" id="firstName" bind:value={firstName} name="firstName" placeholder="Jean" />
+        <Input type="text" class="text-th-black border-th-black-light" id="firstName" bind:value={firstName} name="firstName" placeholder="Jean" />
         {#if errors?.firstName}
         <Helper class={helperClass}> 
             {errors.firstName[0]}
@@ -103,7 +107,7 @@
     </div>
     <div class="mb-6">
         <Label for="lastName" class="ts-text-bold block mb-2">Prénom</Label>
-        <Input class="text-th-black border-th-black-light" id="lastName" bind:value={lastName} name="lastName" placeholder="Dupont" />
+        <Input type="text" class="text-th-black border-th-black-light" id="lastName" bind:value={lastName} name="lastName" placeholder="Dupont" />
         {#if errors?.lastName}
         <Helper class={helperClass}> 
             {errors.lastName[0]}
@@ -112,7 +116,7 @@
     </div>
     <div class="mb-6">
         <Label for="email" class="ts-text-bold block mb-2">Email</Label>
-        <Input readonly={inputDisabled} class="text-th-black border-th-black-light" id="email" bind:value={email} name="email" placeholder="j.dupont@sgs.com" />
+        <Input type="email" readonly={inputDisabled} class="text-th-black border-th-black-light" id="email" bind:value={email} name="email" placeholder="j.dupont@sgs.com" />
         {#if errors?.email}
         <Helper class={helperClass}>
             {errors.email[0]}
@@ -130,7 +134,7 @@
     {/if}
     <div class="mb-6">
         <Label for="phone" class="ts-text-bold block mb-2">Téléphone</Label>
-        <Input class="text-th-black border-th-black-light" id="phone" bind:value={phone} name="phone" placeholder="0621516978" />
+        <Input type="tel" class="text-th-black border-th-black-light" id="phone" bind:value={phone} name="phone" placeholder="0621516978" />
         {#if errors?.phone}
         <Helper class={helperClass}> 
             {errors.phone[0]}

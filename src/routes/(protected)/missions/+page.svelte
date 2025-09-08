@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { AgentFormComponent, SidebarFormConfig } from '$lib/types';
+    import type { MissionFormComponent, SidebarFormConfig } from '$lib/types';
     import type { ActionData,PageData } from './$types'
     
     import { Tabs, TabItem, Button } from 'flowbite-svelte';
@@ -11,6 +11,7 @@
     import LocationCard from "$lib/components/card/LocationCard.svelte";
     import FormLocation from "$lib/components/form/location/FormLocation.svelte";
     import FormMission from "$lib/components/form/mission/FormMission.svelte"
+    import FormResponceToast from "$lib/components/toasts/FormResponceToast.svelte";
 
 
     type Mission = {
@@ -33,7 +34,7 @@
     let sideBarHidden: boolean = $state(true);
     let sidebarConfig: SidebarFormConfig | null = $state(null);
     
-    function sideBarFormConfig(component: AgentFormComponent,sidebarTitle :string, itemUpdate?: any): void {
+    function sideBarFormConfig(component: MissionFormComponent,sidebarTitle :string, itemUpdate?: any): void {
         // to delay updating the component until last (no conflict)
         setTimeout(()=>{
             sideBarHidden = false; // trigger show/hidden
@@ -60,8 +61,8 @@
         const upcomingMissions: Mission[] = [];
 
         for (const mission of missions) {
-            const startDate = new Date(mission.start);            
-            const isSameDay = startDate.getDate() === today.getDate() && startDate.getMonth() === today.getMonth() && startDate.getFullYear() === today.getFullYear();
+            const endDate = new Date(mission.end);            
+            const isSameDay = endDate.getDate() === today.getDate() && endDate.getMonth() === today.getMonth() && endDate.getFullYear() === today.getFullYear();
             if (isSameDay) {
             todayMissions.push(mission);
             }else{                
@@ -75,11 +76,11 @@
         };
     }
 
-    const teamList = data.teamList;
-    const customerList = data.customerList;
-    const missionShiftsList = data.missionShifts;
-    const locationList = data.location;
-    const missionList = groupMissionsByDate(data.missionList);
+    const teamList = $derived(data.teamList);
+    const customerList = $derived(data.customerList);
+    const missionShiftsList = $derived(data.missionShifts);
+    const locationList = $derived(data.location);
+    const missionList = $derived(groupMissionsByDate(data.missionList));
 
     const tabsTitleMissions="Missions"
     const tabsTitleShift="Quarts"
@@ -100,6 +101,11 @@
 <Tabs contentClass={tabsClass} tabStyle="underline" >
     <!-- Mission -->
     <TabItem open title={tabsTitleMissions} activeClasses={tabItemActiveClass} inactiveClasses={tabItemInactiveClass}>
+        {#if (form?.actionName === "missionDelete") && form?.apiReturn && sideBarHidden}
+        <div class="flex justify-center items-center">
+            <FormResponceToast status={form?.apiReturn.status} message={form?.apiReturn.message} />
+        </div>
+        {/if}
         <div class={tabItemTitleRow}>
             <h1 class={tabItemTitle}>{tabsTitleMissions}</h1>
             <!-- <AccessControl anyRole={[Role.ADMIN, Role.MANAGER,Role.TEAM_MANAGER]}> -->
