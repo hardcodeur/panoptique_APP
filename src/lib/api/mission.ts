@@ -25,7 +25,6 @@ export function deleteMission(id: string,event?: ServerEvent): Promise<any> {
 }
 
 
-// voir ???
 export function getMissionWhiteShifts(event?: ServerEvent): Promise<any> {
     return apiClient.get('/missions/shifts', event);
 }

@@ -12,3 +12,7 @@ export function updateCheckerTeam(id: string,event?: ServerEvent): Promise<any> 
 export function updateCheckerMission(id: string,event?: ServerEvent): Promise<any> {
     return apiClient.get(`/update/checker/mission/${id}`, event);
 }
+
+export function updateCheckerLocation(id: string,event?: ServerEvent): Promise<any> {
+    return apiClient.get(`/update/checker/location/${id}`, event);
+}

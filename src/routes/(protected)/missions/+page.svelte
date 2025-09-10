@@ -136,12 +136,9 @@
     <TabItem title={tabsTitleShift} activeClasses={tabItemActiveClass} inactiveClasses={tabItemInactiveClass}>
         <div class={tabItemTitleRow}>
             <h1 class={tabItemTitle}>{tabsTitleShift}</h1>
-            <!-- <AccessControl anyRole={[Role.ADMIN, Role.MANAGER,Role.TEAM_MANAGER]}> -->
-            <!-- <Button size="sm" class={btnClass} on:click={() => (openDrawer(FormMission,"Nouvelle mission"))}><CirclePlusSolid class={btnIconClass} />Ajouter un lieu</Button> -->
-            <!-- </AccessControl> -->
         </div>
         {#each missionShiftsList as missionShifts}
-        <MissionShiftCard {missionShifts}/>
+        <MissionShiftCard {missionShifts} {sideBarFormConfig} />
         {/each}
     </TabItem>
     <!-- Location -->
@@ -153,7 +150,7 @@
             <!-- </AccessControl> -->
         </div>
         {#each locationList as location}
-        <LocationCard {location}/>
+        <LocationCard {location} {sideBarFormConfig}/>
         {/each}
         
     </TabItem>

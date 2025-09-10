@@ -1,12 +1,19 @@
 <script lang="ts">
     import UserBadge from "$lib/components/badge/UserBadge.svelte";
+    import ActionFormDotDropdown from "$lib/components/dropdown/ActionFormDotDropdown.svelte";
+    import FormShift from "$lib/components/form/shift/FormShift.svelte";
 
-    let {missionShifts} = $props();
+    let {
+        missionShifts,
+        sideBarFormConfig
+    } = $props();
 
-    const shifts=missionShifts.shifts;
-    const shiftCo=shifts.connexion.shift[0];
-    const shiftSurv=shifts.surveillance.shift;
-    const shiftDeco=shifts.deconnexion.shift[0];
+    const shifts=$derived(missionShifts.shifts);
+    const shiftCo=$derived(shifts.connexion.shift[0]);
+    const shiftSurv=$derived(shifts.surveillance.shift);
+    const shiftDeco=$derived(shifts.deconnexion.shift[0]);
+
+    let teamAgent = $state();
 
     const shiftDivClass="flex flex-col items-center justify-center ts-text gap-4";
     const shiftDateClass="text-th-black ts-text-bold";
@@ -27,6 +34,9 @@
         </div>
     </div>
     <div class="flex-auto">
+        <div class="flex justify-end py-2 pr-4">
+            <ActionFormDotDropdown  itemId={shifts.id} sideBarFormConfig={() => sideBarFormConfig(FormShift,`Quart`,missionShifts)} />
+        </div>
         <div class="flex justify-center py-4 sm:py-6">
             <span class="ts-title-2">Mission <span class="text-th-red">{missionShifts.id}</span></span>
         </div>

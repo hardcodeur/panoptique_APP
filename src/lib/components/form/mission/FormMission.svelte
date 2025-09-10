@@ -1,7 +1,7 @@
 <script lang="ts">
     import { enhance } from '$app/forms';
     import { invalidateAll } from '$app/navigation';
-    import {Button,Label,Helper,Select,Datepicker} from "flowbite-svelte";
+    import {Button,Label,Helper,Select,Input} from "flowbite-svelte";
     import type { ActionResult } from '@sveltejs/kit';
     import type {SelectInputValue} from "$lib/types"
     import type { ActionData } from './$types';
@@ -18,46 +18,36 @@
     let errors= $derived(formReturn?.errors);
     let submittedData= $derived(formReturn?.formData);
     let formAction: string= $derived(itemUpdate ? `?/missionUpdate`: '?/missionAdd');
-
-    console.log(itemUpdate);
     
-    
-    const dateToday = new Date();
-    const dateTomorrow = new Date(dateToday);
-    dateTomorrow.setDate(dateTomorrow.getDate() + 1);
-
     // state var
-    let missionStartDate: Date|null = $state(null);
-    let missionStartTime: string|null = $state(null);
-    let missionEndDate: Date|null = $state(null);
-    let missionEndTime: string|null = $state(null);
-    let customerSelected: string = $state("");
-    let teamSelected: string = $state("");
-    // hidden fields
     let missionStart: string|null = $state(null);
     let missionEnd: string|null = $state(null);
-
+    let customerSelected: string = $state("");
+    let teamSelected: string = $state("");
     let initialized: boolean = $state(false);
 
-
-    // Unify input date and Time
-    function unifyDate(dateField: Date,hourField: string): string{
-        const [hours, minutes] = hourField.split(':').map(Number);
-        const newDate = new Date(dateField.toISOString());
-        newDate.setHours(hours,minutes,0,0);
-        return newDate.toISOString()
+    function convertDateISOToSting(isoString: string): string{
+        const date = new Date(isoString)
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0')
+        const hours = date.getHours().toString().padStart(2, '0'); 
+        const minutes = date.getMinutes().toString().padStart(2, '0')
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
     }
 
-    function getDateBySting(date: string): Date{
-        return new Date(date);
-    }
-
-    function getTimeBySting(date: string): string{
-        return new Date(date).toTimeString().slice(0, 5);
-    }
-    
     // reload component after submit form
-    const handleEnhance = ()=>{
+    const handleEnhance = ({ formData })=>{
+
+        const start = formData.get('start');
+        if (start && typeof start === 'string' && start.length > 0) {
+            formData.set('start', new Date(start).toISOString());
+        }
+        const end = formData.get('end');
+        if (end && typeof end === 'string' && end.length > 0) {
+            formData.set('end', new Date(end).toISOString());
+        }
+        
         return async ({ result,update }: { result: ActionResult,update:()=>void })=>{
             if (result.type === 'success'){
                 await invalidateAll();
@@ -81,45 +71,22 @@
     $effect(()=>{
         // field values
         if (itemUpdate && !initialized) { // init form with update data
-            missionStartDate = getDateBySting(itemUpdate.start);
-            missionStartTime = getTimeBySting(itemUpdate.start);
-            missionEndDate = getDateBySting(itemUpdate.end);
-            missionEndTime = getTimeBySting(itemUpdate.end);
+            missionStart = convertDateISOToSting(itemUpdate.start);
+            missionEnd = convertDateISOToSting(itemUpdate.end);
             customerSelected = itemUpdate.customerId;
             teamSelected = itemUpdate.teamId;
             initialized = true; // Mark as initialized
         } else if (submittedData) { // handle form submission errors
-            console.log(itemUpdate);
-            if (submittedData.start) {
-                missionStartDate = getDateBySting(submittedData.start);
-                missionStartTime = getTimeBySting(submittedData.start);
-            }
-            if (submittedData.end) {
-                missionEndDate = getDateBySting(submittedData.end);
-                missionEndTime = getTimeBySting(submittedData.end);
-            }
-            customerSelected = submittedData.customer || '';
-            teamSelected = submittedData.team || '';
+            missionStart = convertDateISOToSting(itemUpdate.start);
+            missionEnd = convertDateISOToSting(itemUpdate.end);
+            customerSelected = submittedData.customer;
+            teamSelected = submittedData.team;
         } else if (!itemUpdate) { // reset form for new item creation
-            missionStartDate = null;
-            missionStartTime = null;
-            missionEndDate = null;
-            missionEndTime = null;
+            missionStart = "";
+            missionEnd = "";
             customerSelected = '';
             teamSelected = '';
             initialized = false;
-        }
-
-        // unify date and time for form submission
-        if(missionStartDate && missionStartTime){
-            missionStart = unifyDate(missionStartDate,missionStartTime);
-        } else {
-            missionStart = null;
-        }
-        if(missionEndDate && missionEndTime){
-           missionEnd = unifyDate(missionEndDate,missionEndTime)
-        } else {
-            missionEnd = null;
         }
     });
 
@@ -134,18 +101,8 @@
     <input type="hidden" name="missionId" value="{itemUpdate.id}">
     {/if}
     <div class="mb-6">
-        <span class="ts-text-bold mb-3">Arrivée du bateaux</span>
-        <input type="hidden" name="start" bind:value={missionStart} >
-        <div class="flex items-center gap-7 mb-2">
-            <div>
-                <Label class="ts-text bloc mb-2">Date</Label>
-                <Datepicker bind:value={missionStartDate} locale="fr-FR" />
-            </div>
-            <div>
-                <Label class="ts-text block mb-2">Horaire</Label>
-                <input type="time" bind:value={missionStartTime} required />
-            </div>
-        </div>
+        <Label for="start" class="ts-text-bold block mb-2">Arrivée du bateaux</Label>
+        <Input type="datetime-local" class="text-th-black border-th-black-light" id="start" bind:value={missionStart} name="start"/>
         {#if errors?.start}
         <Helper class={helperClass}> 
             {errors.start[0]}
@@ -153,18 +110,8 @@
         {/if}
     </div>
     <div class="mb-6">
-        <span class="ts-text-bold mb-3">Départ du bateaux</span>
-        <input type="hidden" name="end" bind:value={missionEnd} >
-        <div class="flex items-center gap-7 mb-2">
-            <div>
-                <Label class="ts-text bloc mb-2">Date</Label>
-                <Datepicker bind:value={missionEndDate} locale="fr-FR" />
-            </div>
-            <div>
-                <Label class="ts-text block mb-2">Horaire</Label>
-                <input type="time" bind:value={missionEndTime} required />
-            </div>
-        </div>
+        <Label for="end" class="ts-text-bold block mb-2">Départ du bateaux</Label>
+        <Input type="datetime-local" class="text-th-black border-th-black-light" id="end" bind:value={missionEnd} name="end"/>
         {#if errors?.end}
         <Helper class={helperClass}> 
             {errors.end[0]}

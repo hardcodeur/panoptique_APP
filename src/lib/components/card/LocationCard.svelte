@@ -1,10 +1,13 @@
 <script lang="ts">
     import { AccordionItem, Accordion,Button} from 'flowbite-svelte';
     import { MapPinAltSolid } from 'flowbite-svelte-icons';
+    import ActionFormDotDropdown from "$lib/components/dropdown/ActionFormDotDropdown.svelte";
+    import FormLocation from "$lib/components/form/location/FormLocation.svelte";
     import Map from "$lib/components/map/Map.svelte";
 
     let {
-        location
+        location,
+        sideBarFormConfig
     }=$props()
 
     const accordionItemClass= "flex items-center justify-between w-full ts-text text-left group-first:rounded-t-xl border-b border-th-black-light py-5 text-th-black"
@@ -17,6 +20,9 @@
         </div>
     </div>
     <div class="flex-auto">
+        <div class="flex justify-end py-2 pr-4">
+            <ActionFormDotDropdown itemId={location.id} sideBarFormConfig={() => sideBarFormConfig(FormLocation,`Lieux - ${location.name}`,location)} />
+        </div>
         <div class="p-4 sm:py-8">
             <span class="flex py-2 text-th-black ts-text-bold"><MapPinAltSolid size="lg" class="mr-1" />Adresse:<span class="ml-1 text-th-blue ts-text">{location.address}</span></span>
             <Accordion>

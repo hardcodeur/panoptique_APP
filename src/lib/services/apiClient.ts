@@ -22,36 +22,36 @@ async function refreshToken(fetcher: typeof fetch): Promise<void> {
 type ServerEvent = { cookies: Cookies; fetch: typeof fetch };
 
 export const apiClient = {
-    async get(url: string, event: ServerEvent, options: RequestInit = {}) {
+    async get(url: string, event?: ServerEvent, options: RequestInit = {}) {
         return this.request('GET', url, null, event, options);
     },
 
-    async post(url: string, body: any, event: ServerEvent, options: RequestInit = {}) {
+    async post(url: string, body: any, event?: ServerEvent, options: RequestInit = {}) {
         return this.request('POST', url, body, event, options);
     },
 
-    async put(url: string, body: any, event: ServerEvent, options: RequestInit = {}) {
+    async put(url: string, body: any, event?: ServerEvent, options: RequestInit = {}) {
         return this.request('PUT', url, body, event, options);
     },
 
-    async patch(url: string, body: any, event: ServerEvent, options: RequestInit = {}) {
+    async patch(url: string, body: any, event?: ServerEvent, options: RequestInit = {}) {
         return this.request('PATCH', url, body, event, options);
     },
 
-    async delete(url: string, event: ServerEvent, options: RequestInit = {}) {
+    async delete(url: string, event?: ServerEvent, options: RequestInit = {}) {
         return this.request('DELETE', url, null, event, options);
     },
 
-    async request(method: string, url: string, body: any, event: ServerEvent, options: RequestInit = {}): Promise<any> {
+    async request(method: string, url: string, body: any, event?: ServerEvent, options: RequestInit = {}): Promise<any> {
         
-        const fetcher = event?.fetch;
+        const fetcher = event?.fetch || fetch;
 
         const requestMaker = async () => {
 
             const headers = new Headers(options.headers);
 
             // get cookie server 
-            const accessToken = event.cookies.get('access_token');
+            const accessToken = event ? event.cookies.get('access_token') : null;
             
 
             if (accessToken) {

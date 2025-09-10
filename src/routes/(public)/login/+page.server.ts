@@ -39,14 +39,14 @@ export const actions : Actions = {
     try {
       // Call api
       const {token,refresh_token} = await apiAuthToken(result.data.email, result.data.password);
-            
+
       if(!token && !refresh_token){
         return fail(400, { error: { _global: ["Un problème technique a été détecté. Si l'erreur persiste après un nouvel essai, merci de signaler l'incident au service informatique."] }});
       }
-      
       // Insert access token in classic cookies 
       cookies.set('access_token', token, { 
-        path: '/', 
+        path: '/',
+        httpOnly: true, 
         secure: true, 
         sameSite: 'lax', 
         maxAge: parseInt(ACCESS_TOKEN_LIFETIME, 10)
