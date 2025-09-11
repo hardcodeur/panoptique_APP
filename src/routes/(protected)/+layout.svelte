@@ -15,7 +15,7 @@ const {user} = page.data;
 </script>
 
 <Header/>
-<SideNavBar/>
+<SideNavBar userRole={user.role}/>
 <main class="py-2 px-4 sm:ml-64 mt-18">
 	{@render children()}
 </main>

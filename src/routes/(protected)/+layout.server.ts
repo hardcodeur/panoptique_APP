@@ -1,11 +1,12 @@
 // src/routes/(protected)/+layout.server.ts
 
-import { redirect, type Cookies } from "@sveltejs/kit";
+import type{ Cookies } from "@sveltejs/kit";
 import jwt from 'jsonwebtoken';
 import fs from 'fs';
 import path from 'path';
 import { PUBLIC_API_URL } from '$env/static/public';
 import { ACCESS_TOKEN_LIFETIME } from '$env/static/private';
+import { logout } from "$lib/services/utils.js";
 
 // get public signature key
 const publicKey = fs.readFileSync(path.resolve('./key/public.pem'));
@@ -89,16 +90,10 @@ async function makeRefreshToken(cookies: Cookies, refreshToken: string) {
     cookies.set('access_token', newAccessToken, {
         path: '/',
         secure: true,
+        httpOnly: true,
         sameSite: 'lax',
         maxAge: parseInt(ACCESS_TOKEN_LIFETIME, 10)
     });
 
     return newAccessToken
-}
-
-// delete all auth cookie and redirect
-function logout(cookies: Cookies) {
-    cookies.delete("access_token", { path: "/" });
-    cookies.delete("refresh_token", { path: "/" });
-    throw redirect(303, '/login');
 }

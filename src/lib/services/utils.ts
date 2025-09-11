@@ -1,3 +1,4 @@
+import { redirect, type Cookies } from "@sveltejs/kit";
 
 export function getChangedFields<T extends Record<string, any>>(originalData: T,newData: T): Partial<T> 
 {
@@ -22,4 +23,11 @@ export function getChangedFields<T extends Record<string, any>>(originalData: T,
 	}
 
 	return changedFields;
+}
+
+// delete all auth cookie and redirect
+export function logout(cookies: Cookies) {
+    cookies.delete("access_token", { path: "/" });
+    cookies.delete("refresh_token", { path: "/" });
+    throw redirect(303, '/login');
 }

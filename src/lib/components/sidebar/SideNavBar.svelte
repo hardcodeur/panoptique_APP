@@ -1,9 +1,17 @@
 <script lang="ts">
     import { Sidebar, SidebarGroup, SidebarItem, SidebarWrapper, SidebarDropdownItem, SidebarDropdownWrapper } from 'flowbite-svelte';
     import { HomeSolid, BellSolid, UsersGroupSolid, RectangleListSolid, ChartPieSolid, UserSolid, EditOutline } from 'flowbite-svelte-icons';
-    //import AccessControl from "$lib/components/AccessControl.svelte";
-    import { goto } from '$app/navigation';
+    import AccessControl from "$lib/components/AccessControl.svelte";
     import { page } from "$app/state";
+    import type { roleType } from "$lib/types";
+
+    let {
+      userRole
+    }:{
+      userRole: roleType
+    }=$props()
+
+    
 
     let activeUrl = $state(page.url.pathname);
 
@@ -17,11 +25,10 @@
     const iconeStyle ='transition duration-75 group-hover:text-th-white';
     
 
-    const handLogOut= async ()=>{
-      await fetch('/logout', {
+    const handLogOut= async ()=>{      
+      await fetch('/api/logout', {
         method: 'POST'
       });
-      goto("/login");
     }
 
   </script>
@@ -36,13 +43,13 @@
         </svelte:fragment>
       </SidebarItem>
 
-      <!-- <AccessControl anyRole={[Role.ADMIN, Role.MANAGER,Role.TEAM_MANAGER]}> -->
+      <AccessControl role={userRole} minRole={"team_manager"} >
       <SidebarItem label="Agents" href="/agents" class="flex items-center p-2 ts-text rounded-lg" {nonActiveClass} {activeClass}>
         <svelte:fragment slot="icon">
           <UsersGroupSolid class="w-6 h-6 {iconeStyle}" />
         </svelte:fragment>
       </SidebarItem>
-      <!-- </AccessControl> -->
+      </AccessControl>
 
       <SidebarItem label="Missions" href="/missions" class="flex items-center p-2 ts-text rounded-lg" {nonActiveClass} {activeClass}>
         <svelte:fragment slot="icon">
@@ -71,7 +78,7 @@
             <UserSolid class="w-6 h-6 {iconeStyle}" />
           </svelte:fragment>
         </SidebarItem>
-        <SidebarItem onclick={()=>handLogOut} label="Déconnexion" href="#" class="flex items-center text-th-red hover:text-th-white hover:bg-th-red hover:p-2 transition duration-75 rounded-lg ts-text-bold" spanClass="" />
+        <SidebarItem onclick={handLogOut} label="Déconnexion" href="#" class="flex items-center text-th-red hover:text-th-white hover:bg-th-red hover:p-2 transition duration-75 rounded-lg ts-text-bold" spanClass="" />
       </SidebarGroup>
     </SidebarGroup>
   </SidebarWrapper>

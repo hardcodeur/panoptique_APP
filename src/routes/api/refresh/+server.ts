@@ -2,6 +2,7 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { PUBLIC_API_URL} from '$env/static/public';
 import { ACCESS_TOKEN_LIFETIME} from '$env/static/private';
+import { logout } from "$lib/services/utils";
 
 export const POST: RequestHandler = async ({ cookies }) => {
     const refreshToken = cookies.get('refresh_token');
@@ -40,8 +41,7 @@ export const POST: RequestHandler = async ({ cookies }) => {
         return json({ success: true });
 
     } catch (err: any) {
-        cookies.delete('access_token', { path: '/' });
-        cookies.delete('refresh_token', { path: '/' });
+        logout(cookies)
         if (err.status) {
             throw err;
         }

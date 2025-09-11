@@ -1,7 +1,7 @@
 import { PUBLIC_API_URL } from '$env/static/public';
 import type { Cookies } from '@sveltejs/kit';
 
-// Http client isomorphe
+// Http client
 
 let refreshTokenPromise: Promise<void> | null = null;
 

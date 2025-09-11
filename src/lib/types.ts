@@ -12,6 +12,8 @@ export interface SelectInputValue {
 	name: string;
 }
 
+export type roleType = "admin" | "manager" | "team_manager" | "agent"; 
+
 export type FormField = 'firstName' | 'lastName' | 'email' | 'phone' | 'role' | 'team';
 
 export type FormSchemas = {
