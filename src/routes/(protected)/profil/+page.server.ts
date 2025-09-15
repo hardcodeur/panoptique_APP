@@ -7,19 +7,14 @@ import { getChangedFields } from "$lib/services/utils";
 import { updateUserPartial} from "$lib/api/user";
 import { apiUpdatePass} from "$lib/api/auth";
 
-import { getProfil } from "$lib/api/user"
+import { getProfil } from "$lib/api/profil"
 
 import { updateProfilSchema,updateUserPassSchema } from "$lib/zodSchema/profil/profil";
 
-export const load: PageServerLoad = async ({ cookies, fetch, parent }) => {
+export const load: PageServerLoad = async ({ cookies, fetch }) => {
     try {
-        const { user } = await parent();
 
-        if (!user || !user.id) {
-            throw error(401, 'Utilisateur non authentifié ou identifiant manquant');
-        }
-
-        const profil = await getProfil(user.id, { cookies, fetch });
+        const profil = await getProfil({ cookies, fetch });
 
         return { profil };
 
@@ -54,7 +49,7 @@ export const actions = {
                 return {
                     apiReturn:{
                         status:"error",
-                        message: error.data?.detail ||  error.data?.message || "Mission introuvable."
+                        message: error.data?.detail ||  error.data?.message || "Profil introuvable."
                     } as ApiReturn
                 };
             }

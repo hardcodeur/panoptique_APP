@@ -33,7 +33,7 @@
 
   </script>
   
-  <Sidebar id="sidebar-nav-menu" {activeUrl} aria-label="Sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen px-2 pt-23 transition-transform -translate-x-full bg-th-white border-r border-th-black-light sm:translate-x-0"
+  <Sidebar id="sidebar-nav-menu" {activeUrl} aria-label="Sidebar" class="fixed top-0 left-0 z-40 w-[80vw] sm:w-64 h-screen px-2 pt-23 transition-transform -translate-x-full bg-th-white border-r border-th-black-light sm:translate-x-0"
 >
   <SidebarWrapper divClass="bg-th-white">
     <SidebarGroup>

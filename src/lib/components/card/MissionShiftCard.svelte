@@ -15,10 +15,10 @@
 
     let teamAgent = $state();
 
-    const shiftDivClass="flex flex-col items-center justify-center ts-text gap-4";
+    const shiftDivClass="flex flex-col items-center justify-center ts-text gap-4 py-4 sm:px-3 ";
     const shiftDateClass="text-th-black ts-text-bold";
     const shiftActivityClass="text-th-black-light";
-    const shiftDivInnerClass="flex flex-col sm:flex-row justify-center items-center gap-4 mb-5 sm:mr-5";
+    const shiftDivInnerClass="flex flex-col gap-4 items-center";
     const shiftHourClass="text-th-black ts-text-bold";
 
 </script>
@@ -41,7 +41,7 @@
             <span class="ts-title-2">Mission <span class="text-th-red">{missionShifts.id}</span></span>
         </div>
         <div class="flex items-center justify-center">
-            <div class="flex flex-col sm:flex-row items-center justify-around gap-4 w-full py-8 flex-wrap">
+            <div class="h-full flex flex-col sm:flex-row items-center sm:items-start  w-full py-8 flex-wrap">
                 <div class={shiftDivClass+" border-b lg:border-b-0 lg:border-r border-th-black-light"}>
                     <span class={shiftDateClass}>{shiftCo.startDateFormat}</span>
                     <span class={shiftActivityClass}>Connexion</span>

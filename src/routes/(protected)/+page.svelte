@@ -13,13 +13,15 @@ const shiftMetricActivities=$derived(shiftMetric.activitiesCount);
 </script>
 
 <div class="py-4">
-    <h1 class="ts-title-2 text-th-red">Bonjour, {user.fullName}</h1>
+    <h1 class="ts-title-2 text-th-red">Bonjour, {user?.fullName}</h1>
 </div>
-<div class="grid grid-cols-3 gap-4">
-    <AchivmentWidget value={shiftMetric.totalHours} text="Nombre d’heures effectuées ce mois-ci" />
-    <AchivmentWidget value={shiftMetric.totalShifts} text="Total des quarts travaillés ce mois-ci" />
-    <MonthShiftsMetricWidget activities={shiftMetricActivities}/>
-</div>
-<div class="grid grid-cols-2 gap-4">
-    <WeekShiftWidget shifts={weekShifts} />
+<div class="flex flex-col gap-4">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <AchivmentWidget value={shiftMetric.totalHours} text="Nombre d’heures effectuées ce mois-ci" />
+        <AchivmentWidget value={shiftMetric.totalShifts} text="Total des quarts travaillés ce mois-ci" />
+        <MonthShiftsMetricWidget activities={shiftMetricActivities}/>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <WeekShiftWidget shifts={weekShifts} />
+    </div>
 </div>

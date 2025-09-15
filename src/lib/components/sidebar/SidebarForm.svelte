@@ -28,7 +28,7 @@
 </script>
     
 <Section name="default">
-    <Drawer transitionType="fly" width="w-110" placement="right" {transitionParams} bind:hidden id="crudForm">
+    <Drawer transitionType="fly" width="w-full sm:w-110" placement="right" {transitionParams} bind:hidden id="crudForm">
         <div class="flex items-center">
             <h5 id="drawer-label" class="inline-flex items-center mb-6 text-base font-semibold text-gray-500 uppercase dark:text-gray-400">{sidbarTitle}</h5>
             <CloseButton on:click={() => (hidden = true)} class="mb-4 dark:text-white" />

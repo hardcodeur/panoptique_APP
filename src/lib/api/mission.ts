@@ -25,11 +25,6 @@ export function deleteMission(id: string,event?: ServerEvent): Promise<any> {
 }
 
 
-export function getMissionWhiteShifts(event?: ServerEvent): Promise<any> {
+export function getMissionWithShifts(event?: ServerEvent): Promise<any> {
     return apiClient.get('/missions/shifts', event);
 }
-
-export function getMissionLocationWhiteNote(event?: ServerEvent): Promise<any> {
-    return apiClient.get('/mission/locations', event);
-}
-
