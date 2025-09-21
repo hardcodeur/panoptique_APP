@@ -8,6 +8,10 @@ export function getNotificationByUser(id: string,event?: ServerEvent): Promise<a
 
 // Unique
 
+export function countNewNotification(event?: ServerEvent): Promise<any> {
+    return apiClient.get("/notifications/count/new", event);
+}
+
 export function deleteNotification(id: string,event?: ServerEvent): Promise<any> {
     return apiClient.delete(`/notification/${id}`, event);
 }

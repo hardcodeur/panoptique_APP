@@ -7,12 +7,10 @@ import { schemaAddTeam,schemaUpdateTeam,schemaDeleteTeam } from "$lib/zodSchema/
 // call API
 import { getUsers,addUser,updateUserPartial,deleteUser } from "$lib/api/user"
 import { updateCheckerUser,updateCheckerTeam } from "$lib/api/updateChecker";
-import { getTeamListName,addTeam,deleteTeam,updateTeamPartial } from "$lib/api/team"
+import { getTeamListName,getTeamsWithUsers,addTeam,deleteTeam,updateTeamPartial } from "$lib/api/team"
 import { apiResetPassword } from "$lib/api/auth"
-import { getTeamsWhiteUsers,getTeamUnassignedUsers} from "$lib/api/teamUsers";
 
 import { getChangedFields } from "$lib/services/utils";
-
 
 export async function load({cookies, fetch}) {
     // Get all data
@@ -24,7 +22,7 @@ export async function load({cookies, fetch}) {
         ] = await Promise.all([
             getUsers({ cookies, fetch }),
             getTeamListName({ cookies, fetch }),
-            getTeamsWhiteUsers({ cookies, fetch }),
+            getTeamsWithUsers({ cookies, fetch }),
         ]);
         return { userList, teamList, teamWhiteUsers};
     } catch (err: any) {

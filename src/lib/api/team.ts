@@ -5,6 +5,10 @@ export function getTeamListName(event?: ServerEvent): Promise<any> {
     return apiClient.get('/team/list/name', event);
 }
 
+export function getTeamsWithUsers(event?: ServerEvent): Promise<any> {
+    return apiClient.get('/team/list/member', event);
+}
+
 // Unique
 
 // Get

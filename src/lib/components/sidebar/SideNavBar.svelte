@@ -4,11 +4,14 @@
     import AccessControl from "$lib/components/AccessControl.svelte";
     import { page } from "$app/state";
     import type { roleType } from "$lib/types";
+	import { goto } from '$app/navigation';
 
     let {
-      userRole
+      userRole,
+      notificationCount
     }:{
-      userRole: roleType
+      userRole: roleType,
+      notificationCount: number
     }=$props()
 
     
@@ -29,6 +32,7 @@
       await fetch('/api/logout', {
         method: 'POST'
       });
+      goto("/login");
     }
 
   </script>
@@ -62,7 +66,9 @@
           <BellSolid class="w-6 h-6 {iconeStyle}" />
         </svelte:fragment>
         <svelte:fragment slot="subtext">
-          <span class="inline-flex justify-center items-center p-3 ms-3 w-3 h-3 text-sm font-bold text-th-white bg-th-red rounded-full">3</span>
+          {#if notificationCount > 0}
+          <span class="inline-flex justify-center items-center p-3 ms-3 w-3 h-3 text-sm font-bold text-th-white bg-th-red rounded-full">{notificationCount}</span>
+          {/if}
         </svelte:fragment>
       </SidebarItem>
 

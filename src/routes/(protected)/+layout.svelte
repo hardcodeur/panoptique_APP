@@ -17,11 +17,11 @@ onMount(()=>{
 })
 
 // Data from serveur
-const {user} = page.data;
+const {user,nbNewNotification} = page.data;
 </script>
 
 <Header/>
-<SideNavBar userRole={user.role}/>
+<SideNavBar userRole={user.role} notificationCount={nbNewNotification}/>
 <div class="mx-auto max-w-screen-2xl">
 	<main class="py-2 px-4 sm:ml-64 mt-18">
 		{@render children()}

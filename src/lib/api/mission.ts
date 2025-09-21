@@ -6,6 +6,10 @@ export function getMissions(event?: ServerEvent): Promise<any> {
     return apiClient.get('/missions', event);
 }
 
+export function getProfilMissions(event?: ServerEvent): Promise<any> {
+    return apiClient.get('/profil/missions', event);
+}
+
 // Unique
 
 export function getMissionsById(id: string,event?: ServerEvent): Promise<any> {

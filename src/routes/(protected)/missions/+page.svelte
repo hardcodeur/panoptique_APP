@@ -29,7 +29,6 @@
     // - form for the action part 
     // - data for the load part
     let { form,data } : { form: ActionData,data: PageData}  = $props();
-
  
     let sideBarHidden: boolean = $state(true);
     let sidebarConfig: SidebarFormConfig | null = $state(null);
@@ -77,13 +76,13 @@
     }
 
     const teamList = $derived(data.teamList);
+    const temMemberList = $derived(data.temMemberList);
     const customerList = $derived(data.customerList);
-    const missionShiftsList = $derived(data.missionShifts);
     const locationList = $derived(data.location);
     const missionList = $derived(groupMissionsByDate(data.missionList));
+    const user = data.user;
 
     const tabsTitleMissions="Missions"
-    const tabsTitleShift="Quarts"
     const tabsTitleLocation="Lieux"
     const tabsClass="mt-4";
     const tabItemActiveClass="inline-block ts-text-bold text-center disabled:cursor-not-allowed p-4 text-th-blue border-b-2 border-th-blue active"
@@ -108,9 +107,9 @@
         {/if}
         <div class={tabItemTitleRow}>
             <h1 class={tabItemTitle}>{tabsTitleMissions}</h1>
-            <!-- <AccessControl anyRole={[Role.ADMIN, Role.MANAGER,Role.TEAM_MANAGER]}> -->
+            <AccessControl role={user?.role} minRole={"team_manager"} >
             <Button size="sm" class={btnClass} on:click={() => {sideBarFormConfig(FormMission,"Nouvel mission")}}><CirclePlusSolid class={btnIconClass} />Ajouter une mission</Button>
-            <!-- </AccessControl> -->
+            </AccessControl>
         </div>
         {#if missionList.today.length != 0 || missionList.upcoming.length != 0}
             {#if missionList.today.length != 0}
@@ -132,22 +131,13 @@
         {/if}
 
     </TabItem>
-    <!-- Shift -->
-    <TabItem title={tabsTitleShift} activeClasses={tabItemActiveClass} inactiveClasses={tabItemInactiveClass}>
-        <div class={tabItemTitleRow}>
-            <h1 class={tabItemTitle}>{tabsTitleShift}</h1>
-        </div>
-        {#each missionShiftsList as missionShifts}
-        <MissionShiftCard {missionShifts} {sideBarFormConfig} />
-        {/each}
-    </TabItem>
     <!-- Location -->
     <TabItem title={tabsTitleLocation} activeClasses={tabItemActiveClass} inactiveClasses={tabItemInactiveClass}>
         <div class={tabItemTitleRow}>
             <h1 class={tabItemTitle}>{tabsTitleLocation}</h1>
-            <!-- <AccessControl anyRole={[Role.ADMIN, Role.MANAGER,Role.TEAM_MANAGER]}> -->
+            <AccessControl role={user?.role} minRole={"team_manager"} >
             <Button size="sm" class={btnClass} on:click={() => (sideBarFormConfig(FormLocation,"Nouveau lieu"))}><CirclePlusSolid class={btnIconClass} />Ajouter un lieux</Button>
-            <!-- </AccessControl> -->
+            </AccessControl>
         </div>
         {#each locationList as location}
         <LocationCard {location} {sideBarFormConfig}/>
@@ -155,4 +145,4 @@
         
     </TabItem>
 </Tabs>
-<SidebarForm bind:hidden={sideBarHidden} formComponentData={{teamList,customerList}} config={sidebarConfig} />
+<SidebarForm bind:hidden={sideBarHidden} formComponentData={{teamList,temMemberList,customerList}} config={sidebarConfig} />

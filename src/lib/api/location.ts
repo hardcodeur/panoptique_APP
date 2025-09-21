@@ -5,6 +5,10 @@ export function getLocationWhiteNote(event?: ServerEvent): Promise<any> {
     return apiClient.get('/locations', event);
 }
 
+export function getLocationTeamWithNote(event?: ServerEvent): Promise<any> {
+    return apiClient.get('/locations/team', event);
+}
+
 export function addLocationWhiteNote(body: any,event?: ServerEvent): Promise<any> {
     return apiClient.post('/location' ,body ,event);
 }

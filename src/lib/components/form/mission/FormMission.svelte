@@ -28,12 +28,10 @@
     let submittedData= $derived(formReturn?.formData);
     let formAction: string= $derived(itemUpdate ? `?/missionUpdate`: '?/missionAdd');
 
-    $inspect(errors);
-    
     // state var
     let initialized: boolean = $state(false);
     let shiftsForm : boolean = $state(false);
-    let shiftsFormBtnText: string = $state("Ajouté les quarts");
+    let shiftsFormBtnText: string = $derived((shiftsForm) ? "Masquer les quarts" : "Ajouter les quarts");
     // form var
     let missionStart: string = $state("");
     let missionEnd: string = $state("");
@@ -47,6 +45,8 @@
 
     let maxShiftDate = $derived(missionStart);
     let minShiftDate = $derived(missionEnd);
+
+    $inspect(missionStart);
     
     let dynamicWatchShiftClass = (shiftId: number): string|void=>{
         if (shiftId != firstShift.id && shiftId != watchShift[0].id &&  shiftId != lastShift.id) {
@@ -57,7 +57,8 @@
     let shiftsJSON: string = $derived(
         JSON.stringify(
             shifts.map(f => (
-                { 
+                {   
+                    id : f.id,
                     activity: f.activity, 
                     start: (isDatetimeLocalFormat(f.start)) ? new Date(f.start).toISOString() :"", 
                     end: (isDatetimeLocalFormat(f.end)) ? new Date(f.end).toISOString() :"", 
@@ -114,7 +115,6 @@
 
     const displayShiftsForm = ()=>{
         shiftsForm = (shiftsForm) ? false : true;
-        shiftsFormBtnText = (shiftsForm) ? "Masquer les quarts" : "Ajouté les quarts";
     }
 
     // Dynamic field
@@ -146,32 +146,110 @@
     customerList.forEach(customer => {
         customerItems = [...customerItems, { value: customer.id, name: customer.name }];
     });
+
+    $inspect(shifts);
     
     $effect(()=>{
         
         firstShift.start = missionStart;
         lastShift.end = missionEnd
-        shifts = [firstShift,...watchShift, lastShift];
 
-        // field values
-        // if (itemUpdate && !initialized) { // init form with update data
-        //     initialized = true; // Mark as initialized
-        //     missionStart = convertDateISOToSting(itemUpdate.start);
-        //     missionEnd = convertDateISOToSting(itemUpdate.end);
-        //     customerSelected = itemUpdate.customerId;
-        //     teamSelected = itemUpdate.teamId;
-        // } else if (submittedData) { // handle form submission errors
-        //     missionStart = convertDateISOToSting(itemUpdate.start);
-        //     missionEnd = convertDateISOToSting(itemUpdate.end);
-        //     customerSelected = submittedData.customer;
-        //     teamSelected = submittedData.team;
-        // } else if (!itemUpdate) { // reset form for new item creation
-        //     initialized = false;
-        //     missionStart = "";
-        //     missionEnd = "";
-        //     customerSelected = '';
-        //     teamSelected = '';
-        // }
+        //field values
+        if (itemUpdate && !initialized) { // init form with update data
+            
+            initialized = true; // Mark as initialized
+            missionStart = convertDateISOToSting(itemUpdate.start);
+            missionEnd = convertDateISOToSting(itemUpdate.end);
+            customerSelected = itemUpdate.customerId;
+            teamSelected = itemUpdate.teamId;
+
+            const connexionShift = itemUpdate.shifts.find(shift => shift.activity === 'connexion');
+            if (connexionShift) {
+                firstShift = {
+                    id: connexionShift.id, 
+                    activity: connexionShift.activity,
+                    start: convertDateISOToSting(connexionShift.start),
+                    end: convertDateISOToSting(connexionShift.end),
+                    users: connexionShift.users.map(user => user.id)
+                }
+            };
+
+            watchShift = itemUpdate.shifts.filter(shift => shift.activity === 'surveillance').map((shift)=>(
+                {
+                    id: shift.id, 
+                    activity: shift.activity,
+                    start: convertDateISOToSting(shift.start),
+                    end: convertDateISOToSting(shift.end),
+                    users: shift.users.map(user => user.id)
+                }
+            ))
+            
+            const deconnexionShift = itemUpdate.shifts.find(shift => shift.activity === 'deconnexion');                        
+            if (deconnexionShift) {
+                lastShift = {
+                    id: deconnexionShift.id, 
+                    activity: deconnexionShift.activity,
+                    start: convertDateISOToSting(deconnexionShift.start),
+                    end: convertDateISOToSting(deconnexionShift.end),
+                    users: deconnexionShift.users.map(user => user.id)
+                }
+            };
+
+            // Open shift panel
+            shiftsForm=true;
+
+        } 
+        else if (submittedData) { // handle form submission errors
+            missionStart = convertDateISOToSting(submittedData.start);
+            missionEnd = convertDateISOToSting(submittedData.end);
+            customerSelected = submittedData.customer;
+            teamSelected = submittedData.team;
+
+            const connexionShift = submittedData.shifts.find(shift => shift.activity === 'connexion');
+            if (connexionShift) {
+                firstShift = {
+                    id: connexionShift.id, 
+                    activity: connexionShift.activity,
+                    start: convertDateISOToSting(connexionShift.start),
+                    end: convertDateISOToSting(connexionShift.end),
+                    users: connexionShift.users.map(user => user.id)
+                }
+            };
+
+            watchShift = submittedData.shifts.filter(shift => shift.activity === 'surveillance').map((shift)=>(
+                {
+                    id: shift.id, 
+                    activity: shift.activity,
+                    start: convertDateISOToSting(shift.start),
+                    end: convertDateISOToSting(shift.end),
+                    users: shift.users.map(user => user.id)
+                }
+            ))
+            
+            const deconnexionShift = submittedData.shifts.find(shift => shift.activity === 'deconnexion');                        
+            if (deconnexionShift) {
+                lastShift = {
+                    id: deconnexionShift.id, 
+                    activity: deconnexionShift.activity,
+                    start: convertDateISOToSting(deconnexionShift.start),
+                    end: convertDateISOToSting(deconnexionShift.end),
+                    users: deconnexionShift.users.map(user => user.id)
+                }
+            };
+        } 
+        else if (!itemUpdate && initialized) { // reset form for new item creation
+            missionStart = "";
+            missionEnd = "";
+            customerSelected = '';
+            teamSelected = '';
+            firstShift = {id:0,activity:"connexion",start:"",end:"",users:[]};
+            watchShift = [{id:1,activity:"surveillance",start:"",end:"",users:[]}]
+            lastShift = {id:99,activity:"deconnexion",start:"",end:"",users:[]}
+            shifts = [firstShift,...watchShift, lastShift];
+            initialized = false;
+        }
+
+        shifts = [firstShift,...watchShift, lastShift];
     });
 
     const inputDisabled = (itemUpdate) ? true  : false
@@ -185,7 +263,7 @@
     <input type="hidden" name="missionId" value="{itemUpdate.id}">
     {/if}
     <div class="mb-6">
-        <Label for="start" class="ts-text-bold block mb-2">Arrivée du bateaux</Label>
+        <Label for="start" class="ts-text-bold block mb-2">Arrivée du bateau</Label>
         <Input type="datetime-local" class="text-th-black border-th-black-light" id="start" bind:value={missionStart} name="start"/>
         {#if errors?.start?._errors}
         <Helper class={helperClass}> 
@@ -194,7 +272,7 @@
         {/if}
     </div>
     <div class="mb-6">
-        <Label for="end" class="ts-text-bold block mb-2">Départ du bateaux</Label>
+        <Label for="end" class="ts-text-bold block mb-2">Départ du bateau</Label>
         <Input type="datetime-local" class="text-th-black border-th-black-light" id="end" bind:value={missionEnd} name="end"/>
         {#if errors?.end?._errors}
         <Helper class={helperClass}> 

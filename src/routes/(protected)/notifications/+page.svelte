@@ -15,5 +15,7 @@
         <Toast id={notification.id} message={notification.text} />
     {/each}
     </div>
+{:else}
+    <p class="ts-text-title text-th-red">Pas de notification</p>
 {/if}
 

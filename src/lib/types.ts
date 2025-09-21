@@ -23,7 +23,7 @@ export type FormSchemas = {
 export type ServerEvent = { cookies: Cookies; fetch: typeof fetch };
 
 export type AgentFormComponent = typeof FormAgent | typeof FormTeam;
-export type MissionFormComponent = typeof FormMission | typeof FormLocation | FormShift;
+export type MissionFormComponent = typeof FormMission | typeof FormLocation;
 export type ProfilFormComponent = typeof FormProfil | typeof FormChangePassword;
 
 /**

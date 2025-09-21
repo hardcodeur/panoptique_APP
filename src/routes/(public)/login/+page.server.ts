@@ -9,12 +9,9 @@ const schema = z.object({
         .min(1, 'Champ obligatoire')
         .max(100,("L'email ne peut pas dépasser 100 caractères"))
         .email("Email invalide")
-        .regex(/^[a-zA-Z0-9._-]+@sgs\.(com|fr)$/,"Le numéro de téléphone saisi est invalide. Utilisez le format 0123456789 ou +33123456789."),
+        .regex(/^[a-zA-Z0-9._-]+@sgs\.(com|fr)$/,"L'email doit être une adresse sgs"),
     password: z.string()
         .min(1, 'Champ obligatoire')
-        // .min(8,("Le mot de passe doit faire au moins 8 caractères"))
-        // .max(32, "Le mot de passe ne doit pas dépasser 32 caractères")
-        // .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).*$/,"Le mot de passe doit contenir au moins 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial(!@#$%^&*)")
 });
 
 type FormData = z.infer<typeof schema>;

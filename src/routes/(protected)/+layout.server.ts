@@ -7,6 +7,7 @@ import path from 'path';
 import { PUBLIC_API_URL } from '$env/static/public';
 import { ACCESS_TOKEN_LIFETIME } from '$env/static/private';
 import { logout } from "$lib/services/utils.js";
+import { countNewNotification } from "$lib/api/notification";
 
 // get public signature key
 const publicKey = fs.readFileSync(path.resolve('./key/public.pem'));
@@ -65,9 +66,15 @@ export async function load({ cookies, fetch }) {
             return logout(cookies);
         }
     }
+
+    const [
+        nbNewNotification,
+    ] = await Promise.all([
+        countNewNotification({ cookies, fetch }),
+    ]);
     
     // return user
-    return { user: userPayload };
+    return { user: userPayload,nbNewNotification };
 }
 
 // call Api and replaces access token

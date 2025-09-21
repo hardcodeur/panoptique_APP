@@ -4,32 +4,56 @@ import type { ApiReturn } from '$lib/types';
 import { missionAddSchema,missionUpdateSchema,schemaDeleteMission } from "$lib/zodSchema/mission/mission";
 import { schemaUpdateLocation,schemaAddLocation } from "$lib/zodSchema/mission/location";
 // Api call
-import { getMissionWithShifts,getMissions,addMission,updateMissionPartial,deleteMission,getMissionsById} from "$lib/api/mission";
-import { getLocationWhiteNote,updateLocationWhiteNotePatial,addLocationWhiteNote } from "$lib/api/location.js";
-import { getTeamListName, } from "$lib/api/team"
+import { getMissions,getProfilMissions,addMission,updateMissionPartial,deleteMission} from "$lib/api/mission";
+import { getLocationWhiteNote,updateLocationWhiteNotePatial,addLocationWhiteNote,getLocationTeamWithNote } from "$lib/api/location.js";
+import { getTeamListName,getTeamsWithUsers } from "$lib/api/team"
 import { getCustomerListName, } from "$lib/api/customer"
 import { updateCheckerMission,updateCheckerLocation } from "$lib/api/updateChecker";
 
 import { getChangedFields } from "$lib/services/utils";
 
 
-export async function load({ cookies, fetch }) {
-    try {
-        const [
-            missionList,
-            missionShifts,
-            location,
-            teamList,
-            customerList,
-        ] = await Promise.all([
-            getMissions({ cookies, fetch }),
-            getMissionWithShifts({ cookies, fetch }),
-            getLocationWhiteNote({ cookies, fetch }),
-            getTeamListName({ cookies, fetch }),
-            getCustomerListName({ cookies, fetch })
-        ]);
+export async function load({ cookies, fetch, parent }) {
 
-        return {missionList,missionShifts,location,teamList,customerList};
+    const { user } = await parent();
+
+    try {
+
+        if(user?.role == "agent"){
+            const [
+                missionList,
+                location,
+                teamList,
+                temMemberList,
+                customerList,
+            ] = await Promise.all([
+                getProfilMissions({ cookies, fetch }),
+                getLocationTeamWithNote({ cookies, fetch }),
+                getTeamListName({ cookies, fetch }),
+                getTeamsWithUsers({ cookies, fetch }),
+                getCustomerListName({ cookies, fetch })
+            ]);
+
+            return {missionList,location,teamList,temMemberList,customerList,user};
+
+        }else{
+            const [
+                missionList,
+                location,
+                teamList,
+                temMemberList,
+                customerList,
+            ] = await Promise.all([
+                getMissions({ cookies, fetch }),
+                getLocationWhiteNote({ cookies, fetch }),
+                getTeamListName({ cookies, fetch }),
+                getTeamsWithUsers({ cookies, fetch }),
+                getCustomerListName({ cookies, fetch })
+            ]);
+
+            return {missionList,location,teamList,temMemberList,customerList,user};
+        }
+
 
     } catch (err) {
         throw error(500, 'Erreur lors du chargement des données');
@@ -42,13 +66,26 @@ export const actions = {
 
     missionAdd : async ({ request, cookies }) => {
         // Parse form data
-        const formData = Object.fromEntries(await request.formData());      
+        const formData = Object.fromEntries(await request.formData());
+        
+        // Change shifts type string to object
+        if (formData.shifts && typeof formData.shifts === 'string') {
+            try {
+                formData.shifts = JSON.parse(formData.shifts);
+            } catch (e) {
+                console.error("Erreur lors de l'analyse des champ 'Quarts' depuis JSON:", e);
+                return fail(400, {
+                    formData,
+                    errors: { shifts: ['Les données des quarts sont mal formatées.'] },
+                });
+            }
+        }
+        
         // Zod check Form requirement 
         const result = missionAddSchema.safeParse(formData);
 
         if (!result.success) {
-            
-            const errors = result.error.flatten().fieldErrors;            
+            const errors = result.error.format();         
             return fail(400, { errors,formData});
         }
 
@@ -75,7 +112,20 @@ export const actions = {
     },
     missionUpdate: async ({ request, cookies }) => {
         // Parse form data
-        const formData = Object.fromEntries(await request.formData()) as Partial<FormData> ;
+        const formData = Object.fromEntries(await request.formData());
+
+        //Change shifts type string to object
+        if (formData.shifts && typeof formData.shifts === 'string') {
+            try {
+                formData.shifts = JSON.parse(formData.shifts);
+            } catch (e) {
+                console.error("Erreur lors de l'analyse des champ 'Quarts' depuis JSON:", e);
+                return fail(400, {
+                    formData,
+                    errors: { shifts: ['Les données des quarts sont mal formatées.'] },
+                });
+            }
+        }
 
         // Zod check Form requirement 
         const result = missionUpdateSchema.safeParse(formData);
@@ -114,7 +164,7 @@ export const actions = {
                 } as ApiReturn
             };
         }
-
+        
         // update
         try {
             const rep = await updateMissionPartial(id,updatedFields,{ cookies, fetch });            
