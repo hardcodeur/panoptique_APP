@@ -39,14 +39,18 @@
         }
     }
 
-    const teamList = formComponentData.teamList
-    
-    let roleItems :SelectInputValue[] = [
+    const teamList = formComponentData.teamList;
+    const userLogRole = formComponentData.user.role;
+
+    const roleForManagerOrAdmin = [
         { value: 'admin', name: 'Administrateur' },
         { value: 'manager', name: "Directeur d'agence" },
         { value: 'team_manager', name: "Chef d'équipe" },
         { value: 'agent', name: "Agent" },
     ];
+    
+    
+    let roleItems :SelectInputValue[] = (userLogRole != "team_manager") ? roleForManagerOrAdmin : [{ value: 'agent', name: "Agent" }];
     
     let teamItems :SelectInputValue[] = [];
     teamList.forEach(team => {

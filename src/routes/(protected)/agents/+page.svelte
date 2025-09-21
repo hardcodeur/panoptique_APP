@@ -7,6 +7,7 @@
     import TableUser from "$lib/components/tables/TableUser.svelte";
     import TeamCard from "$lib/components/card/TeamCard.svelte";
     import FormResponceToast from "$lib/components/toasts/FormResponceToast.svelte";
+    import AccessControl from "$lib/components/AccessControl.svelte";
     import type { ActionData,PageData } from './$types';
     import type { AgentFormComponent, SidebarFormConfig } from '$lib/types';
 
@@ -54,6 +55,7 @@
     const teamList = $derived(data.teamList);
     const userList = $derived(data.userList);
     const teamsUsers = $derived(data.teamWhiteUsers);
+    const user = data.user;
 
 </script>
   
@@ -70,6 +72,7 @@
         </div>
         <TableUser {userList} sideBarFormConfig={sideBarFormConfig} />
     </TabItem>
+    <AccessControl role={user?.role} minRole={"manager"} >
     <TabItem title={tabsTitleTeam} activeClasses={tabItemActiveClass} inactiveClasses={tabItemInactiveClass}>
         {#if form?.actionName === "teamDelete" && form?.apiReturn && sideBarHidden}
         <div class="flex justify-center items-center">
@@ -86,5 +89,6 @@
             {/each}
         </div>
     </TabItem>
+    </AccessControl>
 </Tabs>
-<SidebarForm bind:hidden={sideBarHidden} formComponentData={{teamList}} config={sidebarConfig} />
+<SidebarForm bind:hidden={sideBarHidden} formComponentData={{teamList,user}} config={sidebarConfig} />

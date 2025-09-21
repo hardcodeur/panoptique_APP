@@ -18,42 +18,21 @@ export async function load({ cookies, fetch, parent }) {
     const { user } = await parent();
 
     try {
+        const [
+            missionList,
+            location,
+            teamList,
+            temMemberList,
+            customerList,
+        ] = await Promise.all([
+            (user?.role == "agent") ? getProfilMissions({ cookies, fetch }) : getMissions({ cookies, fetch }),
+            (user?.role == "agent" || user?.role == "team_manager") ? getLocationTeamWithNote({ cookies, fetch }) : getLocationWhiteNote({ cookies, fetch }),
+            getTeamListName({ cookies, fetch }),
+            getTeamsWithUsers({ cookies, fetch }),
+            getCustomerListName({ cookies, fetch })
+        ]);
 
-        if(user?.role == "agent"){
-            const [
-                missionList,
-                location,
-                teamList,
-                temMemberList,
-                customerList,
-            ] = await Promise.all([
-                getProfilMissions({ cookies, fetch }),
-                getLocationTeamWithNote({ cookies, fetch }),
-                getTeamListName({ cookies, fetch }),
-                getTeamsWithUsers({ cookies, fetch }),
-                getCustomerListName({ cookies, fetch })
-            ]);
-
-            return {missionList,location,teamList,temMemberList,customerList,user};
-
-        }else{
-            const [
-                missionList,
-                location,
-                teamList,
-                temMemberList,
-                customerList,
-            ] = await Promise.all([
-                getMissions({ cookies, fetch }),
-                getLocationWhiteNote({ cookies, fetch }),
-                getTeamListName({ cookies, fetch }),
-                getTeamsWithUsers({ cookies, fetch }),
-                getCustomerListName({ cookies, fetch })
-            ]);
-
-            return {missionList,location,teamList,temMemberList,customerList,user};
-        }
-
+        return {missionList,location,teamList,temMemberList,customerList,user};
 
     } catch (err) {
         throw error(500, 'Erreur lors du chargement des données');

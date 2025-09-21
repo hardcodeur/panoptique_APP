@@ -5,26 +5,30 @@ import type { ApiReturn } from '$lib/types';
 import { schemaAddUser,schemaUpdateUser,schemaResetPass,schemaDeleteUser } from "$lib/zodSchema/agent/agent";
 import { schemaAddTeam,schemaUpdateTeam,schemaDeleteTeam } from "$lib/zodSchema/agent/team";
 // call API
-import { getUsers,addUser,updateUserPartial,deleteUser } from "$lib/api/user"
+import { getUsers,getUsersTeam,addUser,updateUserPartial,deleteUser } from "$lib/api/user"
 import { updateCheckerUser,updateCheckerTeam } from "$lib/api/updateChecker";
 import { getTeamListName,getTeamsWithUsers,addTeam,deleteTeam,updateTeamPartial } from "$lib/api/team"
 import { apiResetPassword } from "$lib/api/auth"
 
 import { getChangedFields } from "$lib/services/utils";
 
-export async function load({cookies, fetch}) {
+export async function load({cookies, fetch,parent}) {
+
+    const { user } = await parent();
+
     // Get all data
     try {
-        const [
+        let [
             userList,
             teamList,
             teamWhiteUsers,
         ] = await Promise.all([
-            getUsers({ cookies, fetch }),
+            (user?.role == "team_manager") ? getUsersTeam({ cookies, fetch }) : getUsers({ cookies, fetch }),
             getTeamListName({ cookies, fetch }),
             getTeamsWithUsers({ cookies, fetch }),
         ]);
-        return { userList, teamList, teamWhiteUsers};
+
+        return { userList, teamList, teamWhiteUsers,user};
     } catch (err: any) {
         console.log(err);
         throw error(500, 'Erreur lors du chargement des données');

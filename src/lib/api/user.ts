@@ -9,6 +9,10 @@ export function getUsers(event?: ServerEvent): Promise<any> {
     return apiClient.get('/users', event);
 }
 
+export function getUsersTeam(event?: ServerEvent): Promise<any> {
+    return apiClient.get('/users/team', event);
+}
+
 // Unique user
 
 // GET
