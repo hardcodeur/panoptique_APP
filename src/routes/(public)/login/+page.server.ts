@@ -61,8 +61,11 @@ export const actions : Actions = {
     } catch (error: any) {
       console.log(error?.message);
       // call api error management
-      if(error?.code === 401 && error?.message?.includes('Invalid credentials.')){
+      if(error?.message == 'Invalid credentials.'){
         return fail(400, { error: { _global: ["Identifiant invalide"] }});
+      }
+      if(error?.message == 'Too many requests'){
+        return fail(400, { error: { _global: ["Trop de tentatives réessayé dans 15 min"] }});
       }
 
       return fail(500, { error: { _global: ["Erreur serveur"] }});

@@ -8,12 +8,12 @@
 
 </script>
 
-<div class="border border-th-black-light rounded-lg flex flex-col sm:flex-row mt-10 sm:mt-4">
+<div class="border border-th-black-light lg:col-span-3  rounded-lg flex flex-col sm:flex-row mt-10 sm:mt-4">
     <div class="flex flex-col w-full">
         {#if shiftList.length !== 0 }
         <div class="flex flex-col p-4">
             {#each shiftList as shift}
-            <div class="flex flex-col items-center sm:justify-start sm:flex-row py-3 gap-4 border-b border-th-black-light xl:justify-around">
+            <div class="flex flex-col items-center justify-around sm:flex-row py-3 gap-4 border-b border-th-black-light">
                 <span class="ts-text-bold text-th-blue">{shift.shiftStartDateFormat}</span>
                 <span class="capitalize">{shift.activity}</span>
                 <span class="ts-text-bold text-th-blue">{shift.shiftStartHourFormat} - {shift.shiftEndHourFormat}</span>

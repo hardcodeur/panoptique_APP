@@ -115,13 +115,13 @@
             {#if missionList.today.length != 0}
                 <h4 class={missionListTitleClass}>En cours</h4>
                 {#each missionList.today as mission}
-                    <MissionCard {mission} {sideBarFormConfig}/>
+                    <MissionCard {mission} userRole={data.user?.role} {sideBarFormConfig}/>
                 {/each}
             {/if}
             {#if missionList.upcoming.length != 0}
                 <h4 class={missionListTitleClass+" mt-6"}>À venir</h4>
                 {#each missionList.upcoming as mission}
-                    <MissionCard {mission} {sideBarFormConfig}/>
+                    <MissionCard {mission} userRole={data.user?.role} {sideBarFormConfig}/>
                 {/each}
             {/if}
         {:else}

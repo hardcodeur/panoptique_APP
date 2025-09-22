@@ -4,7 +4,7 @@ import type { ApiReturn } from '$lib/types';
 import { missionAddSchema,missionUpdateSchema,schemaDeleteMission } from "$lib/zodSchema/mission/mission";
 import { schemaUpdateLocation,schemaAddLocation } from "$lib/zodSchema/mission/location";
 // Api call
-import { getMissions,getProfilMissions,addMission,updateMissionPartial,deleteMission} from "$lib/api/mission";
+import { getMissions,getProfilMissions,getTeamMissions,addMission,updateMissionPartial,deleteMission} from "$lib/api/mission";
 import { getLocationWhiteNote,updateLocationWhiteNotePatial,addLocationWhiteNote,getLocationTeamWithNote } from "$lib/api/location.js";
 import { getTeamListName,getTeamsWithUsers } from "$lib/api/team"
 import { getCustomerListName, } from "$lib/api/customer"
@@ -25,7 +25,7 @@ export async function load({ cookies, fetch, parent }) {
             temMemberList,
             customerList,
         ] = await Promise.all([
-            (user?.role == "agent") ? getProfilMissions({ cookies, fetch }) : getMissions({ cookies, fetch }),
+            (user?.role == "agent") ? getProfilMissions({ cookies, fetch }) : (user?.role == "team_manager") ? getTeamMissions({ cookies, fetch }) :getMissions({ cookies, fetch }),
             (user?.role == "agent" || user?.role == "team_manager") ? getLocationTeamWithNote({ cookies, fetch }) : getLocationWhiteNote({ cookies, fetch }),
             getTeamListName({ cookies, fetch }),
             getTeamsWithUsers({ cookies, fetch }),

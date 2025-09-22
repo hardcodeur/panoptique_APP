@@ -3,9 +3,11 @@
     import ActionFormDotDropdown from "$lib/components/dropdown/ActionFormDotDropdown.svelte";
     import FormMission from "$lib/components/form/mission/FormMission.svelte";
     import UserBadge from "$lib/components/badge/UserBadge.svelte";
+    import AccessControl from "$lib/components/AccessControl.svelte";
     
     let {
         mission,
+        userRole,
         sideBarFormConfig
     } = $props();
 
@@ -23,7 +25,9 @@
 <div class="full-w border border-th-black-light rounded-lg flex flex-col lg:flex-row mt-10 lg:mt-4">
     <div class="flex-auto">
         <div class="flex justify-end py-2 pr-4">
-            <ActionFormDotDropdown alertMsg={deleteMsg} deleteAction="?/missionDelete" itemId={mission.id} sideBarFormConfig={() => sideBarFormConfig(FormMission,`Mission - ${mission.id}`,mission)} />
+            <AccessControl role={userRole} minRole={"team_manager"} >
+                <ActionFormDotDropdown alertMsg={deleteMsg} deleteAction="?/missionDelete" itemId={mission.id} sideBarFormConfig={() => sideBarFormConfig(FormMission,`Mission - ${mission.id}`,mission)} />
+            </AccessControl>
         </div>
         <div class="flex justify-center p-4 lg:p-8">
             <span class="ts-title-2">Mission <span class="text-th-red">{mission.id}</span></span>

@@ -146,8 +146,6 @@
     customerList.forEach(customer => {
         customerItems = [...customerItems, { value: customer.id, name: customer.name }];
     });
-
-    $inspect(shifts);
     
     $effect(()=>{
         
@@ -163,43 +161,47 @@
             customerSelected = itemUpdate.customerId;
             teamSelected = itemUpdate.teamId;
 
-            const connexionShift = itemUpdate.shifts.find(shift => shift.activity === 'connexion');
-            if (connexionShift) {
-                firstShift = {
-                    id: connexionShift.id, 
-                    activity: connexionShift.activity,
-                    start: convertDateISOToSting(connexionShift.start),
-                    end: convertDateISOToSting(connexionShift.end),
-                    users: connexionShift.users.map(user => user.id)
+            if(itemUpdate.shifts.length > 0){
+                const connexionShift = itemUpdate.shifts.find(shift => shift.activity === 'connexion');
+                if (connexionShift ) {
+                    firstShift = {
+                        id: connexionShift.id, 
+                        activity: connexionShift.activity,
+                        start: convertDateISOToSting(connexionShift.start),
+                        end: convertDateISOToSting(connexionShift.end),
+                        users: connexionShift.users.map(user => user.id)
+                    }
                 }
-            };
+    
+                watchShift = itemUpdate.shifts?.filter(shift => shift.activity === 'surveillance').map((shift)=>(
+                    {
+                        id: shift.id, 
+                        activity: shift.activity,
+                        start: convertDateISOToSting(shift.start),
+                        end: convertDateISOToSting(shift.end),
+                        users: shift.users.map(user => user.id)
+                    }
+                ))
+                
+                const deconnexionShift = itemUpdate.shifts?.find(shift => shift.activity === 'deconnexion');                        
+                if (deconnexionShift) {
+                    lastShift = {
+                        id: deconnexionShift.id, 
+                        activity: deconnexionShift.activity,
+                        start: convertDateISOToSting(deconnexionShift.start),
+                        end: convertDateISOToSting(deconnexionShift.end),
+                        users: deconnexionShift.users.map(user => user.id)
+                    }
+                };
 
-            watchShift = itemUpdate.shifts.filter(shift => shift.activity === 'surveillance').map((shift)=>(
-                {
-                    id: shift.id, 
-                    activity: shift.activity,
-                    start: convertDateISOToSting(shift.start),
-                    end: convertDateISOToSting(shift.end),
-                    users: shift.users.map(user => user.id)
-                }
-            ))
-            
-            const deconnexionShift = itemUpdate.shifts.find(shift => shift.activity === 'deconnexion');                        
-            if (deconnexionShift) {
-                lastShift = {
-                    id: deconnexionShift.id, 
-                    activity: deconnexionShift.activity,
-                    start: convertDateISOToSting(deconnexionShift.start),
-                    end: convertDateISOToSting(deconnexionShift.end),
-                    users: deconnexionShift.users.map(user => user.id)
-                }
-            };
+                // Open shift panel
+                shiftsForm=true;
+            }
 
-            // Open shift panel
-            shiftsForm=true;
 
         } 
         else if (submittedData) { // handle form submission errors
+
             missionStart = convertDateISOToSting(submittedData.start);
             missionEnd = convertDateISOToSting(submittedData.end);
             customerSelected = submittedData.customer;

@@ -20,8 +20,6 @@ const shiftMetricActivities=$derived(shiftMetric.activitiesCount);
         <AchivmentWidget value={shiftMetric.totalHours} text="Nombre d’heures effectuées ce mois-ci" />
         <AchivmentWidget value={shiftMetric.totalShifts} text="Total des quarts travaillés ce mois-ci" />
         <MonthShiftsMetricWidget activities={shiftMetricActivities}/>
-    </div>
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <WeekShiftWidget shifts={weekShifts} />
     </div>
 </div>
