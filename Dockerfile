@@ -35,6 +35,9 @@ RUN npm run build
 WORKDIR /app/build
 RUN npm install --production --no-optional
 
+# Copy keys from original location
+RUN cp -r /app/key /app/build/key
+
 # Expose port
 EXPOSE 5173
 
