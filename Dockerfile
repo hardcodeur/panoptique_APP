@@ -38,5 +38,5 @@ RUN npm install --production --no-optional
 # Expose port
 EXPOSE 5173
 
-# Production mode - serve with Node.js
-CMD ["node", "index.js"]
+# Production mode - serve with Node.js on port 5173
+CMD ["sh", "-c", "PORT=5173 HOST=0.0.0.0 node index.js"]
