@@ -31,8 +31,12 @@ RUN echo "PUBLIC_API_URL=${PUBLIC_API_URL}" > .env && echo "PUBLIC_APP_URL=${PUB
 # Build the application
 RUN npm run build
 
+# Change to build directory and install production dependencies
+WORKDIR /app/build
+RUN npm install --production --no-optional
+
 # Expose port
 EXPOSE 5173
 
-# Production mode - serve built files with preview
-CMD ["npm", "run", "preview", "--", "--host", "0.0.0.0", "--port", "5173"]
+# Production mode - serve with Node.js
+CMD ["node", "index.js"]
