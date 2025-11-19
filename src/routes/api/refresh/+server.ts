@@ -31,11 +31,12 @@ export const POST: RequestHandler = async ({ cookies }) => {
 
         // Create new acces_token, the refresh token not change
         cookies.set('access_token', token, { 
-            path: '/', 
+            path: '/',
+            domain: '.panoptique.online',
             httpOnly: true, 
             secure: true, 
             sameSite: 'lax', 
-            maxAge: parseInt(ACCESS_TOKEN_LIFETIME, 10),
+            maxAge: parseInt(ACCESS_TOKEN_LIFETIME, 10)
         });
 
         return json({ success: true });

@@ -43,6 +43,7 @@ export const actions : Actions = {
       // Insert access token in classic cookies 
       cookies.set('access_token', token, { 
         path: '/',
+        domain: '.panoptique.online',
         httpOnly: true, 
         secure: true, 
         sameSite: 'lax', 
@@ -52,6 +53,7 @@ export const actions : Actions = {
       // Insert refresh token in secure cookies http only
       cookies.set('refresh_token', refresh_token, { 
         path: '/', 
+        domain: '.panoptique.online',
         httpOnly: true, 
         secure: true, 
         sameSite: 'lax', 

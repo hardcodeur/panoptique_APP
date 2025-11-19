@@ -96,6 +96,7 @@ async function makeRefreshToken(cookies: Cookies, refreshToken: string) {
     // add cookie with the new access token, cookie public
     cookies.set('access_token', newAccessToken, {
         path: '/',
+        domain: '.panoptique.online',
         secure: true,
         httpOnly: true,
         sameSite: 'lax',

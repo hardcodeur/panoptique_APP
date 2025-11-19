@@ -27,7 +27,13 @@ export function getChangedFields<T extends Record<string, any>>(originalData: T,
 
 // delete all auth cookie and redirect
 export function logout(cookies: Cookies) {
-    cookies.delete("access_token", { path: "/" });
-    cookies.delete("refresh_token", { path: "/" });
+    cookies.delete("access_token", { 
+        path: "/",
+        domain: '.panoptique.online'
+    });
+    cookies.delete("refresh_token", { 
+        path: "/",
+        domain: '.panoptique.online'
+    });
     throw redirect(303, '/login');
 }
