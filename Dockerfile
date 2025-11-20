@@ -35,8 +35,10 @@ RUN npm run build
 WORKDIR /app/build
 RUN npm install --production --no-optional
 
-# Create key directory (the key will be mounted from a volume)
+# Create key directory and copy JWT public key
 RUN mkdir -p /app/build/key
+COPY ./jwt_keys/public.pem /app/build/key/public.pem
+RUN chmod 644 /app/build/key/public.pem
 
 # Expose port
 EXPOSE 5173
