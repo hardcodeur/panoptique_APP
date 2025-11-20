@@ -35,8 +35,9 @@ RUN npm run build
 WORKDIR /app/build
 RUN npm install --production --no-optional
 
-# Create key directory (the key will be mounted from a volume)
+# Create key directory and copy JWT public key from API container
 RUN mkdir -p /app/build/key
+COPY --from=panoptique_api_prod /var/www/html/config/jwt/public.pem /app/build/key/public.pem
 
 # Expose port
 EXPOSE 5173
